@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const http = require('http');
+const fs = require('fs');
 const { Server: SocketIOServer } = require('socket.io');
 const { WebSocketServer, WebSocket } = require('ws');
 
@@ -13,14 +14,33 @@ app.use(cors({
     allowedHeaders: ['Content-Type']
 }));
 
+// Servir archivos estáticos normales (JS, CSS, imágenes)
 app.use(express.static(path.resolve(__dirname)));
 
+// Función para leer crush-cars.html e inyectar el fix antes de enviarlo
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'crush-cars.html'));
+    const filePath = path.join(__dirname, 'crush-cars.html');
+    fs.readFile(filePath, 'utf8', (err, html) => {
+        if (err) {
+            return res.status(500).send("Error crítico: No se encontró crush-cars.html");
+        }
+        
+        // Inyectamos la variable global rota justo al principio de la etiqueta <head>
+        const fixScript = `
+        <head>
+        <script>
+            // Forzamos la definición de la variable que rompe el juego
+            window.MP_SERVER = window.location.origin;
+            console.log("Inyección exitosa de MP_SERVER:", window.MP_SERVER);
+        </script>`;
+        
+        const htmlModificado = html.replace('<head>', fixScript);
+        res.send(htmlModificado);
+    });
 });
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'crush-cars.html'));
+    res.redirect('/');
 });
 
 const PORT = process.env.PORT || 3000;
@@ -146,7 +166,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (salaActual && salas.has(salaActual)) {
             const sala = salas.get(salaActual);
-            sala.jugadores.delete(socket.id);
+            slate.jugadores?.delete(socket.id);
             if (sala.jugadores.size === 0 && sala.jugadoresNat.size === 0) {
                 salas.delete(salaActual);
             } else {
@@ -244,12 +264,11 @@ wss.on('connection', (ws) => {
             if (sala.jugadores.size === 0 && sala.jugadoresNat.size === 0) {
                 salas.delete(salaActual);
             } else {
-                actualizarSalaGlobal(salaActual);
-            }
-        }
-    });
+actualizarSalaGlobal(salaActual);
+}
+}
 });
-
+});
 server.listen(PORT, () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
+console.log(Servidor con auto-parche MP_SERVER corriendo en puerto ${PORT});
 });
