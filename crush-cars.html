@@ -5330,11 +5330,6 @@ const mpStore = (() => {
 const NET = { ws: null, st: 'off', url: '', pid: null, token: null, room: null, rtt: 0, off: 0, samples: [], retries: 0, hash: null, mode: 'duel', kind: 'race', pendingJoin: null, wantOpen: false, pingT: 0, retryT: 0, lastErr: '' };
 const serverNow = () => Date.now() + NET.off;
 const touchDev = () => document.body.classList.contains('touch');
-
-/* ---------- dirección del servidor (Socket.io) ---------- */
-/* ▼▼▼ SERVIDOR PREDETERMINADO: es lo que aparece siempre en la casilla de Ajustes avanzados al entrar (en cualquier dispositivo). Se puede editar, pero la edición sólo vale para esa sesión. ▼▼▼ */
-const MP_SERVER = 'https://crush-cars-europa.onrender.com';
-/* ▲▲▲ ----------------------------------------------------------------------------------------------------------- ▲▲▲ */
 function netNormUrl(v) {
   v = String(v || '').trim();
   const pre = /^(?:(?:wss?|https?)?:)?\/+/i;
