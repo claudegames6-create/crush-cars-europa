@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 // Ruta base para que Render verifique que el servicio está activo (Health Check)
 app.get('/', (req, res) => {
-    res.send({ status: "online", game: "Crush Cars Server" });
+    res.send({ status: "online", game: "Crush Cars Europa" });
 });
 
 const server = app.listen(PORT, () => {
