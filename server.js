@@ -6,26 +6,22 @@ const { Server } = require('socket.io');
 
 const app = express();
 
-// Configuración de CORS segura
+// CORS permisivo para que acepte peticiones desde cualquier origen configurado en tu input
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
 }));
 
-// Servir todos los archivos estáticos desde la raíz de GitHub
+// Servir archivos estáticos del repositorio
 app.use(express.static(path.resolve(__dirname)));
 
-// Cargar automáticamente tu archivo con el nombre correcto
+// Cargar el juego en la ruta principal
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'crush-cars.html'), (err) => {
-        if (err) {
-            res.status(500).send("Error crítico: No se encontró crush-cars.html en el servidor.");
-        }
-    });
+    res.sendFile(path.join(__dirname, 'crush-cars.html'));
 });
 
-// Ruta comodín para evitar cualquier error 404/Cannot GET
+// Comodín para rutas caídas
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'crush-cars.html'));
 });
@@ -33,15 +29,20 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
-// Inicializar el servidor Socket.io requerido por tu juego
+// Inicialización flexible de Socket.io alineada con el cliente v4.7.5
 const io = new Server(server, {
     cors: {
         origin: '*',
-        methods: ['GET', 'POST']
-    }
+        methods: ['GET', 'POST'],
+        credentials: true
+    },
+    allowEIO3: true, // Compatibilidad con clientes antiguos si los hubiera
+    transports: ['polling', 'websocket'], // Asegura conexión aunque falle WebSocket directo
+    pingTimeout: 60000,
+    pingInterval: 25000
 });
 
-// Almacenamiento de salas en memoria
+// Almacenamiento de salas en memoria dinámica
 const salas = new Map();
 
 function generarCodigoSala() {
@@ -57,38 +58,39 @@ function generarCodigoSala() {
     return codigo;
 }
 
-// Lógica de salas con Socket.io
+// Lógica de red para las salas multijugador del juego
 io.on('connection', (socket) => {
     let salaActual = null;
     let jugadorId = null;
 
+    // Evento de control para verificar enlace establecido
+    socket.emit('connect_success', { status: 'ok' });
+
     socket.on('CREAR_SALA', (data) => {
         const nuevoCodigo = generarCodigoSala();
         salaActual = nuevoCodigo;
-        jugadorId = data.jugadorId || 'Host';
+        jugadorId = data?.jugadorId || 'Host';
 
         socket.join(nuevoCodigo);
         salas.set(nuevoCodigo, {
-            configuracion: data.configuracion || {},
-            jugadores: new Map([[socket.id, { id: jugadorId, nombre: data.nombre, coche: data.coche, listo: false }]])
+            configuracion: data?.configuracion || {},
+            jugadores: new Map([[socket.id, { id: jugadorId, nombre: data?.nombre || 'Piloto', coche: data?.coche, listo: false }]])
         });
 
         socket.emit('SALA_CREADA', { codigo: nuevoCodigo });
     });
 
     socket.on('UNIRSE_SALA', (data) => {
-        const codigoUnir = data.codigo?.toUpperCase();
+        const codigoUnir = data?.codigo?.toUpperCase();
         if (salas.has(codigoUnir)) {
             salaActual = codigoUnir;
-            jugadorId = data.jugadorId || `Jugador_${Date.now()}`;
+            jugadorId = data?.jugadorId || `Jugador_${Date.now()}`;
             
             socket.join(codigoUnir);
             const sala = salas.get(codigoUnir);
-            sala.jugadores.set(socket.id, { id: jugadorId, nombre: data.nombre, coche: data.coche, listo: false });
+            sala.jugadores.set(socket.id, { id: jugadorId, nombre: data?.nombre || 'Piloto', coche: data?.coche, listo: false });
 
             socket.emit('SALA_UNIDO', { codigo: codigoUnir, configuracion: sala.configuracion });
-            
-            // Enviar lista actualizada a toda la sala
             io.to(codigoUnir).emit('ACTUALIZAR_SALA', { jugadores: Array.from(sala.jugadores.values()) });
         } else {
             socket.emit('ERROR', { message: 'La sala no existe' });
@@ -100,8 +102,8 @@ io.on('connection', (socket) => {
             const sala = salas.get(salaActual);
             const jugador = sala.jugadores.get(socket.id);
             if (jugador) {
-                if (data.coche) jugador.coche = data.coche;
-                if (typeof data.listo !== 'undefined') jugador.listo = data.listo;
+                if (data?.coche) jugador.coche = data.coche;
+                if (typeof data?.listo !== 'undefined') jugador.listo = data.listo;
                 io.to(salaActual).emit('ACTUALIZAR_SALA', { jugadores: Array.from(sala.jugadores.values()) });
             }
         }
@@ -111,7 +113,7 @@ io.on('connection', (socket) => {
         if (salaActual) {
             socket.to(salaActual).emit('OPONENTE_MOVIMIENTO', {
                 jugadorId: jugadorId,
-                datos: data.datos
+                datos: data?.datos
             });
         }
     });
@@ -137,5 +139,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Servidor robusto de Crush Cars corriendo en puerto ${PORT}`);
+    console.log(`Servidor multijugador robusto corriendo en puerto ${PORT}`);
 });
