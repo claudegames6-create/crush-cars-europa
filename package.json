@@ -1,7 +1,7 @@
 {
   "name": "crush-cars-server",
   "version": "1.0.0",
-  "description": "Servidor multijugador para Crush Cars",
+  "description": "Servidor multijugador y hosting para Crush Cars",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
