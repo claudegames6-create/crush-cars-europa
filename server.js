@@ -2,26 +2,24 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const http = require('http');
-const { Server } = require('socket.io');
+const { Server: SocketIOServer } = require('socket.io');
+const { WebSocketServer, WebSocket } = require('ws');
 
 const app = express();
 
-// CORS permisivo para que acepte peticiones desde cualquier origen configurado en tu input
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
 }));
 
-// Servir archivos estáticos del repositorio
 app.use(express.static(path.resolve(__dirname)));
 
-// Cargar el juego en la ruta principal
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'crush-cars.html'));
 });
 
-// Comodín para rutas caídas
+// Evita fallos de enrutamiento redirigiendo cualquier petición extra al juego
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'crush-cars.html'));
 });
@@ -29,20 +27,29 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
-// Inicialización flexible de Socket.io alineada con el cliente v4.7.5
-const io = new Server(server, {
-    cors: {
-        origin: '*',
-        methods: ['GET', 'POST'],
-        credentials: true
-    },
-    allowEIO3: true, // Compatibilidad con clientes antiguos si los hubiera
-    transports: ['polling', 'websocket'], // Asegura conexión aunque falle WebSocket directo
-    pingTimeout: 60000,
-    pingInterval: 25000
+// --- 1. CONFIGURACIÓN DE SOCKET.IO ---
+const io = new SocketIOServer(server, {
+    cors: { origin: '*', methods: ['GET', 'POST'], credentials: true },
+    transports: ['polling', 'websocket'],
+    pingTimeout: 90000,
+    pingInterval: 20000
 });
 
-// Almacenamiento de salas en memoria dinámica
+// --- 2. CONFIGURACIÓN DE WEBSOCKETS NATIVOS (WS) ---
+const wss = new WebSocketServer({ noServer: true });
+
+// Integrar ambos servidores en el mismo puerto HTTP de Render
+server.on('upgrade', (request, socket, head) => {
+    const pathname = request.url;
+    // Si la petición no es de Socket.io, se encarga el servidor WebSocket nativo
+    if (!pathname.startsWith('/socket.io')) {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+            wss.emit('connection', ws, request);
+        });
+    }
+});
+
+// Estructura única para almacenar las salas de juego
 const salas = new Map();
 
 function generarCodigoSala() {
@@ -58,12 +65,31 @@ function generarCodigoSala() {
     return codigo;
 }
 
-// Lógica de red para las salas multijugador del juego
+// Función auxiliar para emitir actualizaciones globales de sala
+function actualizarSalaGlobal(codigoSala) {
+    const sala = salas.get(codigoSala);
+    if (!sala) return;
+
+    const listaJugadores = Array.from(sala.jugadores.values());
+
+    // Actualizar a los clientes de Socket.io
+    io.to(codigoSala).emit('ACTUALIZAR_SALA', { jugadores: listaJugadores });
+
+    // Actualizar a los clientes de WS nativo
+    sala.jugadoresNat?.forEach((info, cliente) => {
+        if (cliente.readyState === WebSocket.OPEN) {
+            cliente.send(JSON.stringify({ type: 'ACTUALIZAR_SALA', jugadores: listaJugadores }));
+        }
+    });
+}
+
+// ==========================================
+// LÓGICA RED A: MÓDULO SOCKET.IO
+// ==========================================
 io.on('connection', (socket) => {
     let salaActual = null;
     let jugadorId = null;
 
-    // Evento de control para verificar enlace establecido
     socket.emit('connect_success', { status: 'ok' });
 
     socket.on('CREAR_SALA', (data) => {
@@ -74,9 +100,9 @@ io.on('connection', (socket) => {
         socket.join(nuevoCodigo);
         salas.set(nuevoCodigo, {
             configuracion: data?.configuracion || {},
-            jugadores: new Map([[socket.id, { id: jugadorId, nombre: data?.nombre || 'Piloto', coche: data?.coche, listo: false }]])
+            jugadores: new Map([[socket.id, { id: jugadorId, nombre: data?.nombre || 'Piloto', coche: data?.coche, listo: false }]]),
+            jugadoresNat: new Map()
         });
-
         socket.emit('SALA_CREADA', { codigo: nuevoCodigo });
     });
 
@@ -91,7 +117,7 @@ io.on('connection', (socket) => {
             sala.jugadores.set(socket.id, { id: jugadorId, nombre: data?.nombre || 'Piloto', coche: data?.coche, listo: false });
 
             socket.emit('SALA_UNIDO', { codigo: codigoUnir, configuracion: sala.configuracion });
-            io.to(codigoUnir).emit('ACTUALIZAR_SALA', { jugadores: Array.from(sala.jugadores.values()) });
+            actualizarSalaGlobal(codigoUnir);
         } else {
             socket.emit('ERROR', { message: 'La sala no existe' });
         }
@@ -104,16 +130,19 @@ io.on('connection', (socket) => {
             if (jugador) {
                 if (data?.coche) jugador.coche = data.coche;
                 if (typeof data?.listo !== 'undefined') jugador.listo = data.listo;
-                io.to(salaActual).emit('ACTUALIZAR_SALA', { jugadores: Array.from(sala.jugadores.values()) });
+                actualizarSalaGlobal(salaActual);
             }
         }
     });
 
     socket.on('MOVIMIENTO_CARRERA', (data) => {
         if (salaActual) {
-            socket.to(salaActual).emit('OPONENTE_MOVIMIENTO', {
-                jugadorId: jugadorId,
-                datos: data?.datos
+            socket.to(salaActual).emit('OPONENTE_MOVIMIENTO', { jugadorId, datos: data?.datos });
+            // Reenviar también a los jugadores en WS nativo
+            salas.get(salaActual)?.jugadoresNat?.forEach((info, cliente) => {
+                if (cliente.readyState === WebSocket.OPEN) {
+                    cliente.send(JSON.stringify({ type: 'OPONENTE_MOVIMIENTO', jugadorId, datos: data?.datos }));
+                }
             });
         }
     });
@@ -121,6 +150,9 @@ io.on('connection', (socket) => {
     socket.on('INICIAR_CARRERA', () => {
         if (salaActual) {
             io.to(salaActual).emit('CARRERA_EMPEZADA');
+            salas.get(salaActual)?.jugadoresNat?.forEach((info, cliente) => {
+                if (cliente.readyState === WebSocket.OPEN) cliente.send(JSON.stringify({ type: 'CARRERA_EMPEZADA' }));
+            });
         }
     });
 
@@ -128,16 +160,114 @@ io.on('connection', (socket) => {
         if (salaActual && salas.has(salaActual)) {
             const sala = salas.get(salaActual);
             sala.jugadores.delete(socket.id);
-
-            if (sala.jugadores.size === 0) {
+            if (sala.jugadores.size === 0 && sala.jugadoresNat.size === 0) {
                 salas.delete(salaActual);
             } else {
-                io.to(salaActual).emit('ACTUALIZAR_SALA', { jugadores: Array.from(sala.jugadores.values()) });
+                actualizarSalaGlobal(salaActual);
             }
         }
     });
 });
 
+// ==========================================
+// LÓGICA RED B: MÓDULO WEBSOCKET NATIVO (WS)
+// ==========================================
+wss.on('connection', (ws) => {
+    let salaActual = null;
+    let jugadorId = null;
+
+    ws.send(JSON.stringify({ type: 'connect_success', status: 'ok' }));
+
+    ws.on('message', (message) => {
+        try {
+            const data = JSON.parse(message);
+
+            switch (data.type) {
+                case 'CREAR_SALA':
+                    const nuevoCodigo = generarCodigoSala();
+                    salaActual = nuevoCodigo;
+                    jugadorId = data.jugadorId || 'Host';
+
+                    salas.set(nuevoCodigo, {
+                        configuracion: data.configuracion || {},
+                        jugadores: new Map(),
+                        jugadoresNat: new Map([[ws, { id: jugadorId, nombre: data.nombre || 'Piloto', coche: data.coche, listo: false }]])
+                    });
+                    ws.send(JSON.stringify({ type: 'SALA_CREADA', codigo: nuevoCodigo }));
+                    break;
+
+                case 'UNIRSE_SALA':
+                    const codigoUnir = data.codigo?.toUpperCase();
+                    if (salas.has(codigoUnir)) {
+                        salaActual = codigoUnir;
+                        jugadorId = data.jugadorId || `Jugador_${Date.now()}`;
+                        
+                        const sala = salas.get(codigoUnir);
+                        sala.jugadoresNat.set(ws, { id: jugadorId, nombre: data.nombre || 'Piloto', coche: data.coche, listo: false });
+
+                        ws.send(JSON.stringify({ type: 'SALA_UNIDO', codigo: codigoUnir, configuracion: sala.configuracion }));
+                        actualizarSalaGlobal(codigoUnir);
+                    } else {
+                        ws.send(JSON.stringify({ type: 'ERROR', message: 'La sala no existe' }));
+                    }
+                    break;
+
+                case 'ACTUALIZAR_ESTADO':
+                    if (salaActual && salas.has(salaActual)) {
+                        const sala = salas.get(salaActual);
+                        const jugador = sala.jugadoresNat.get(ws);
+                        if (jugador) {
+                            if (data.coche) jugador.coche = data.coche;
+                            if (typeof data.listo !== 'undefined') jugador.listo = data.listo;
+                            actualizarSalaGlobal(salaActual);
+                        }
+                    }
+                    break;
+
+                case 'MOVIMIENTO_CARRERA':
+                    if (salaActual) {
+                        const sala = salas.get(salaActual);
+                        // Enviar a otros de WS
+                        sala.jugadoresNat.forEach((info, cliente) => {
+                            if (cliente !== ws && cliente.readyState === WebSocket.OPEN) {
+                                cliente.send(JSON.stringify({ type: 'OPONENTE_MOVIMIENTO', jugadorId, datos: data.datos }));
+                            }
+                        });
+                        // Enviar a los de Socket.io
+                        io.to(salaActual).emit('OPONENTE_MOVIMIENTO', { jugadorId, datos: data.datos });
+                    }
+                    break;
+
+                case 'INICIAR_CARRERA':
+                    if (salaActual) {
+                        io.to(salaActual).emit('CARRERA_EMPEZADA');
+                        salas.get(salaActual).jugadoresNat.forEach((info, cliente) => {
+                            if (cliente.readyState === WebSocket.OPEN) cliente.send(JSON.stringify({ type: 'CARRERA_EMPEZADA' }));
+                        });
+                    }
+                    break;
+                case 'PING':
+                    ws.send(JSON.stringify({ type: 'PONG' }));
+                    break;
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    });
+
+    ws.on('close', () => {
+        if (salaActual && salas.has(salaActual)) {
+            const sala = salas.get(salaActual);
+            sala.jugadoresNat.delete(ws);
+Use code with caution.
+if (sala.jugadores.size === 0 && sala.jugadoresNat.size === 0) {
+salas.delete(salaActual);
+} else {
+actualizarSalaGlobal(salaActual);
+}
+}
+});
+});
 server.listen(PORT, () => {
-    console.log(`Servidor multijugador robusto corriendo en puerto ${PORT}`);
+console.log(Servidor híbrido funcionando sin límites en puerto ${PORT});
 });
