@@ -1028,6 +1028,11 @@ body.inrace.touch #touch{display:block}body.inrace{touch-action:none;overscroll-
       <button class="btn pri" id="mpJoin">UNIRSE</button></div>
   </div>
   <div class="mp-err" id="mpErr"></div>
+  <details id="mpAdv"><summary>AJUSTES AVANZADOS · SERVIDOR</summary>
+    <div class="row"><input class="inp" id="mpSrv" placeholder="https://crush-cars-europa.onrender.com" autocomplete="off" spellcheck="false"><button class="btn sm" id="mpConnect">CONECTAR</button></div>
+    <p style="margin-top:6px">Si abres el juego desde tu propio servidor se usa automáticamente. Si lo abres desde otro sitio o como archivo, escribe aquí la dirección de tu servidor.</p></details>
+</section>
+
 <section class="screen opaque" id="mplobby">
   <div class="lb-head">
     <div><div class="lb-lbl">CÓDIGO DE SALA</div><div class="lb-code" id="lbCode">CC-?????</div></div>
@@ -5325,6 +5330,11 @@ const mpStore = (() => {
 const NET = { ws: null, st: 'off', url: '', pid: null, token: null, room: null, rtt: 0, off: 0, samples: [], retries: 0, hash: null, mode: 'duel', kind: 'race', pendingJoin: null, wantOpen: false, pingT: 0, retryT: 0, lastErr: '' };
 const serverNow = () => Date.now() + NET.off;
 const touchDev = () => document.body.classList.contains('touch');
+
+/* ---------- dirección del servidor (Socket.io) ---------- */
+/* ▼▼▼ SERVIDOR PREDETERMINADO: es lo que aparece siempre en la casilla de Ajustes avanzados al entrar (en cualquier dispositivo). Se puede editar, pero la edición sólo vale para esa sesión. ▼▼▼ */
+const MP_SERVER = 'https://crush-cars-europa.onrender.com';
+/* ▲▲▲ ----------------------------------------------------------------------------------------------------------- ▲▲▲ */
 function netNormUrl(v) {
   v = String(v || '').trim();
   const pre = /^(?:(?:wss?|https?)?:)?\/+/i;
