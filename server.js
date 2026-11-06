@@ -14,32 +14,32 @@ app.use(cors({
     allowedHeaders: ['Content-Type']
 }));
 
-// Servir archivos estáticos del repositorio
+// Servir de forma estática imágenes, audios, texturas y modelos 3D del repositorio
 app.use(express.static(path.resolve(__dirname)));
 
 app.get('/', (req, res) => {
     const filePath = path.join(__dirname, 'crush-cars.html');
     fs.readFile(filePath, 'utf8', (err, html) => {
         if (err) {
-            return res.status(500).send("Error critico: No se encontro crush-cars.html");
+            return res.status(500).send("Error crítico: No se encontró crush-cars.html en la raíz del servidor.");
         }
         
-        // PARCHE ULTRA-ROBUSTO: Desactivamos el script con el error de sintaxis metiéndolo en un comentario oculto
-        let htmlModificado = html
-            .replace('<script id="ioFallback">', '<!-- <script id="ioFallback">')
-            .replace('<\/script>\r\n<style>', '<\/script> -->\r\n<style>')
-            .replace('<\/script>\n<style>', '<\/script> -->\n<style>');
-
-        // Inyectamos la variable que el juego necesita para el multijugador
+        // 1. Inyectamos las variables de entorno de red seguras al principio de la etiqueta <head>
         const fixScript = `
         <head>
         <script>
             window.MP_SERVER = window.location.origin;
-            console.log("Auto-Fix MP_SERVER activo:", window.MP_SERVER);
+            console.log("Auto-Fix unificado aplicado con éxito:", window.MP_SERVER);
         </script>`;
-        
-        htmlModificado = htmlModificado.replace('<head>', fixScript);
-        
+        let htmlModificado = html.replace('<head>', fixScript);
+
+        // 2. Anulamos el script de fallback defectuoso que rompe la pantalla metiéndolo en un bloque de comentario
+        htmlModificado = htmlModificado
+            .replace('<script id="ioFallback">', '<!-- <script id="ioFallback">')
+            .replace('<\/script>\r\n<style>', '<\/script> -->\r\n<style>')
+            .replace('<\/script>\n<style>', '<\/script> -->\n<style>')
+            .replace('<\/script><style>', '<\/script> --><style>');
+
         res.send(htmlModificado);
     });
 });
@@ -258,15 +258,14 @@ wss.on('connection', (ws) => {
                     }
                     break;
                 case 'PING':
-                    ws.send(JSON.stringify({ type: 'PONG' }));
-                    break;
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    });
-
-    ws.on('close', () => {
+ws.send(JSON.stringify({ type: 'PONG' }));
+break;
+}
+} catch (e) {
+console.error(e);
+}
+});
+ws.on('close', () => {
 if (salaActual && salas.has(salaActual)) {
 const sala = salas.get(salaActual);
 sala.jugadoresNat.delete(ws);
@@ -279,5 +278,5 @@ actualizarSalaGlobal(salaActual);
 });
 });
 server.listen(PORT, () => {
-console.log("Servidor corriendo.");
+console.log("Servidor reparador en línea.");
 });
