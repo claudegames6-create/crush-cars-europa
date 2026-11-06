@@ -24,16 +24,28 @@ app.get('/', (req, res) => {
             return res.status(500).send("Error crítico: No se encontró crush-cars.html en la raíz del servidor.");
         }
         
-        // 1. Inyectamos las variables de entorno de red seguras al principio de la etiqueta <head>
+        // Parche de Conexión Automática Inmediata en el cliente
         const fixScript = `
         <head>
         <script>
+            // Forzamos la inicialización de red automática en un segundo
             window.MP_SERVER = window.location.origin;
-            console.log("Auto-Fix unificado aplicado con éxito:", window.MP_SERVER);
+            document.addEventListener("DOMContentLoaded", () => {
+                if (typeof io !== "undefined" && !window.socket) {
+                    window.socket = io(window.location.origin, {
+                        transports: ['websocket', 'polling'],
+                        timeout: 5000
+                    });
+                    window.socket.on('connect', () => {
+                        console.log("¡Conectado automáticamente en 1 segundo!");
+                    });
+                }
+            });
         </script>`;
+        
         let htmlModificado = html.replace('<head>', fixScript);
 
-        // 2. Anulamos el script de fallback defectuoso que rompe la pantalla metiéndolo en un bloque de comentario
+        // Desactivamos el script con el fallo sintáctico original
         htmlModificado = htmlModificado
             .replace('<script id="ioFallback">', '<!-- <script id="ioFallback">')
             .replace('<\/script>\r\n<style>', '<\/script> -->\r\n<style>')
@@ -250,14 +262,14 @@ wss.on('connection', (ws) => {
                 case 'INICIAR_CARRERA':
                     if (salaActual) {
                         io.to(salaActual).emit('CARRERA_EMPEZADA');
-                        salas.get(salaActual).jugadoresNat.forEach((info, cliente) => {
-                            if (cliente.readyState === WebSocket.OPEN) {
-                                cliente.send(JSON.stringify({ type: 'CARRERA_EMPEZADA' }));
-                            }
-                        });
-                    }
-                    break;
-                case 'PING':
+salas.get(salaActual).jugadoresNat.forEach((info, cliente) => {
+if (cliente.readyState === WebSocket.OPEN) {
+cliente.send(JSON.stringify({ type: 'CARRERA_EMPEZADA' }));
+}
+});
+}
+break;
+case 'PING':
 ws.send(JSON.stringify({ type: 'PONG' }));
 break;
 }
@@ -278,5 +290,5 @@ actualizarSalaGlobal(salaActual);
 });
 });
 server.listen(PORT, () => {
-console.log("Servidor reparador en línea.");
+console.log("Servidor multijugador unificado activo.");
 });
