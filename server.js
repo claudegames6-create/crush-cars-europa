@@ -19,7 +19,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'crush-cars.html'));
 });
 
-// Evita fallos de enrutamiento redirigiendo cualquier petición extra al juego
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'crush-cars.html'));
 });
@@ -27,7 +26,6 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
-// --- 1. CONFIGURACIÓN DE SOCKET.IO ---
 const io = new SocketIOServer(server, {
     cors: { origin: '*', methods: ['GET', 'POST'], credentials: true },
     transports: ['polling', 'websocket'],
@@ -35,13 +33,10 @@ const io = new SocketIOServer(server, {
     pingInterval: 20000
 });
 
-// --- 2. CONFIGURACIÓN DE WEBSOCKETS NATIVOS (WS) ---
 const wss = new WebSocketServer({ noServer: true });
 
-// Integrar ambos servidores en el mismo puerto HTTP de Render
 server.on('upgrade', (request, socket, head) => {
     const pathname = request.url;
-    // Si la petición no es de Socket.io, se encarga el servidor WebSocket nativo
     if (!pathname.startsWith('/socket.io')) {
         wss.handleUpgrade(request, socket, head, (ws) => {
             wss.emit('connection', ws, request);
@@ -49,7 +44,6 @@ server.on('upgrade', (request, socket, head) => {
     }
 });
 
-// Estructura única para almacenar las salas de juego
 const salas = new Map();
 
 function generarCodigoSala() {
@@ -65,17 +59,14 @@ function generarCodigoSala() {
     return codigo;
 }
 
-// Función auxiliar para emitir actualizaciones globales de sala
 function actualizarSalaGlobal(codigoSala) {
     const sala = salas.get(codigoSala);
     if (!sala) return;
 
     const listaJugadores = Array.from(sala.jugadores.values());
 
-    // Actualizar a los clientes de Socket.io
     io.to(codigoSala).emit('ACTUALIZAR_SALA', { jugadores: listaJugadores });
 
-    // Actualizar a los clientes de WS nativo
     sala.jugadoresNat?.forEach((info, cliente) => {
         if (cliente.readyState === WebSocket.OPEN) {
             cliente.send(JSON.stringify({ type: 'ACTUALIZAR_SALA', jugadores: listaJugadores }));
@@ -83,9 +74,6 @@ function actualizarSalaGlobal(codigoSala) {
     });
 }
 
-// ==========================================
-// LÓGICA RED A: MÓDULO SOCKET.IO
-// ==========================================
 io.on('connection', (socket) => {
     let salaActual = null;
     let jugadorId = null;
@@ -138,7 +126,6 @@ io.on('connection', (socket) => {
     socket.on('MOVIMIENTO_CARRERA', (data) => {
         if (salaActual) {
             socket.to(salaActual).emit('OPONENTE_MOVIMIENTO', { jugadorId, datos: data?.datos });
-            // Reenviar también a los jugadores en WS nativo
             salas.get(salaActual)?.jugadoresNat?.forEach((info, cliente) => {
                 if (cliente.readyState === WebSocket.OPEN) {
                     cliente.send(JSON.stringify({ type: 'OPONENTE_MOVIMIENTO', jugadorId, datos: data?.datos }));
@@ -169,9 +156,6 @@ io.on('connection', (socket) => {
     });
 });
 
-// ==========================================
-// LÓGICA RED B: MÓDULO WEBSOCKET NATIVO (WS)
-// ==========================================
 wss.on('connection', (ws) => {
     let salaActual = null;
     let jugadorId = null;
@@ -227,13 +211,11 @@ wss.on('connection', (ws) => {
                 case 'MOVIMIENTO_CARRERA':
                     if (salaActual) {
                         const sala = salas.get(salaActual);
-                        // Enviar a otros de WS
                         sala.jugadoresNat.forEach((info, cliente) => {
                             if (cliente !== ws && cliente.readyState === WebSocket.OPEN) {
                                 cliente.send(JSON.stringify({ type: 'OPONENTE_MOVIMIENTO', jugadorId, datos: data.datos }));
                             }
                         });
-                        // Enviar a los de Socket.io
                         io.to(salaActual).emit('OPONENTE_MOVIMIENTO', { jugadorId, datos: data.datos });
                     }
                     break;
@@ -259,15 +241,15 @@ wss.on('connection', (ws) => {
         if (salaActual && salas.has(salaActual)) {
             const sala = salas.get(salaActual);
             sala.jugadoresNat.delete(ws);
-Use code with caution.
-if (sala.jugadores.size === 0 && sala.jugadoresNat.size === 0) {
-salas.delete(salaActual);
-} else {
-actualizarSalaGlobal(salaActual);
-}
-}
+            if (sala.jugadores.size === 0 && sala.jugadoresNat.size === 0) {
+                salas.delete(salaActual);
+            } else {
+                actualizarSalaGlobal(salaActual);
+            }
+        }
+    });
 });
-});
+
 server.listen(PORT, () => {
-console.log(Servidor híbrido funcionando sin límites en puerto ${PORT});
+    console.log(`Servidor corriendo en puerto ${PORT}`);
 });
