@@ -14,8 +14,10 @@ app.use(cors({
     allowedHeaders: ['Content-Type']
 }));
 
+// Servir archivos estáticos del repositorio (imágenes, audios, estilos)
 app.use(express.static(path.resolve(__dirname)));
 
+// Cargar crush-cars.html, inyectar variables globales y reparar el error de comillas
 app.get('/', (req, res) => {
     const filePath = path.join(__dirname, 'crush-cars.html');
     fs.readFile(filePath, 'utf8', (err, html) => {
@@ -23,15 +25,23 @@ app.get('/', (req, res) => {
             return res.status(500).send("Error critico: No se encontro crush-cars.html");
         }
         
+        // 1. Corregimos el error sintáctico de las comillas simples que deja la pantalla en negro
+        let htmlCorregido = html.replace(
+            "document.write('<script src=\"https://crush-cars-europa.onrender.com/socket.io/socket.io.js\"><\\/script>');",
+            "document.write(\"<script src='https://crush-cars-europa.onrender.com/socket.io/socket.io.js'><\\/script>\");"
+        );
+
+        // 2. Inyectamos la variable global MP_SERVER de forma segura para corregir el segundo error
         const fixScript = `
         <head>
         <script>
             window.MP_SERVER = window.location.origin;
-            console.log("Inyeccion exitosa de MP_SERVER:", window.MP_SERVER);
+            console.log("Auto-Fix MP_SERVER inyectado con exito:", window.MP_SERVER);
         </script>`;
         
-        const htmlModificado = html.replace('<head>', fixScript);
-        res.send(htmlModificado);
+        htmlCorregido = htmlCorregido.replace('<head>', fixScript);
+        
+        res.send(htmlCorregido);
     });
 });
 
@@ -249,23 +259,21 @@ wss.on('connection', (ws) => {
                     break;
             }
         } catch (e) {
-            console.error(e);
-        }
-    });
-
-    ws.on('close', () => {
-        if (salaActual && salas.has(salaActual)) {
-            const sala = salas.get(salaActual);
-            sala.jugadoresNat.delete(ws);
-            if (sala.jugadores.size === 0 && sala.jugadoresNat.size === 0) {
-                salas.delete(salaActual);
-            } else {
-                actualizarSalaGlobal(salaActual);
-            }
-        }
-    });
+console.error(e);
+}
 });
-
+ws.on('close', () => {
+if (salaActual && salas.has(salaActual)) {
+const sala = salas.get(salaActual);
+sala.jugadoresNat.delete(ws);
+if (sala.jugadores.size === 0 && sala.jugadoresNat.size === 0) {
+salas.delete(salaActual);
+} else {
+actualizarSalaGlobal(salaActual);
+}
+}
+});
+});
 server.listen(PORT, () => {
-    console.log("Servidor levantado correctamente en el puerto configurado");
+console.log("Servidor con auto-parche de comillas e inyeccion de red corriendo.");
 });
