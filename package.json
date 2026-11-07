@@ -1,13 +1,15 @@
 {
   "name": "crush-cars-server",
   "version": "1.0.0",
-  "description": "Servidor multijugador para Crush Cars",
+  "description": "Servidor multijugador de CRUSH CARS (Socket.io)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5"
+    "socket.io": "4.7.5"
   }
 }
