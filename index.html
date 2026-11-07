@@ -970,7 +970,6 @@ html.sky-cinematic-active body>:not(#skyCine){visibility:hidden!important}
     <div class="pc-car"><b id="mnCarName"></b><span id="mnCarTag"></span></div>
     <button class="btn sm" data-go="garage">PERSONALIZAR</button>
   </aside>
-  <button class="dv-open" id="dvOpen" type="button" title="Panel de administrador (temporal)" aria-label="Panel de administrador">⚙</button>
 </section>
 
 <section class="screen" id="modes">
@@ -6701,7 +6700,7 @@ requestAnimationFrame(frame);
 </script>
 <!-- ===== DEVTOOLS-BEGIN (JS) · TEMPORAL: eliminar este bloque de script completo antes de publicar ===== -->
 <script id="devtools">
-/* Panel de administrador: Ctrl+Shift+1+Q o botón ⚙ del menú principal. Sólo cambia datos al pulsar expresamente sus botones. */
+/* Panel de administrador: Ctrl+Shift+1+Q. Sólo cambia datos al pulsar expresamente sus botones. */
 (() => {
   'use strict';
   const root = document.getElementById('devpanel'), stEl = document.getElementById('dvState'), skEl = document.getElementById('dvSky'), msgEl = document.getElementById('dvMsg');
