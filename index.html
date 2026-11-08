@@ -687,6 +687,9 @@ body.inrace #netBadge{top:6px}
 .grow{flex:1}
 .cf-r.crw{flex-direction:column;align-items:stretch}.cf-r.crw .cf-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.cf-r.crw .cf-g .btn{padding:8px 4px;font-size:12px;white-space:normal;line-height:1.15;text-align:center}
 @media(max-width:620px){.cf-r.crw .cf-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#maps.ro #mapGrid,#maps.ro #ccRow,#maps.ro #evRow,#survival.ro #cwList,#survival.ro #cwCc,#survival.ro #svEv,#survival.ro #cwGo,#maps.ro #btnStart{pointer-events:none}
+.pty-ro{display:none;margin:0 0 12px;padding:9px 14px;border-left:4px solid var(--orange);border-radius:8px;background:#ff7a1a1a;color:var(--orange2);font-weight:800;font-size:13px;letter-spacing:.04em}
+#maps.ro .pty-ro,#survival.ro .pty-ro{display:block}
 #mplobby.party .lb-right,#mplobby.party #lbReady,#mplobby.party #lbStart,#mplobby:not(.party) #lbCont,#mplobby.party #lbBack{display:none!important}
 #mplobby.party .lb-grid{grid-template-columns:minmax(0,1fr)}
 #ptyBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px;padding:10px 14px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;background:#0a1226cc}
@@ -1025,6 +1028,7 @@ body.touch #skyRace.on #srTouch{display:block}
 </section>
 
 <section class="screen opaque" id="maps">
+  <div class="pty-ro">👀 El anfitrión está eligiendo la partida · tú ves lo que elige en directo</div>
   <h2 class="title">ELIGE <b>CIRCUITO</b></h2>
   <p class="sub">Sube de nivel para desbloquear nuevos escenarios. Cada circuito paga más monedas y XP.</p>
   <div class="cc-row" id="ccRow"><span class="cc-l">CILINDRADA</span>
@@ -1048,6 +1052,7 @@ body.touch #skyRace.on #srTouch{display:block}
 </section>
 
 <section class="screen opaque" id="survival">
+  <div class="pty-ro">👀 El anfitrión está eligiendo la corona · tú ves lo que elige en directo</div>
   <h2 class="title"><b>SUPERVIVENCIA</b></h2>
   <p class="sub">Elige una corona: 4 rondas de eliminación. Salen 12 pilotos y pasan 9, luego 9 → 6, 6 → 3 y en la final 3 → 1: solo uno gana. XP y monedas se entregan una sola vez, al ser eliminado o ganar la corona.</p>
   <div class="cr-grid" id="cwList"></div>
@@ -4325,7 +4330,7 @@ function thumb(cnv, map, rev) {
 }
 function renderMaps() {
   const L = playerLevel();
-  if (!MAPS.some(m => m.id === save.map && L >= m.lvl)) save.map = MAPS[0].id;
+  if (!(NET.room && NET.room.host !== NET.pid) && !MAPS.some(m => m.id === save.map && L >= m.lvl)) save.map = MAPS[0].id;   // un invitado ve el circuito del anfitrión aunque aún no lo tenga
   $('mpCar').textContent = CAR_BY_ID[save.sel].name; renderEv();
   $('ccRow').querySelectorAll('[data-cc]').forEach(b => {
     const c = +b.dataset.cc; b.classList.toggle('on', c === save.cc);
@@ -4333,7 +4338,7 @@ function renderMaps() {
   });
   $('ccHint').innerHTML = `<b>${save.cc}cc</b> · ${CC[save.cc].txt} Premios <b>×${fm(save.rev ? REV_RW[save.cc] : CC[save.cc].vis)}</b>` + (save.rev ? ' · <b>INVERTIDO</b>: coches más rápidos, mejores premios.' : ' · Elige INVERTIDO en un circuito: más rápido y mejor pagado.');
   $('mapGrid').innerHTML = MAPS.map((m, i) => {
-    const lock = L < m.lvl, mm = MAP_META[m.id], isSel = !lock && m.id === save.map;
+    const lock = L < m.lvl, mm = MAP_META[m.id], isSel = (!lock || (NET.room && NET.room.host !== NET.pid)) && m.id === save.map;
     return `<div class="card ${lock ? 'locked' : ''} ${isSel ? 'sel' : ''}" data-map="${m.id}" style="--c:${mm.c}">
       <div class="thumb"><canvas width="440" height="270"></canvas>${lock ? `<div class="lock">${LOCK_SVG}<span>NIVEL ${m.lvl}</span></div>` : ''}</div>
       <div class="mtag"><span>${mm.tag}</span><span class="dif" title="Dificultad">${[0, 1, 2, 3, 4].map(k => `<u class="${k <= Math.round(i * 4 / (MAPS.length - 1)) ? 'on' : ''}"></u>`).join('')}</span></div>
@@ -4360,11 +4365,11 @@ $('mapGrid').addEventListener('click', e => {
   if (playerLevel() < m.lvl) { toast('Alcanza el nivel ' + m.lvl + ' para desbloquear ' + m.name); return; }
   const d = e.target.closest('[data-dir]');
   save.map = m.id; if (d) save.rev = d.dataset.dir === 'rev';
-  persist(); renderMaps();
+  persist(); renderMaps(); netPartySync();
 });
 $('ccRow').addEventListener('click', e => {
   const b = e.target.closest('[data-cc]'); if (!b) return;
-  save.cc = +b.dataset.cc; persist(); renderMaps();
+  save.cc = +b.dataset.cc; persist(); renderMaps(); netPartySync();
 });
 
 const EV_INFO = { off: 'Sin rayos, tornados ni plataformas: carrera pura.', one: 'Rayos, tornados y plataformas turbo, pero sólo un evento activo a la vez.', chaos: 'Tormentas, tornados y plataformas pueden coincidir: hasta 2 eventos a la vez.' };
@@ -4377,7 +4382,7 @@ function renderEv() {
 }
 for (const id of ['evRow']) $(id).addEventListener('click', e => {
   const b = e.target.closest('[data-ev]'); if (!b) return;
-  save.ev = b.dataset.ev; persist(); renderEv();
+  save.ev = b.dataset.ev; persist(); renderEv(); netPartySync();
 });
 $('btnStart').addEventListener('click', () => {
   const m = MAPS.find(x => x.id === save.map) || MAPS[0];
@@ -5175,9 +5180,9 @@ function renderCrowns() {
 }
 $('survival').addEventListener('click', e => {
   if (e.target.closest('#skyOpen')) { go('skycrown'); return; }
-  const t = e.target.closest('.cr-b'); if (t) { CW.sel = +t.dataset.ci; CW.ask = false; renderCrowns(); $('cwDet').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
-  const ev = e.target.closest('#svEv [data-ev]'); if (ev) { save.ev = ev.dataset.ev; persist(); renderEv(); return; }
-  const k = e.target.closest('[data-cwcc]'); if (k && !k.disabled) { save.cc = +k.dataset.cwcc; persist(); renderCrowns(); return; }
+  const t = e.target.closest('.cr-b'); if (t) { CW.sel = +t.dataset.ci; CW.ask = false; renderCrowns(); netPartySync(); $('cwDet').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  const ev = e.target.closest('#svEv [data-ev]'); if (ev) { save.ev = ev.dataset.ev; persist(); renderEv(); netPartySync(); return; }
+  const k = e.target.closest('[data-cwcc]'); if (k && !k.disabled) { save.cc = +k.dataset.cwcc; persist(); renderCrowns(); netPartySync(); return; }
   if (e.target.closest('#cwReset')) { if (!CW.ask) { CW.ask = true; renderCrowns(); } else { delete save.champ.cur[CROWNS[CW.sel].id]; CW.ask = false; persist(); renderCrowns(); toast('Campeonato reiniciado'); } return; }
   if (e.target.closest('#cwGo')) { const c = CROWNS[CW.sel]; if (NET.room) { netPartyStart({ crown: c.id, cc: save.cc, ev: save.ev }); return; } if (save.champ.cur[c.id]) champRace(CW.sel); else champStart(CW.sel); }
 });
@@ -5954,13 +5959,34 @@ function netGiveUp() {
 function netTarget() {
   const r = NET.room, ph = r.phase || 'lobby', host = r.host === NET.pid;
   if (ph === 'menu') return 'modes'; if (ph === 'party') return 'mplobby';
-  return host ? (r.kind === 'surv' ? 'survival' : 'maps') : 'mplobby';   // el anfitrión elige en las pantallas de siempre; el resto espera en la sala
+  return r.kind === 'surv' ? 'survival' : 'maps';   // todos ven las pantallas de siempre; solo el anfitrión puede tocarlas
 }
 function netRoute() {
   const r = NET.room; if (!r) return;
   const tgt = netTarget();
   if (mode === 'mpmenu' || (['mplobby', 'modes', 'maps', 'survival'].includes(mode) && mode !== tgt)) { NET.routing = true; try { go(tgt); } finally { NET.routing = false; } }
-  else if (mode === 'mplobby') lbSchedule(); else if (mode === 'modes') renderPartyBar();
+  else if (mode === 'mplobby') lbSchedule(); else if (mode === 'modes') renderPartyBar(); else if (mode === 'maps' || mode === 'survival') partyView();
+}
+/* invitados: las pantallas de circuitos/coronas se dibujan con la configuración del anfitrión (sin tocar sus ajustes guardados) y no se pueden pulsar */
+function partyView() {
+  const r = NET.room, host = r && r.host === NET.pid, sc = mode === 'maps' ? $('maps') : mode === 'survival' ? $('survival') : null;
+  if (!sc) return;
+  sc.classList.toggle('ro', !!r && !host);
+  const btn = mode === 'maps' ? $('btnStart') : $('cwGo');
+  if (!r || host) { if (mode === 'maps') { btn.disabled = false; btn.textContent = '¡A CORRER!'; } return; }
+  const c = r.cfg, bk = { map: save.map, rev: save.rev, cc: save.cc, ev: save.ev }, sel = CW.sel;
+  try {
+    if (CC_LIST.includes(+c.cc)) save.cc = +c.cc; if (['off', 'one', 'chaos'].includes(c.ev)) save.ev = c.ev;
+    if (mode === 'maps') { if (MAPS.some(m => m.id === c.mapId)) save.map = c.mapId; save.rev = !!c.rev; renderMaps(); }
+    else { CW.sel = Math.max(0, CROWNS.findIndex(x => x.id === c.crown)); renderCrowns(); }
+  } finally { save.map = bk.map; save.rev = bk.rev; save.cc = bk.cc; save.ev = bk.ev; if (mode === 'survival') CW.sel = sel; }
+  const b2 = mode === 'maps' ? $('btnStart') : $('cwGo'); if (b2) { b2.disabled = true; b2.textContent = 'ESPERANDO AL ANFITRIÓN…'; }
+}
+/* anfitrión: cada cambio se manda a la sala para que los demás lo vean en directo */
+function netPartySync() {
+  const r = NET.room; if (!r || r.host !== NET.pid) return;
+  if (mode === 'maps') { const m = MAPS.find(x => x.id === save.map) || MAPS[0]; netSend({ t: 'cfg', cfg: { mapId: m.id, rev: !!save.rev, cc: save.cc, ev: save.ev, laps: m.laps } }); }
+  else if (mode === 'survival' && CROWNS[CW.sel]) netSend({ t: 'cfg', cfg: { crown: CROWNS[CW.sel].id, cc: save.cc, ev: save.ev } });
 }
 /* anfitrión: manda la configuración elegida en las pantallas individuales y arranca para todo el grupo */
 function netPartyStart(cfg) {
@@ -6352,10 +6378,10 @@ const _go = go;
 go = function (name) {
   const prev = mode;
   if (NET.room && !NET.routing && (prev === 'maps' || prev === 'survival') && name === 'modes') {   // atrás: el grupo vuelve a «Elige modo»
-    if (NET.room.host === NET.pid) netSend({ t: 'phase', v: 'menu' });
-    return;
+    if (NET.room.host === NET.pid) { netSend({ t: 'phase', v: 'menu' }); return; }
+    netLeaveRoom(); toast('Has salido de la sala'); name = 'menu';
   }
-  if (NET.room && !NET.routing && prev === 'garage' && name === 'menu') name = netTarget();   // el garaje de una sala vuelve a la pantalla de elegir partida
+  if (NET.room && !NET.routing && prev === 'garage' && name === 'menu') { name = netTarget(); netSend({ t: 'prof', prof: mpProf() }); }   // el garaje de una sala vuelve a la pantalla de elegir partida
   if (NET.room && !NET.routing && prev === 'modes' && name === 'menu') {   // atrás desde «Elige modo» dentro de una sala: el anfitrión vuelve a la sala, el resto espera
     if (NET.room.host === NET.pid) netSend({ t: 'phase', v: 'party' }); else toast('Solo el anfitrión puede volver atrás');
     return;
@@ -6367,6 +6393,7 @@ go = function (name) {
   if (name === 'mpmenu') { renderMpMenu(); if (NET.st === 'off' && netDefaultUrl()) { NET.wantOpen = true; netConnect().catch(e => { NET.wantOpen = false; mpShowErr(e.message); }); } }
   else if (name === 'mplobby') renderLobby();
   else if (name === 'modes') renderPartyBar();
+  else if (name === 'maps' || name === 'survival') { partyView(); if (NET.room && NET.room.host === NET.pid) setTimeout(netPartySync, 50); }
   if (name === 'menu' && NET.pendingJoin && !NET._jt) {
     NET._jt = setTimeout(() => { NET._jt = 0; const c = NET.pendingJoin; NET.pendingJoin = null; if (mode !== 'menu') return; go('mpmenu'); $('mpCode').value = c; mpJoin(); }, 350);
   }
