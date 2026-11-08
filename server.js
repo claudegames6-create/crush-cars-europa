@@ -109,7 +109,7 @@ function fixBots(r) {
 }
 function roomView(r) {
   return {
-    code: r.code, kind: r.kind, mode: r.mode, host: r.host, maxHumans: maxHumans(r), state: r.state, cfg: r.cfg,
+    code: r.code, phase: r.phase, kind: r.kind, mode: r.mode, host: r.host, maxHumans: maxHumans(r), state: r.state, cfg: r.cfg,
     players: r.players.map(p => ({ pid: p.pid, name: p.name, av: p.av, lvl: p.lvl, carId: p.carId, upg: p.upg, pfx: p.pfx, ready: p.pid === r.host ? true : p.ready, host: p.pid === r.host, connected: p.connected, block: blockOf(r, p) })),
   };
 }
@@ -362,7 +362,7 @@ io.on('connection', sock => {
     leaveRoom(P); setProf(P, m.prof);
     const kind = m.kind === 'surv' ? 'surv' : 'race', mode = m.mode === 'party' ? 'party' : 'duel', mapId = pickMap(m.cfg && m.cfg.mapId), map = G.MAPS.find(x => x.id === mapId);
     const code = newCode();
-    const room = { code, kind, mode, host: P.pid, state: 'lobby', players: [P], race: null, tour: null, timer: null,
+    const room = { code, kind, mode, phase: 'party', host: P.pid, state: 'lobby', players: [P], race: null, tour: null, timer: null,
       cfg: { mapId, rev: !!(m.cfg && m.cfg.rev), cc: m.cfg && G.CC_LIST.includes(+m.cfg.cc) ? +m.cfg.cc : 150, laps: map.laps, bots: mode === 'party' && kind === 'race' ? 3 : 0, diff: 1, unlockAll: false, ev: 'chaos', crown: G.CROWNS[0].id } };
     fixBots(room); rooms.set(code, room); P.room = room; P.ready = false; sock.join(code); broadcast(room);
   }));
@@ -375,6 +375,24 @@ io.on('connection', sock => {
     if (room.state !== 'lobby') return err('La carrera ya ha empezado. Espera a que termine.', 'started');
     if (room.players.length >= maxHumans(room)) return err('La sala está llena.', 'full');
     leaveRoom(P); setProf(P, m.prof); P.ready = false; P.room = room; room.players.push(P); sock.join(code); fixBots(room); broadcast(room);
+  }));
+  /* fases de la sala: 'party' (elegir coche) → 'menu' (el anfitrión elige modo) → 'lobby' (configurar y correr) */
+  on('phase', need(m => {
+    const r = P.room; if (!r || r.host !== P.pid || r.state !== 'lobby') return;
+    if (m.v === 'menu' && r.phase === 'party') {
+      if (r.players.length < 2) return err('Necesitas al menos un amigo en la sala para continuar.');
+      if (r.players.some(p => !p.connected)) return err('Hay jugadores desconectados.');
+    }
+    if (m.v === 'menu' || m.v === 'party') { r.phase = m.v; for (const p of r.players) p.ready = false; broadcast(r); }
+  }));
+  on('mode', need(m => {
+    const r = P.room; if (!r || r.host !== P.pid || r.state !== 'lobby' || r.phase !== 'menu') return;
+    const kind = m.kind === 'surv' ? 'surv' : 'race';
+    r.kind = kind; r.mode = 'party'; r.phase = 'lobby';
+    r.cfg.bots = kind === 'surv' ? 0 : 3; r.cfg.unlockAll = false;
+    if (kind === 'surv' && !G.CROWNS.some(x => x.id === r.cfg.crown)) r.cfg.crown = G.CROWNS[0].id;
+    for (const p of r.players) p.ready = false;
+    fixBots(r); broadcast(r);
   }));
   on('leave', need(() => leaveRoom(P)));
   on('prof', need(m => { const r = P.room; if (!r || r.state !== 'lobby') return; setProf(P, m.prof); broadcast(r); }));
@@ -402,6 +420,7 @@ io.on('connection', sock => {
   }));
   on('start', need(() => {
     const r = P.room; if (!r || r.host !== P.pid || r.state !== 'lobby') return;
+    if (r.phase !== 'lobby') return err('Primero elige el modo de juego.');
     if (r.players.some(p => !p.connected)) return err('Hay jugadores desconectados.');
     if (r.players.some(p => blockOf(r, p))) return err('Algún jugador no cumple los requisitos (nivel o coche).');
     if (r.players.some(p => p.pid !== r.host && !p.ready)) return err('Faltan jugadores por marcar "LISTO".');
