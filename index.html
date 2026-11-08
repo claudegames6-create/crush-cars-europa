@@ -872,9 +872,6 @@ body.inrace.touch #touch{display:block}body.inrace.touch.spec #touch{display:non
 .dv-msg{min-height:20px;margin-top:12px;font-size:13px;font-weight:800;color:var(--green)}
 .dv-msg.err{color:var(--red)}
 #devpanel .btn:hover:not(:disabled){transform:none}
-.dv-open{position:fixed;left:12px;bottom:10px;z-index:30;width:34px;height:34px;border-radius:50%;border:1px solid #2a3a66;background:#0a1226aa;color:#6f82b8;font-size:16px;line-height:1;cursor:pointer;opacity:.28;transition:opacity .2s}
-.dv-open:hover,.dv-open:focus-visible{opacity:1}
-#menu .dv-open{display:block}
 /* ===== DEVTOOLS-END (CSS) ===== */
 /* ---- Corona de los Cielos · pantalla secreta ---- */
 .sk-entry{display:flex;justify-content:center;margin:6px 0 18px}
@@ -915,6 +912,38 @@ html.sky-cinematic-active body>:not(#skyCine){visibility:hidden!important}
 @keyframes skyIn{to{opacity:1;transform:none;filter:blur(0)}}
 @keyframes skySub{to{opacity:1;transform:none}}
 @keyframes skyBtn{to{opacity:1}}
+/* ---- Corona de los Cielos · Parte 4 · circuito celestial (aislado: sólo existe mientras se juega) ---- */
+html.sky-race-active,html.sky-race-active body{background:#0b1a44!important}
+html.sky-race-active body>:not(#skyRace){visibility:hidden!important}
+#skyRace{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;z-index:2147483646;display:none;background:#5aa6ff;overflow:hidden;margin:0!important;padding:0!important;isolation:isolate;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#skyRace.on{display:block}
+#srCv{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
+.srov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:radial-gradient(900px 600px at 50% 40%,#0a1a4acc,#050a24ee);padding:16px;z-index:3}
+.srov.on{display:flex}
+#srFall{background:radial-gradient(900px 600px at 50% 40%,#10163acc,#03061aee)}
+.srbox{width:min(520px,94vw);max-height:94vh;overflow:auto;text-align:center;padding:26px 24px;border:1px solid #ffd56a88;border-radius:16px;background:linear-gradient(180deg,#0f2160ee,#08123aee);box-shadow:0 0 40px #ffd56a33,0 20px 60px #000a;display:flex;flex-direction:column;gap:12px;align-items:stretch}
+.srbox h2{margin:0;font-family:var(--disp);font-size:clamp(24px,5vw,38px);font-style:italic;font-weight:900;letter-spacing:.08em;color:#fff6d8;text-shadow:0 0 18px #ffd56a,0 0 44px #5cc8ff}
+.srbox p{margin:0;color:#cfe3ff;font-size:15px;line-height:1.45}
+.srbox .btn{justify-content:center}
+.srbox kbd{background:#16213d;border:1px solid #2b4a88;border-bottom-width:3px;border-radius:5px;padding:1px 7px;color:#fff;font-family:inherit;font-weight:700}
+.srstats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 4px}
+.srstats div{padding:8px 10px;border:1px solid #2b4a88;border-radius:10px;background:#0a1640aa;text-align:left}
+.srstats small{display:block;font-size:11px;letter-spacing:.14em;color:#8fb0ff;font-weight:800}
+.srstats b{font-family:var(--disp);font-size:22px;color:#ffe9a6;font-style:italic}
+.srnote{font-size:12px!important;color:#8fb0ff!important;letter-spacing:.04em}
+#srTouch{display:none;position:absolute;inset:0;pointer-events:none;z-index:2}
+body.touch #skyRace.on #srTouch{display:block}
+#srTouch button{pointer-events:auto;touch-action:none;position:absolute;border-radius:50%;background:#0b1224aa;border:2px solid #ffd56aaa;color:#fff;font-weight:900;font-size:22px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;padding:0;font-family:inherit}
+#srTouch button.down{background:#ffd56a66;transform:scale(.94)}
+#srTouch{--tb:76px}
+#srTouch [data-k=KeyA]{left:calc(14px + env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:var(--tb);height:var(--tb)}
+#srTouch [data-k=KeyD]{left:calc(24px + var(--tb) + env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:var(--tb);height:var(--tb)}
+#srTouch [data-k=KeyW]{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:calc(var(--tb)*1.15);height:calc(var(--tb)*1.15);border-color:#7fe3ffcc}
+#srTouch [data-k=KeyS]{right:calc(30px + var(--tb)*1.15 + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:var(--tb);height:var(--tb)}
+#srTouch [data-k=Space]{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(36px + var(--tb)*1.15 + env(safe-area-inset-bottom,0px));width:calc(var(--tb)*.95);height:calc(var(--tb)*.95);font-size:13px;letter-spacing:.06em;border-color:#ff9a2ecc}
+#srTouch #srTcPause{left:calc(12px + env(safe-area-inset-left,0px));top:calc(62px + env(safe-area-inset-top,0px));width:44px;height:44px;font-size:15px}
+@media(max-height:480px){#srTouch{--tb:62px}}
+@media(prefers-reduced-motion:reduce){#srCv{filter:none}}
 </style>
 </head>
 <body>
@@ -1024,7 +1053,7 @@ html.sky-cinematic-active body>:not(#skyCine){visibility:hidden!important}
     <h2 class="sk-title">CORONA DE LOS CIELOS</h2>
     <p class="sk-desc">Más allá de las nubes espera la prueba definitiva de CRUSH CARS: el desafío secreto reservado a quien ha conquistado las 8 coronas. Aquí solo hay una corona en juego, y no existe otra mayor.</p>
     <div class="sk-chips"><span>UNA ÚNICA CORONA</span><span>RECOMPENSA: LA CORONA DE LOS CIELOS</span><span>DESAFÍO DEFINITIVO</span></div>
-    <div class="sk-act"><button class="btn pri" id="skGo">COMENZAR COMPETICIÓN</button><button class="btn" id="skBack">‹ VOLVER A SUPERVIVENCIA</button></div>
+    <div class="sk-act"><button class="btn pri" id="skGo">EMPEZAR</button><button class="btn" id="skBack">‹ VOLVER A SUPERVIVENCIA</button></div>
   </div>
 </section>
 
@@ -1259,6 +1288,39 @@ html.sky-cinematic-active body>:not(#skyCine){visibility:hidden!important}
 <!-- ===== DEVTOOLS-END (HTML) ===== -->
 
 <div id="skyCine"><canvas id="skyCv"></canvas><div class="skyMsg"><h1>UN NUEVO CAMINO SE HA ABIERTO...</h1><p>ALGO TE ESPERA MÁS ALLÁ DE LAS NUBES</p><button class="btn pri" id="skyBtn">CONTINUAR</button></div></div>
+<div id="skyRace" aria-label="Circuito celestial">
+  <canvas id="srCv"></canvas>
+  <div id="srTouch" aria-hidden="true">
+    <button data-k="KeyA" aria-label="Inclinar hacia arriba / izquierda">◀</button><button data-k="KeyD" aria-label="Inclinar hacia abajo / derecha">▶</button>
+    <button data-k="KeyS" aria-label="Freno">▼</button><button data-k="KeyW" aria-label="Acelerar">▲</button>
+    <button data-k="Space" aria-label="Nitro">NITRO</button>
+    <button id="srTcPause" aria-label="Pausa">❚❚</button>
+  </div>
+  <div class="srov" id="srPause"><div class="srbox">
+    <h2>PAUSA</h2>
+    <button class="btn pri" id="srPzGo">CONTINUAR</button>
+    <button class="btn" id="srPzCp">REINICIAR DESDE EL CHECKPOINT</button>
+    <button class="btn" id="srPzSt">REINICIAR DESDE EL INICIO</button>
+    <button class="btn danger" id="srPzQuit">SALIR A LA CORONA</button>
+    <p class="srnote"><kbd>P</kbd> / <kbd>Esc</kbd> continuar · <kbd>R</kbd> checkpoint · <kbd>T</kbd> inicio</p>
+  </div></div>
+  <div class="srov" id="srFall"><div class="srbox">
+    <h2 id="srFallT">¡CAÍSTE AL VACÍO!</h2>
+    <p id="srFallP">Vuelve a intentarlo desde el último punto de control o desde el principio.</p>
+    <button class="btn pri" id="srFaCp">DESDE EL CHECKPOINT</button>
+    <button class="btn" id="srFaSt">DESDE EL INICIO</button>
+    <button class="btn danger" id="srFaQuit">SALIR A LA CORONA</button>
+    <p class="srnote"><kbd>R</kbd> / <kbd>Enter</kbd> checkpoint · <kbd>T</kbd> inicio</p>
+  </div></div>
+  <div class="srov" id="srFin"><div class="srbox">
+    <h2>¡CIRCUITO COMPLETADO!</h2>
+    <p>Has cruzado la meta de la Corona de los Cielos.</p>
+    <div class="srstats"><div><small>TIEMPO</small><b id="srFiT">--</b></div><div><small>MEJOR (SESIÓN)</small><b id="srFiB">--</b></div><div><small>CAÍDAS</small><b id="srFiF">0</b></div><div><small>AROS</small><b id="srFiR">0</b></div></div>
+    <button class="btn pri" id="srFiAgain">JUGAR DE NUEVO</button>
+    <button class="btn" id="srFiBack">VOLVER A LA CORONA</button>
+    <p class="srnote">Pantalla provisional · los rivales, la competición y las recompensas llegarán en la Parte 5.</p>
+  </div></div>
+</div>
 <div id="toast"></div>
 <div id="netBadge" hidden></div>
 <div id="touch" aria-hidden="true">
@@ -4050,7 +4112,7 @@ function mpPlaceSlot(c, T, slot) { const row = slot >> 1, col = slot & 1; placeC
    role 'client': mi coche se simula aquí (R.player); el resto son 'remote' (se rellenan desde los snapshots).
    role 'server': los bots se simulan allí (con la IA del juego); los humanos son 'remote' (posición que envía su cliente). */
 function mpCreateRace(cfg, grid, localPid, role) {
-  const map = MAPS.find(m => m.id === cfg.mapId) || SURV_MAPS.find(m => m.id === cfg.mapId) || MAPS[0];
+  const map = MAPS.find(m => m.id === cfg.mapId) || SURV_MAPS.find(m => m.id === cfg.mapId) || CROWN_MAPS.find(m => m.id === cfg.mapId) || MAPS[0];
   const rev = !!cfg.rev, cc = CC[cfg.cc] ? cfg.cc : 150, laps = clamp(Math.floor(cfg.laps) || map.laps, 1, MPC.LAPS_MAX);
   const T = getTrack(map, rev), rnd = rng((cfg.seed | 0) + 17);
   const R = {
@@ -6030,6 +6092,8 @@ function renderLobby() {
   const cfSig = JSON.stringify([r.kind, r.mode, cfg, r.players.length, hostP.lvl, host, !!NET.evIgnored]);
   if (lbS.cfg !== cfSig) { lbS.cfg = cfSig; rebuilt = true;
   $('lbCfg').innerHTML = r.kind === 'surv' ? `<div class="rwd">${SURV_ROUNDS.map((x, i) => `<span class="chip2 ${i === 3 ? 'rv' : ''}">${i === 3 ? '🏆 FINAL · ' + x.n + ' → 1' : 'RONDA ' + (i + 1) + ' · ' + x.n + ' → ' + x.k}</span>`).join('')}</div><p class="lb-note">Cuatro pistas exclusivas, una por ronda. El servidor decide quién pasa; los eliminados ven los resultados hasta el final.</p>` +
+    seg('crown', 'CORONA', CROWNS.map(c => [c.id, c.emoji + ' ' + c.name.replace('CORONA ', '')]), (CROWNS.find(c => c.id === cfg.crown) || CROWNS[0]).id) +
+    `<p class="lb-note">${(CROWNS.find(c => c.id === cfg.crown) || CROWNS[0]).tracks.map((t, i) => (i === 3 ? '🏆 ' : (i + 1) + '. ') + esc(t.name)).join(' → ')}</p>` +
     seg('cc', 'CILINDRADA', CC_LIST.map(c => [c, c + 'cc']), cfg.cc) + seg('ev', 'EVENTOS', [['off', 'SIN EVENTOS'], ['one', 'UNO A LA VEZ'], ['chaos', 'CAOS']], cfg.ev || 'chaos') :
     `<div class="lb-maps">${MAPS.map(m => { const lock = !cfg.unlockAll && hostP.lvl < m.lvl; return `<div class="lb-map ${m.id === cfg.mapId ? 'sel' : ''} ${lock ? 'locked' : ''}" data-k="mapId" data-v="${m.id}"><canvas width="220" height="134"></canvas><b>${esc(m.name)}</b><small>${lock ? '🔒 NIVEL ' + m.lvl : 'NIVEL ' + m.lvl}</small></div>`; }).join('')}</div>` +
     seg('mode', 'MODO', [['duel', 'DUELO 1v1'], ['party', 'AMIGOS + BOTS']], r.mode) +
@@ -6053,7 +6117,7 @@ const API_MAX_PLAYERS = MPC.MAX_PLAYERS;
 $('lbCfg').addEventListener('click', e => {
   const r = NET.room, b = e.target.closest('[data-k]'); if (!r || !b || r.host !== NET.pid || b.disabled) return;
   const k = b.dataset.k; let v;
-  if (b.dataset.d) v = r.cfg[k] + (+b.dataset.d); else if (k === 'rev' || k === 'unlockAll') v = b.dataset.v === '1'; else if (k === 'mapId' || k === 'mode' || k === 'ev') v = b.dataset.v; else v = +b.dataset.v;
+  if (b.dataset.d) v = r.cfg[k] + (+b.dataset.d); else if (k === 'rev' || k === 'unlockAll') v = b.dataset.v === '1'; else if (k === 'mapId' || k === 'mode' || k === 'ev' || k === 'crown') v = b.dataset.v; else v = +b.dataset.v;
   if (k === 'mapId' && b.classList.contains('locked')) { toast('Circuito bloqueado para la sala (nivel del anfitrión)'); return; }
   netSend({ t: 'cfg', cfg: { [k]: v } });
   if (k === 'ev') {   // si el servidor descarta el ajuste 'ev' (lista blanca de cfg sin actualizar) se avisa en vez de no hacer nada
@@ -6084,7 +6148,7 @@ function netBeginRace(m) {
     if (evm !== 'off') { let hs = m.cfg.seed | 0; for (const ch of String(m.raceId)) hs = (Math.imul(hs, 31) + ch.charCodeAt(0)) | 0; EV.fixed = true; R.ev = evInit(rng(hs ^ 0x5bd1e995)); R.ev.mode = evm; } }
   me.abLast = 0; for (const c of R.cars) c.abLast = 0;
   if (m.surv) R.surv = { round: m.surv.round, k: m.surv.k, n: m.surv.n, end: true, ann: true };
-  race = R; lastMap = MAPS.find(x => x.id === m.cfg.mapId) || SURV_MAPS.find(x => x.id === m.cfg.mapId); lastRev = R.rev; lastCc = R.cc; snapCam(R);
+  race = R; lastMap = MAPS.find(x => x.id === m.cfg.mapId) || SURV_MAPS.find(x => x.id === m.cfg.mapId) || CROWN_MAPS.find(x => x.id === m.cfg.mapId); lastRev = R.rev; lastCc = R.cc; snapCam(R);
   for (const k in trackCache) if (trackCache[k] !== R.T) trackCache[k].tiles = null;
   { const hx = W / 2 / cam.z, hy = H / 2 / cam.z; drawTiles(ctx, R.T, cam.x - hx, cam.y - hy, cam.x + hx, cam.y + hy, 40, true); }
   $('pause').classList.remove('on'); $('pzRestart').style.display = 'none';
@@ -6207,11 +6271,11 @@ function netShowSurvResults(m) {
   clearInterval(NET.svT);
   const S = m.surv, mine = m.mine, me = m.order.find(o => o.pid === NET.pid), ok = !!(me && me.q), pos = me ? me.pos : 0;
   const lv0 = playerLevel(), g = netApplyReward(mine), lv1 = playerLevel(), a1 = xpAt(lv1), b1 = xpAt(lv1 + 1);
-  const win = ok && S.last, cls = pos === 1 ? 'p1' : pos === 2 ? 'p2' : pos === 3 ? 'p3' : 'pn', map = SURV_MAPS.find(x => x.id === m.cfg.mapId) || SURV_MAPS[S.round];
+  const win = ok && S.last, cls = pos === 1 ? 'p1' : pos === 2 ? 'p2' : pos === 3 ? 'p3' : 'pn', map = SURV_MAPS.find(x => x.id === m.cfg.mapId) || CROWN_MAPS.find(x => x.id === m.cfg.mapId) || SURV_MAPS[S.round];
   const title = !me ? 'ESTÁS ELIMINADO' : win ? '¡CAMPEÓN DE LA SUPERVIVENCIA!' : ok ? '¡CLASIFICADO!' : '¡ELIMINADO!';
   const flow = SURV_ROUNDS.map((r, i) => `<span class="chip2 ${i === S.round ? 'rv' : ''}">${(i < S.round || (i === S.round && ok)) ? '✔ ' : ''}${i === 3 ? '🏆 FINAL' : r.n + ' → ' + r.k}</span>`).join('');
   const rows = m.order.map(o => `<tr class="${o.pid === NET.pid ? 'me' : ''}"><td>${o.pos}</td><td>${o.human ? (AVATARS[o.av] || '🏎️') : '🤖'} ${esc(o.name)}</td><td class="n">${o.fin ? fmtTime(o.finT) : o.dnf ? '<span class="dim">abandonó</span>' : '<span class="dim">no terminó</span>'}</td><td>${o.q ? (S.k === 1 ? '<span style="color:var(--orange2)">🏆 CAMPEÓN</span>' : '<span style="color:var(--green)">✔ PASA</span>') : '<span style="color:var(--red)">✖ FUERA</span>'}</td></tr>`).join('');
-  const nx = S.next, nextM = nx && SURV_MAPS.find(x => x.id === nx.mapId);
+  const nx = S.next, nextM = nx && (SURV_MAPS.find(x => x.id === nx.mapId) || CROWN_MAPS.find(x => x.id === nx.mapId));
   const rew = mine ? `<div class="rgrid"><div class="kv coin2"><small>Monedas</small><b>+${fmt(mine.coins)}</b></div><div class="kv xp2"><small>Experiencia</small><b>+${fmt(mine.xp)}</b></div><div class="kv"><small>Tu tiempo</small><b>${me && me.fin ? fmtTime(me.finT) : '—'}</b></div></div><div class="rwd"><span class="chip2 bal"><span class="coin"></span>SALDO ${fmt(save.coins)}</span></div>`
     : me ? '<div class="banner unl">Sin recompensa: hay que cruzar la meta para cobrarla.</div>' : '<div class="banner unl">Sigues los resultados del torneo hasta el final.</div>';
   $('resBox').innerHTML = `<div class="rhead"><div class="pos ${cls}">${pos || '–'}<sup>${pos ? 'º' : ''}</sup></div><div class="rtitle"><h2>${title}</h2><p>🌐 ${esc(NET.room ? NET.room.code : '')} · RONDA ${S.round + 1}/4 · ${esc(map.name)} · ${m.cfg.cc}cc · ${S.n} pilotos</p></div></div>
@@ -6690,17 +6754,708 @@ function skyEnd() {
   race = null; go('menu');                                // vuelve al menú normal: no se abre ninguna corona
 }
 $('skyBtn').onclick = skyEnd;
-$('skGo').onclick = () => toast('El circuito de los cielos aún no está listo: llegará en la próxima actualización');
+/* #skGo («EMPEZAR») lo gestiona el módulo del circuito celestial (Parte 4/6), más abajo */
 $('skBack').onclick = () => go('survival');
 addEventListener('keydown', e => { if (SKY.run) { if (SKY.done && (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space')) skyEnd(); e.stopImmediatePropagation(); e.preventDefault(); } }, true);
 setTimeout(() => { if (mode === 'menu') skyCheck(); }, 1500);   // cuentas que ya tenían las 8 coronas antes de esta función: la ven una vez
+
+
+/* =====================================================================
+   CORONA DE LOS CIELOS · PARTE 4/6 · circuito celestial + físicas de vuelo
+   ---------------------------------------------------------------------
+   AISLAMIENTO: todo vive en este bloque (prefijo SR / sr). No toca save, MP-CORE, mpHash, las físicas de carrera
+   (stepCar, updateRace…), los circuitos, las 8 coronas ni la cinemática. Sólo se activa desde el botón de la pantalla
+   «CORONA DE LOS CIELOS» (mode = 'skyrace'); usa su propio canvas (#srCv), su propio bucle requestAnimationFrame, su
+   propio estado de teclas (SR.k) y registra sus eventos sólo mientras dura (srExit los retira todos).
+   Vista lateral 2D: x avanza hacia la derecha, y crece hacia abajo; el ángulo a es el giro del canvas (a<0 = morro arriba).
+   ===================================================================== */
+const SRC = {
+  G: 1150, VMAX: 720, ACC: 560, BRK: 1300, DRAG: .16, ROLL: 40, SLOPE_G: .45, REV: 170,
+  NIT_MUL: 1.36, NIT_ACC: 1.9, NIT_USE: .26, NIT_REGEN: .03,
+  ROT: 3.1, LIFT: .5, STEP: 32, H: 22, RAMP_VY: 240, BOUNCE_VY: 1300, PAD_V: 600, RING_V: 250,
+};
+const SR = {
+  run: false, raf: 0, last: 0, cv: null, g: null, w: 0, h: 0, k: 1, art: null, trk: null, state: 'idle', paused: false,
+  car: null, cam: { x: 0, y: 0, z: 1, sx: 0, sy: 0 }, in: { thr: 0, brk: 0, str: 0, nit: 0 }, keys: {}, pad: { p9: false, p0: false, p1: false },
+  time: 0, cd: 0, cp: -1, falls: 0, ringN: 0, best: null, msg: '', msgT: 0, msgCol: '#fff', fade: 0, flash: 0, shake: 0, fallT: 0, fallWhy: '', finT: 0, finShown: false,
+  fx: { n: 0 }, anim: 0, snd: 0, hint: 0, evs: [], bounceT: 0, listeners: false, disp: 'sans-serif', frames: 0,
+};
+const SRE = { l: u => u, s: u => u * u * (3 - 2 * u), i: u => u * u, o: u => 1 - (1 - u) * (1 - u) };
+const srH = (a, b) => { let h = Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+
+/* ---------- construcción de la pista (una sola vez) ---------- */
+function srBuildTrack() {
+  const S = SRC.STEP, plats = [], rings = [], pads = [], cps = [], lamps = [], signs = [], r = rng(4242);
+  let cx = 0, cy = 0, cur = null;
+  const begin = (kind, thick) => { cur = { kind, thick, x0: cx, ys: [cy] }; };
+  const seg = (len, dy, e = SRE.s) => { const n = Math.max(1, Math.round(len / S)); for (let i = 1; i <= n; i++) cur.ys.push(cy + dy * e(i / n)); cx += n * S; cy += dy; };
+  const end = () => {
+    const p = cur, n = p.ys.length; p.x1 = p.x0 + (n - 1) * S; p.ys = Float32Array.from(p.ys); p.bot = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const edge = Math.min(i, n - 1 - i) / Math.max(1, Math.min(8, (n - 1) / 2)), tp = Math.min(1, .35 + edge * .65);
+      p.bot[i] = p.kind === 'bridge' ? 14 : p.kind === 'bounce' ? 34 : p.thick * (.55 + .45 * r()) * tp;
+    }
+    let lo = 1e9, hi = -1e9; for (let i = 0; i < n; i++) { lo = Math.min(lo, p.ys[i]); hi = Math.max(hi, p.ys[i] + p.bot[i]); } p.ylo = lo; p.yhi = hi; p.maxy = Math.max(...p.ys);
+    plats.push(p); cur = null;
+  };
+  const gap = (w, dy) => { cx += w; cy += dy; };
+  const lamp = (x0, x1, every) => { for (let x = x0; x < x1; x += every) lamps.push(x); };
+
+  // 1 · SALIDA y colinas suspendidas
+  begin('start', 340); seg(1500, 0, SRE.l); const startEnd = cx; end();
+  pads.push({ x0: 1060, x1: 1240 });
+  begin('road', 300); seg(700, -120); seg(380, 0); seg(800, 100); seg(300, 0); seg(520, -50); seg(420, 0); const r1 = cx; end();
+  // 2 · primera rampa y salto
+  signs.push({ x: r1 - 260, a: 'ramp' });
+  begin('ramp', 200); seg(380, -170, SRE.i); end();
+  const g1x = cx; gap(640, 70);
+  rings.push({ x: g1x + 300, y: cy - 330, r: 78, a: -.25 });
+  // 3 · isla B: curvas y cambios de altura (CP1)
+  begin('road', 300); seg(520, 0); cps.push({ x: cx - 300, got: false }); seg(900, 180); seg(420, 0); seg(760, -150); seg(360, 0);
+  pads.push({ x0: cx - 300, x1: cx - 130 }); end();
+  // 4 · puente estrecho con tablones rotos
+  gap(120, 0); begin('bridge', 14); seg(520, -40); end(); gap(120, 0); begin('bridge', 14); seg(380, 30); end(); gap(140, 0); begin('bridge', 14); seg(420, -20); seg(260, 0); end();
+  // 5 · nube de rebote → plataforma alta
+  begin('bounce', 34); seg(320, 0, SRE.l); const bx1 = cx; end();
+  gap(430, -430);
+  // 6 · isla C elevada (CP2): curvas, bajada y rampa grande
+  begin('road', 320); seg(560, 0); cps.push({ x: cx - 330, got: false }); seg(760, -110); seg(300, 0); seg(900, 210); seg(500, 0); seg(520, -70);
+  pads.push({ x0: cx - 560, x1: cx - 380 }); seg(420, 0); const r2 = cx; end();
+  signs.push({ x: r2 - 300, a: 'ramp' });
+  begin('ramp', 220); seg(430, -240, SRE.i); end();
+  const g2x = cx; gap(1260, 260);
+  rings.push({ x: g2x + 330, y: cy - 700, r: 84, a: -.45 }, { x: g2x + 700, y: cy - 640, r: 84, a: -.1 }, { x: g2x + 1050, y: cy - 440, r: 84, a: .35 });
+  // 7 · isla D (CP3): descenso largo veloz
+  begin('road', 340); seg(640, 0); cps.push({ x: cx - 320, got: false }); seg(1100, 250); seg(520, 0); seg(700, -60); seg(300, 0); const dEnd = cx; end();
+  pads.push({ x0: dEnd - 560, x1: dEnd - 380 });
+  // 8 · segundo puente
+  gap(130, 0); begin('bridge', 14); seg(640, 0); end(); gap(150, 20); begin('bridge', 14); seg(500, -40); end(); gap(130, 0); begin('bridge', 14); seg(540, 20); seg(260, 0); const r3 = cx; end();
+  signs.push({ x: r3 - 220, a: 'ramp' });
+  // 9 · rampa final y gran salto a la meta
+  begin('ramp', 240); seg(480, -270, SRE.i); end();
+  const g3x = cx; gap(1060, 150);
+  rings.push({ x: g3x + 330, y: cy - 600, r: 86, a: -.4 }, { x: g3x + 720, y: cy - 470, r: 86, a: .15 });
+  begin('finish', 360); seg(700, 0, SRE.l); const finX = cx - 120; seg(900, 0, SRE.l); end();
+
+  for (const p of plats) if (p.kind === 'road' || p.kind === 'start') lamp(Math.ceil(p.x0 / 480) * 480 + 120, p.x1 - 60, 480);
+  const T = { plats, rings, pads, cps, lamps: lamps.filter(x => { const p = srPlatAtT(plats, x); return p && p.kind !== 'bridge'; }), signs, startX: 220, xmin: 60, finishX: finX, xmax: plats[plats.length - 1].x1 - 80, bounceEnd: bx1, len: plats[plats.length - 1].x1 };
+  // altura del vacío en cada tramo: el punto más bajo cercano + margen
+  T.voidBin = 400; T.voidY = new Float32Array(Math.ceil(T.len / T.voidBin) + 2);
+  for (let b = 0; b < T.voidY.length; b++) { const bx = b * T.voidBin; let lo = -1e9; for (const p of plats) if (p.x1 > bx - 3200 && p.x0 < bx + 3200) lo = Math.max(lo, p.maxy); T.voidY[b] = lo + 820; }
+  return T;
+}
+function srPlatAtT(P, x) {
+  let lo = 0, hi = P.length - 1, r = -1;
+  while (lo <= hi) { const m = (lo + hi) >> 1; if (P[m].x0 <= x) { r = m; lo = m + 1; } else hi = m - 1; }
+  return r >= 0 && x <= P[r].x1 ? P[r] : null;
+}
+const srPlatAt = x => srPlatAtT(SR.trk.plats, x);
+function srY(p, x) {
+  const f = (x - p.x0) / SRC.STEP, i = Math.max(0, Math.min(p.ys.length - 2, Math.floor(f))), t = Math.max(0, Math.min(1, f - i));
+  return p.ys[i] + (p.ys[i + 1] - p.ys[i]) * t;
+}
+function srSurfY(x) { const p = srPlatAt(x); return p ? srY(p, x) : null; }
+function srSlope(x) {
+  const p = srPlatAt(x); if (!p) return 0;
+  const a = Math.max(p.x0, x - 24), b = Math.min(p.x1, x + 24); if (b - a < 4) return 0;
+  return Math.atan2(srY(p, b) - srY(p, a), b - a);
+}
+const srVoidAt = x => { const T = SR.trk, i = clamp(Math.floor(x / T.voidBin), 0, T.voidY.length - 1); return T.voidY[i]; };
+
+/* ---------- coche (estado) ---------- */
+function srNewCar() {
+  return { x: 0, y: 0, v: 0, vx: 0, vy: 0, a: 0, w: 0, lean: 0, g: true, air: 0, nit: 1, nitOn: false, boostT: 0, padId: -1, wheel: 0, land: 0, trail: 0 };
+}
+function srPlace(x, v) {
+  const c = SR.car, ys = srSurfY(x);
+  c.x = x; c.y = (ys == null ? 0 : ys) - SRC.H; c.g = true; c.v = v; c.vx = c.vy = 0; c.a = srSlope(x); c.w = 0; c.lean = 0; c.air = 0; c.boostT = 0; c.padId = -1; c.nitOn = false; c.trail = 0;
+}
+function srMsg(t, col, dur) { SR.msg = t; SR.msgCol = col || '#fff6d8'; SR.msgT = SR.msgDur = dur || 1.6; }
+function srShake(a) { SR.shake = Math.min(1, Math.max(SR.shake, a)); }
+const srEvt = n => { if (SR.evs.length < 12) SR.evs.push(n); };   // sonidos pendientes (se reproducen en el bucle de render)
+
+/* ---------- partículas (reserva fija: no se crean objetos en el bucle) ---------- */
+const SRP = { N: 320, x: null, y: null, vx: null, vy: null, l: null, m: null, s: null, t: null, c: null, i: 0 };
+function srPartsInit() { const N = SRP.N; SRP.x = new Float32Array(N); SRP.y = new Float32Array(N); SRP.vx = new Float32Array(N); SRP.vy = new Float32Array(N); SRP.l = new Float32Array(N); SRP.m = new Float32Array(N); SRP.s = new Float32Array(N); SRP.t = new Uint8Array(N); SRP.c = new Uint8Array(N); SRP.i = 0; }
+const SRCOL = ['255,255,255', '255,214,106', '127,227,255', '255,154,46', '255,255,214', '255,123,213'];
+function srEmit(t, x, y, vx, vy, life, s, c) { const i = SRP.i; SRP.i = (i + 1) % SRP.N; SRP.t[i] = t; SRP.x[i] = x; SRP.y[i] = y; SRP.vx[i] = vx; SRP.vy[i] = vy; SRP.l[i] = SRP.m[i] = life; SRP.s[i] = s; SRP.c[i] = c; }
+function srPartsStep(dt) {
+  const N = SRP.N, dmp = Math.exp(-2.2 * dt);
+  for (let i = 0; i < N; i++) {
+    if (SRP.l[i] <= 0) continue; SRP.l[i] -= dt; SRP.x[i] += SRP.vx[i] * dt; SRP.y[i] += SRP.vy[i] * dt;
+    if (SRP.t[i] === 0) { SRP.vx[i] *= dmp; SRP.vy[i] = SRP.vy[i] * dmp - 90 * dt; }        // polvo: sube suave
+    else if (SRP.t[i] === 1) { SRP.vy[i] += 700 * dt; SRP.vx[i] *= dmp; }                     // chispas: caen
+    else { SRP.vx[i] *= dmp; SRP.vy[i] *= dmp; }
+  }
+}
+function srBurst(x, y, n, t, c, sp, life, s) { for (let i = 0; i < n; i++) { const a = Math.random() * TAU, v = sp * (.3 + Math.random() * .7); srEmit(t, x, y, Math.cos(a) * v, Math.sin(a) * v, life * (.6 + Math.random() * .6), s * (.7 + Math.random() * .6), c); } }
+function srDust(x, y, n, dir, power) { for (let i = 0; i < n; i++) srEmit(0, x + (Math.random() - .5) * 30, y - 2, (Math.random() - .5) * 140 * power - dir * 40, -(20 + Math.random() * 120) * power, .5 + Math.random() * .5, 5 + Math.random() * 8, 0); }
+
+/* ---------- reinicio ---------- */
+function srRespawn(toStart) {
+  const T = SR.trk, c = SR.car, cpt = !toStart && SR.cp >= 0 ? T.cps[SR.cp] : null;
+  if (toStart) { SR.cp = -1; SR.time = 0; SR.falls = 0; SR.ringN = 0; for (const cpp of T.cps) cpp.got = false; c.nit = 1; }
+  else c.nit = Math.max(c.nit, .7);
+  const x = cpt ? cpt.x : T.startX;
+  srPlace(x, cpt ? 260 : 0);
+  for (const rg of T.rings) if (toStart || rg.x > x - 4) { rg.used = false; rg.fx = 0; }
+  SR.state = toStart ? 'count' : 'run'; SR.cd = toStart ? 2.7 : 0; SR.paused = false; SR.fade = 1; SR.flash = 0; SR.shake = 0; SR.fallT = 0; SR.finT = 0; SR.finShown = false; SR.bounceT = 0;
+  SR.msgT = 0; SR.in.thr = SR.in.brk = SR.in.str = SR.in.nit = 0; SRP.l.fill(0);
+  srCamSnap(); if (SR.ui) SR.ui();
+}
+
+/* ---------- física ---------- */
+function srFail(why) {
+  if (SR.state !== 'run') return;
+  SR.state = 'fall'; SR.fallT = 0; SR.fallWhy = why; SR.falls++; srShake(.5); srEvt('fall');
+}
+function srBounce(c, ys, vt, vyIn) {   // nube elástica: rebote vertical con impulso (al caer sobre ella o al rodar sobre ella)
+  c.y = ys - SRC.H; c.g = false; c.vx = Math.max(vt, 200) * .8 + 40; c.vy = -Math.max(Math.abs(vyIn || 0) * .92, SRC.BOUNCE_VY); c.air = .01; c.a = -.25; c.w = 0; c.v = 0;
+  SR.bounceT = .45; srBurst(c.x, ys, 22, 2, 5, 420, .6, 5); srBurst(c.x, ys, 10, 2, 2, 300, .5, 4); srShake(.45); srEvt('bounce'); srMsg('¡REBOTE!', '#ff9be0', 1.2);
+}
+function srLand(c, p, ys, vxIn, vyIn) {
+  const s = srSlope(c.x), cs = Math.cos(s), sn = Math.sin(s), vn = -vxIn * sn + vyIn * cs, vt = vxIn * cs + vyIn * sn;
+  const diff = Math.abs(angDiff(c.a, s)), big = c.air > .32 || vn > 420, air = c.air;
+  c.y = ys - SRC.H; c.g = true; c.v = vt; c.vx = c.vy = 0; c.w *= .3; c.air = 0;
+  if (p.kind === 'bounce') { srBounce(c, ys, vt, vyIn); return; }
+  if (!big) { c.land = .12; return; }
+  let q = 'good', loss = .97;
+  if (diff < .2) { q = 'perfect'; loss = 1; } else if (diff < .5) { q = 'good'; loss = .96; } else if (diff < 1.0) { q = 'rough'; loss = .74; } else if (diff < 1.35) { q = 'hard'; loss = .5; } else q = 'crash';
+  c.v = vt * loss; c.land = .25;
+  const pw = clamp(vn / 1100, .12, 1);
+  srDust(c.x, ys, Math.round(8 + 22 * pw), Math.sign(c.v) || 1, .6 + pw); srBurst(c.x, ys - 4, Math.round(4 + 10 * pw), 1, 1, 380 * pw + 120, .45, 3);
+  srShake((q === 'rough' || q === 'hard' ? .55 : .3) * (.4 + pw)); srEvt(q === 'perfect' || q === 'good' ? 'land' : 'landhard');
+  if (q === 'crash') { srFail('crash'); return; }
+  if (air > .55) { if (q === 'perfect') { srMsg('ATERRIZAJE PERFECTO', '#ffe08a', 1.5); c.nit = Math.min(1, c.nit + .08); } else if (q === 'good') srMsg('BUEN ATERRIZAJE', '#bfe8ff', 1.2); else srMsg('ATERRIZAJE BRUSCO', '#ff9a6a', 1.3); }
+}
+function srTakeoff(c, fromRamp) {
+  const s = srSlope(c.x), cs = Math.cos(s), sn = Math.sin(s);
+  c.g = false; c.vx = c.v * cs; c.vy = c.v * sn; c.air = 0;
+  c.vy += c.lean * c.v * .28;                                // inclinación previa: el morro arriba da más altura
+  if (fromRamp) { c.vy -= SRC.RAMP_VY; c.vx += 30; srEvt('launch'); srBurst(c.x, c.y + SRC.H, 16, 3, 3, 380, .5, 4); srBurst(c.x, c.y + SRC.H, 10, 2, 1, 300, .5, 4); srShake(.3); srMsg('¡DESPEGUE!', '#ffe08a', 1.1); }
+}
+function srStep(dt) {
+  const c = SR.car, I = SR.in, T = SR.trk, H = SRC.H;
+  SR.anim += dt; if (SR.bounceT > 0) SR.bounceT -= dt; if (c.land > 0) c.land -= dt;
+  if (SR.state === 'count') { SR.cd -= dt; if (SR.cd <= 0) { SR.state = 'run'; srEvt('go'); srMsg('¡YA!', '#7dffb0', .9); } else { const n = Math.ceil(SR.cd - .0); if (n !== SR.lastN && n <= 3) { SR.lastN = n; srEvt('count'); } } }
+  if (SR.state === 'fall') { SR.fallT += dt; c.vy += SRC.G * dt; c.y += c.vy * dt; c.x += c.vx * dt; return; }
+  const active = SR.state === 'run' || SR.state === 'finish', fin = SR.state === 'finish';
+  const thr = active && !fin ? I.thr : 0, brk = fin ? 1 : active ? I.brk : 0, str = active && !fin ? I.str : 0;
+  const nitWant = active && !fin && I.nit && c.nit > .02;
+  c.nitOn = nitWant; if (nitWant) c.nit = Math.max(0, c.nit - SRC.NIT_USE * dt); else if (!fin) c.nit = Math.min(1, c.nit + SRC.NIT_REGEN * dt);
+  if (c.boostT > 0) c.boostT -= dt;
+  if (SR.state === 'run') SR.time += dt;
+  const px = c.x;
+  if (c.g) {
+    const sl = srSlope(c.x), vmax = SRC.VMAX * (c.nitOn ? SRC.NIT_MUL : 1) * (c.boostT > 0 ? 1.2 : 1);
+    if (thr) { const f = Math.max(0, 1 - Math.pow(Math.max(c.v, 0) / vmax, 2.2)); c.v += SRC.ACC * (c.nitOn ? SRC.NIT_ACC : 1) * (c.boostT > 0 ? 1.4 : 1) * f * dt; }
+    if (c.v > vmax) c.v -= (c.v - vmax) * 1.4 * dt;
+    if (brk) { if (c.v > 0) c.v = Math.max(0, c.v - SRC.BRK * dt); else c.v = Math.max(-SRC.REV, c.v - SRC.ACC * .5 * dt); }
+    else if (!thr) c.v -= Math.sign(c.v) * Math.min(Math.abs(c.v), (SRC.ROLL + Math.abs(c.v) * SRC.DRAG) * dt);
+    c.v += SRC.G * SRC.SLOPE_G * Math.sin(sl) * dt;
+    c.lean += (str * .32 - c.lean) * Math.min(1, 10 * dt);
+    c.a += angDiff(c.a, sl + c.lean * .9) * Math.min(1, 13 * dt);
+    c.wheel += c.v * dt / 13;
+    let dx = c.v * Math.cos(sl) * dt, nx = c.x + dx;
+    if (nx < T.xmin) { nx = T.xmin; if (c.v < 0) c.v = 0; }
+    if (nx > T.xmax) { nx = T.xmax; if (c.v > 0) c.v = 0; }
+    const p0 = srPlatAt(c.x); let p1 = srPlatAt(nx), edge = false;
+    if (!p1 && p0) { nx = dx > 0 ? p0.x1 : p0.x0; edge = true; p1 = p0; }          // borde de la plataforma: se despega justo en el borde
+    c.x = nx; const ys = p1 ? srY(p1, nx) : null;
+    if (ys == null) { srTakeoff(c, false); }
+    else {
+      const nsl = srSlope(nx), dsl = nsl - sl, ady = Math.abs(nx - px);
+      c.y = ys - H;
+      if (edge && p1 === p0 && dx > 0) srTakeoff(c, p0.kind === 'ramp');
+      else if (edge) srTakeoff(c, false);
+      else if (ady > .3 && dsl > 0 && c.v * c.v * (dsl / ady) > SRC.G * 1.05 && c.v > 250) srTakeoff(c, false);   // cresta pronunciada a velocidad: se despega
+      // zonas de impulso
+      if (c.g && p1.kind === 'bounce' && nx > p1.x0 + 24 && c.v > 120) srBounce(c, ys, c.v, 0);
+      if (c.g) {
+        let pid = -1; for (let i = 0; i < T.pads.length; i++) if (nx >= T.pads[i].x0 && nx <= T.pads[i].x1) { pid = i; break; }
+        if (pid >= 0 && pid !== c.padId) { c.v = Math.max(c.v, SRC.PAD_V) + 110; c.boostT = 1.4; c.nit = Math.min(1, c.nit + .1); srEvt('pad'); srBurst(c.x, c.y + H, 14, 2, 2, 380, .45, 3); srShake(.2); }
+        c.padId = pid;
+      }
+    }
+  } else {
+    c.air += dt;
+    // control de inclinación: A = morro arriba · D = morro abajo; sin teclas se estabiliza suavemente
+    const spd = Math.hypot(c.vx, c.vy), phi = Math.atan2(c.vy, c.vx);
+    c.w += (str * SRC.ROT - c.w) * Math.min(1, 12 * dt);
+    if (!str) { c.w *= Math.exp(-5 * dt); c.a += angDiff(c.a, clamp(phi * .8, -.9, 1.0)) * Math.min(1, .9 * dt); }
+    c.a = clamp(c.a + c.w * dt, -1.6, 1.6);
+    const ysN = srSurfY(c.x), hgt = ysN == null ? 1e9 : ysN - (c.y + H);
+    if (ysN != null && hgt < 150 && c.vy > 0 && !str) c.a += angDiff(c.a, srSlope(c.x) + .1) * Math.min(1, 5 * dt);   // ayuda al aterrizar
+    if (thr) { const T2 = SRC.ACC * .5 * (c.nitOn ? 2.2 : 1); c.vx += Math.cos(c.a) * T2 * dt; c.vy += Math.sin(c.a) * T2 * dt; }
+    else if (c.nitOn) { c.vx += Math.cos(c.a) * SRC.ACC * 1.1 * dt; c.vy += Math.sin(c.a) * SRC.ACC * 1.1 * dt; }
+    if (brk) { const k = Math.exp(-1.3 * dt); c.vx *= k; c.vy = c.vy * Math.exp(-.4 * dt); }
+    if (spd > 40) {   // sustentación según el ángulo de ataque + resistencia inducida
+      const al = clamp(phi - c.a, -.6, .6), sf = Math.min(1, spd / SRC.VMAX), lift = SRC.G * SRC.LIFT * sf * sf * (al / .6) * (al < 0 ? .45 : 1);
+      c.vx += Math.sin(phi) * lift * dt; c.vy += -Math.cos(phi) * lift * dt;
+      const dr = (.06 + Math.abs(al) * .22) * dt; c.vx -= c.vx * dr; c.vy -= c.vy * dr;
+    }
+    c.vy += SRC.G * dt;
+    if (c.vy > 1500) c.vy = 1500;
+    let nx = c.x + c.vx * dt, ny = c.y + c.vy * dt;
+    if (nx < T.xmin) { nx = T.xmin; c.vx = Math.abs(c.vx) * .2; }
+    if (nx > T.xmax) { nx = T.xmax; c.vx = -Math.abs(c.vx) * .2; }
+    const p = srPlatAt(nx);
+    if (p) {
+      const ys = srY(p, nx), pen = ny + H - ys, prevPen = c.y + H - ys;
+      if (pen >= 0 && pen < p.thick + 40) {
+        if (prevPen <= 34 + Math.max(0, c.vy) * dt) { c.x = nx; srLand(c, p, ys, c.vx, c.vy); }   // 34: las ruedas «trepan» por el borde de la plataforma
+        else { nx = c.x; c.vx = -Math.abs(c.vx) * .3 - 20; srShake(.35); srEvt('landhard'); srBurst(c.x + 30, ny, 8, 1, 1, 260, .35, 3); c.x = nx; c.y = ny; }
+      } else { c.x = nx; c.y = ny; }
+    } else { c.x = nx; c.y = ny; }
+  }
+  // aros de impulso
+  if (active) for (let i = 0; i < T.rings.length; i++) {
+    const rg = T.rings[i]; if (rg.used || Math.abs(c.x - rg.x) > 60) continue;
+    if ((px - rg.x) * (c.x - rg.x) <= 0 && Math.abs(c.y - rg.y) <= rg.r + 12) {
+      rg.used = true; rg.fx = .6; SR.ringN++;
+      if (c.g) c.v += SRC.RING_V; else { const sp = Math.max(Math.hypot(c.vx, c.vy), 520) + SRC.RING_V, ph = Math.atan2(c.vy, c.vx), nph = ph + angDiff(ph, rg.a) * .4; c.vx = Math.cos(nph) * sp; c.vy = Math.sin(nph) * sp; }
+      c.nit = Math.min(1, c.nit + .2); c.boostT = Math.max(c.boostT, 1.0);
+      srBurst(rg.x, rg.y, 26, 2, 1, 520, .7, 4); srBurst(rg.x, rg.y, 16, 2, 2, 380, .6, 4); srShake(.18); srEvt('ring'); srMsg('¡IMPULSO!', '#ffe08a', 1.0);
+    }
+  }
+  // puntos de control (en orden)
+  if (active && !fin) { const nx = SR.cp + 1; if (nx < T.cps.length && c.x >= T.cps[nx].x) { T.cps[nx].got = true; SR.cp = nx; srEvt('cp'); srMsg('PUNTO DE CONTROL ' + (nx + 1) + '/' + T.cps.length, '#9fe4ff', 1.8); srBurst(T.cps[nx].x, c.y, 18, 2, 2, 360, .7, 4); } }
+  // meta
+  if (SR.state === 'run' && c.x >= T.finishX) {
+    SR.state = 'finish'; SR.finT = 0; SR.flash = 1; if (SR.best == null || SR.time < SR.best) SR.best = SR.time; srEvt('finish'); srMsg('¡META!', '#ffe08a', 3);
+    for (let i = 0; i < 70; i++) srEmit(1, T.finishX + (Math.random() - .5) * 200, c.y - 200 - Math.random() * 120, (Math.random() - .5) * 700, -200 - Math.random() * 500, 1.6 + Math.random(), 4 + Math.random() * 4, 1 + (i % 5));
+  }
+  if (SR.state === 'finish') SR.finT += dt;
+  // vacío
+  if (SR.state === 'run' && c.y - H > srVoidAt(c.x)) srFail('void');
+  // rastro y partículas continuas
+  if (c.nitOn && Math.random() < dt * 90) srEmit(2, c.x - Math.cos(c.a) * 44, c.y - Math.sin(c.a) * 44, -Math.cos(c.a) * 300 + (Math.random() - .5) * 60, -Math.sin(c.a) * 300 + (Math.random() - .5) * 60, .3, 6, Math.random() < .5 ? 3 : 2);
+  if (c.g && Math.abs(c.v) > 260 && Math.random() < dt * 30) srEmit(0, c.x - 40, c.y + H - 3, -c.v * .08, -10 - Math.random() * 40, .35, 3 + Math.random() * 4, 0);
+}
+
+/* ---------- arte precalculado (una vez): montañas y estructuras, islas flotantes, nubes volumétricas, sol ---------- */
+function srMakeArt() {
+  const mk = (w, h) => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; return cv; };
+  const A = { far: null, isl: [], puff: [], sun: null };
+  // horizonte: tres cordilleras azuladas + torres y arcos celestiales (se repite sin costuras: senos de ciclos enteros)
+  { const W0 = 1800, H0 = 560, cv = A.far = mk(W0, H0), g = cv.getContext('2d'), r = rng(11);
+    const ridge = (base, amp, c0, c1, cyc) => {
+      const ph = [r() * 6, r() * 6, r() * 6]; g.beginPath(); g.moveTo(0, H0);
+      for (let x = 0; x <= W0; x += 10) { const t = x / W0 * TAU; g.lineTo(x, base - amp * (.55 * Math.sin(t * cyc + ph[0]) + .3 * Math.sin(t * cyc * 2 + ph[1]) + .15 * Math.sin(t * cyc * 5 + ph[2]) + .5)); }
+      g.lineTo(W0, H0); g.closePath(); const gr = g.createLinearGradient(0, base - amp * 1.2, 0, H0); gr.addColorStop(0, c0); gr.addColorStop(1, c1); g.fillStyle = gr; g.fill();
+    };
+    ridge(330, 150, 'rgba(180,212,255,.75)', 'rgba(205,228,255,.2)', 3);
+    ridge(380, 150, 'rgba(120,165,245,.85)', 'rgba(170,205,255,.25)', 4);
+    const tower = (x, base, hh, ww, col) => {
+      g.fillStyle = col; g.beginPath(); g.moveTo(x - ww, base); g.lineTo(x - ww * .55, base - hh); g.lineTo(x, base - hh - ww * 1.6); g.lineTo(x + ww * .55, base - hh); g.lineTo(x + ww, base); g.closePath(); g.fill();
+      g.fillStyle = 'rgba(255,230,150,.9)'; g.beginPath(); g.arc(x, base - hh - ww * 1.7, ww * .22, 0, TAU); g.fill();
+      g.fillStyle = 'rgba(255,240,190,.55)'; g.fillRect(x - ww * .08, base - hh * .8, ww * .16, hh * .35);
+    };
+    for (let i = 0; i < 9; i++) { const x = 100 + i * 190 + r() * 60, b = 330 + r() * 40; tower(x, b + 70, 70 + r() * 150, 10 + r() * 10, 'rgba(110,150,235,.9)'); }
+    ridge(430, 130, 'rgba(70,110,215,.95)', 'rgba(110,160,240,.4)', 5);
+    for (let i = 0; i < 4; i++) {   // arcos celestiales dorados
+      const x = 220 + i * 440 + r() * 80, b = 410, rr = 55 + r() * 30; g.strokeStyle = 'rgba(255,224,150,.85)'; g.lineWidth = 7; g.beginPath(); g.arc(x, b - rr, rr, Math.PI, 0); g.stroke();
+      g.fillStyle = 'rgba(255,224,150,.85)'; g.fillRect(x - rr - 4, b - rr, 8, rr + 40); g.fillRect(x + rr - 4, b - rr, 8, rr + 40);
+    }
+    ridge(480, 110, 'rgba(50,85,190,1)', 'rgba(90,140,230,.55)', 6);
+  }
+  // islas flotantes (3 variantes)
+  for (let n = 0; n < 3; n++) {
+    const cv = mk(520, 340), g = cv.getContext('2d'), r = rng(90 + n * 7);
+    g.beginPath(); g.moveTo(24, 96);
+    const pts = 14; for (let i = 1; i < pts; i++) { const u = i / pts, x = 24 + u * 472, depth = Math.sin(u * Math.PI) ** .8 * (170 + r() * 90); g.lineTo(x, 96 + depth * (.75 + r() * .25)); }
+    g.lineTo(496, 96); g.closePath(); const gr = g.createLinearGradient(0, 96, 0, 330); gr.addColorStop(0, '#9fb4e8'); gr.addColorStop(.5, '#5f74c4'); gr.addColorStop(1, '#2a3475'); g.fillStyle = gr; g.fill();
+    g.fillStyle = n === 1 ? '#ffe9a6' : '#8fe8b8'; g.beginPath(); g.ellipse(260, 96, 238, 28, 0, 0, TAU); g.fill();
+    g.fillStyle = n === 1 ? '#ffcf70' : '#54c996'; g.beginPath(); g.ellipse(260, 100, 222, 16, 0, 0, TAU); g.fill();
+    for (let i = 0; i < 5; i++) { const x = 90 + r() * 340, hh = 24 + r() * 40; g.fillStyle = n === 2 ? '#bfe8ff' : '#2f9c78'; g.beginPath(); g.moveTo(x - 10, 92); g.lineTo(x, 92 - hh); g.lineTo(x + 10, 92); g.fill(); }
+    g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(430 + r() * 30, 100, 5, 120 + r() * 60);   // cascada
+    g.fillStyle = 'rgba(255,224,150,.9)'; g.fillRect(250, 40, 10, 56); g.beginPath(); g.moveTo(240, 40); g.lineTo(255, 8); g.lineTo(270, 40); g.fill();   // pequeña torre
+    A.isl.push(cv);
+  }
+  // nubes volumétricas: sombra azulada abajo + volumen blanco arriba
+  for (let n = 0; n < 3; n++) {
+    const cv = mk(320, 150), g = cv.getContext('2d'), r = rng(500 + n * 13), bl = 6 + n * 2, pts = [];
+    for (let i = 0; i < bl; i++) pts.push([60 + r() * 200, 62 + (r() - .4) * 26, 26 + r() * 30]);
+    for (const [x, y, rad] of pts) { const gr = g.createRadialGradient(x, y + 16, 2, x, y + 16, rad * 1.1); gr.addColorStop(0, 'rgba(130,160,215,.7)'); gr.addColorStop(1, 'rgba(130,160,215,0)'); g.fillStyle = gr; g.fillRect(0, 0, 320, 150); }
+    for (const [x, y, rad] of pts) { const gr = g.createRadialGradient(x, y - 4, 2, x, y, rad); gr.addColorStop(0, 'rgba(255,255,255,.98)'); gr.addColorStop(.6, 'rgba(244,250,255,.8)'); gr.addColorStop(1, 'rgba(240,248,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 320, 150); }
+    A.puff.push(cv);
+  }
+  { const cv = A.sun = mk(512, 512), g = cv.getContext('2d'), gr = g.createRadialGradient(256, 256, 4, 256, 256, 256);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.08, 'rgba(255,250,220,1)'); gr.addColorStop(.18, 'rgba(255,230,150,.7)'); gr.addColorStop(.5, 'rgba(255,200,110,.18)'); gr.addColorStop(1, 'rgba(255,200,110,0)'); g.fillStyle = gr; g.fillRect(0, 0, 512, 512); }
+  return A;
+}
+
+/* ---------- cámara ---------- */
+function srCamTarget() {
+  const c = SR.car, cm = SR.cam, w = SR.w, h = SR.h, spf = clamp(Math.hypot(c.vx || c.v, c.vy) / (SRC.VMAX * 1.4), 0, 1);
+  const baseZ = Math.min(h / 680, w / 1000), z = baseZ * (1 - .2 * spf - (SR.state === 'finish' ? .05 : 0));
+  const vw = w / z, vh = h / z, vx = c.g ? c.v : c.vx;
+  return { z, x: c.x + vw * .15 + clamp(vx, -120, 1000) * .17, y: c.y - vh * .09 + clamp(c.vy, -1200, 1200) * (c.g ? 0 : .13) };
+}
+function srCamSnap() { const t = srCamTarget(), cm = SR.cam; cm.x = t.x; cm.y = t.y; cm.z = t.z; }
+function srCamUpdate(dt) {
+  const c = SR.car, cm = SR.cam, t = srCamTarget(), vh = SR.h / cm.z;
+  cm.x += (t.x - cm.x) * (1 - Math.exp(-5.2 * dt)); cm.z += (t.z - cm.z) * (1 - Math.exp(-2.2 * dt));
+  cm.y += (t.y - cm.y) * (1 - Math.exp(-(c.g ? 3.4 : 5.2) * dt));
+  const lim = vh * .34; cm.y = clamp(cm.y, c.y - lim - vh * .09, c.y + lim - vh * .09 + 0);   // el coche nunca sale de la pantalla
+  SR.shake = Math.max(0, SR.shake - dt * 3.2);
+  const a = SR.shake * SR.shake * 9; cm.sx = (Math.random() - .5) * 2 * a; cm.sy = (Math.random() - .5) * 2 * a;   // vibración muy moderada (≤ 9 px)
+}
+
+/* ---------- dibujo ---------- */
+function srLayer(g, spr, f, sc, cw, y0, y1, prob, alpha, seed, base, wob) {
+  const cm = SR.cam, z = cm.z * sc, w = SR.w, h = SR.h, fx = cm.x * f, fy = cm.y * f * .8, half = w / 2 / z + base, c0 = Math.floor((fx - half) / cw), c1 = Math.floor((fx + half) / cw), t = SR.anim;
+  g.globalAlpha = alpha;
+  for (let ci = c0; ci <= c1; ci++) {
+    if (srH(ci, seed) > prob) continue;
+    const X = ci * cw + srH(ci, seed + 1) * cw * .8 + t * wob * (.4 + srH(ci, seed + 5)), Y = y0 + srH(ci, seed + 2) * (y1 - y0), v = Math.floor(srH(ci, seed + 3) * spr.length), s = base * (.7 + srH(ci, seed + 4) * .7), im = spr[v];
+    const sx = w / 2 + (X - fx) * z, sy = h / 2 + (Y - fy) * z, dw = s * z, dh = dw * im.height / im.width;
+    if (sx + dw < 0 || sx - dw > w || sy + dh < -50 || sy - dh > h + 50) continue;
+    g.drawImage(im, sx - dw / 2, sy - dh * .35, dw, dh);
+  }
+  g.globalAlpha = 1;
+}
+function srDrawBack(g) {
+  const w = SR.w, h = SR.h, cm = SR.cam, A = SR.art, t = SR.anim, alt = clamp(-cm.y / 1100, 0, 1);
+  if (!SR.skyG || SR.skyH !== h) { const gr = SR.skyG = g.createLinearGradient(0, 0, 0, h); SR.skyH = h; gr.addColorStop(0, '#0f4fd8'); gr.addColorStop(.38, '#2f8cff'); gr.addColorStop(.72, '#85c6ff'); gr.addColorStop(1, '#dff0ff'); }
+  g.fillStyle = SR.skyG; g.fillRect(0, 0, w, h);
+  if (alt > 0) { g.fillStyle = `rgba(8,30,120,${(alt * .28).toFixed(3)})`; g.fillRect(0, 0, w, h * .7); }   // más altura = azul más profundo
+  // sol, resplandor y rayos
+  const sx = w * .78 - cm.x * .004 % 40, sy = h * (.2 + alt * .03), sz = Math.min(w, h) * .85;
+  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .8; g.drawImage(A.sun, sx - sz / 2, sy - sz / 2, sz, sz);
+  g.translate(sx, sy); g.rotate(t * .025); const R = Math.hypot(w, h);
+  for (let i = 0; i < 9; i++) { const a = i / 9 * TAU, wd = .07 + .02 * Math.sin(i * 2.7 + t * .5); g.fillStyle = 'rgba(255,240,190,.06)'; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a - wd) * R, Math.sin(a - wd) * R); g.lineTo(Math.cos(a + wd) * R, Math.sin(a + wd) * R); g.closePath(); g.fill(); }
+  g.restore();
+  // horizonte lejano (se repite): cordilleras y estructuras celestiales emergiendo del mar de nubes
+  { const dh = h * .62, sc = dh / 560, tw = 1800 * sc, yb = h * .93 + clamp(-cm.y, -300, 900) * cm.z * .035 * 0 + (cm.y * .03) * cm.z, off = ((cm.x * .035 * cm.z) % tw + tw) % tw;
+    for (let x = -off; x < w; x += tw) g.drawImage(A.far, x, yb - dh, tw + 1, dh);
+    const gr = g.createLinearGradient(0, yb - h * .08, 0, yb + h * .1); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.5, 'rgba(240,248,255,.9)'); gr.addColorStop(1, 'rgba(240,248,255,1)'); g.fillStyle = gr; g.fillRect(0, yb - h * .08, w, h - (yb - h * .08)); }
+  srLayer(g, A.puff, .08, .55, 700, -420, 520, .8, .85, 31, 360, 6);
+  srLayer(g, A.isl, .13, .5, 1700, -480, 420, .8, .75, 41, 330, 0);
+  srLayer(g, A.puff, .2, .8, 600, -700, 640, .75, .9, 32, 340, 9);
+  srLayer(g, A.isl, .3, .8, 1500, -700, 640, .7, .92, 42, 400, 0);
+  srLayer(g, A.puff, .42, 1, 650, -900, 800, .7, .95, 33, 380, 12);
+}
+function srDrawTrack(g) {
+  const T = SR.trk, cm = SR.cam, z = cm.z, w = SR.w, h = SR.h, S = SRC.STEP, t = SR.anim, c = SR.car;
+  const vx0 = cm.x - w / 2 / z - 160, vx1 = cm.x + w / 2 / z + 160;
+  for (const p of T.plats) {
+    if (p.x1 < vx0 || p.x0 > vx1) continue;
+    const n = p.ys.length, i0 = Math.max(0, Math.floor((vx0 - p.x0) / S)), i1 = Math.min(n - 1, Math.ceil((vx1 - p.x0) / S));
+    if (i1 <= i0) continue;
+    const X = i => p.x0 + i * S, kd = p.kind;
+    if (kd !== 'bridge' && kd !== 'bounce') {   // cuerpo rocoso flotante
+      if (!p.gr) { const gr = p.gr = g.createLinearGradient(0, p.ylo, 0, p.yhi); gr.addColorStop(0, '#b6c8f2'); gr.addColorStop(.18, '#7188d6'); gr.addColorStop(.6, '#3b4a9c'); gr.addColorStop(1, '#1b2260'); }
+      g.beginPath(); g.moveTo(X(i0), p.ys[i0]); for (let i = i0 + 1; i <= i1; i++) g.lineTo(X(i), p.ys[i]);
+      for (let i = i1; i >= i0; i--) g.lineTo(X(i), p.ys[i] + p.bot[i]); g.closePath(); g.fillStyle = p.gr; g.fill();
+      g.strokeStyle = 'rgba(210,225,255,.22)'; g.lineWidth = 3; g.stroke();
+    }
+    // calzada
+    const th = kd === 'bridge' ? 9 : 24;
+    g.beginPath(); g.moveTo(X(i0), p.ys[i0]); for (let i = i0 + 1; i <= i1; i++) g.lineTo(X(i), p.ys[i]); for (let i = i1; i >= i0; i--) g.lineTo(X(i), p.ys[i] + th); g.closePath();
+    g.fillStyle = kd === 'bridge' ? '#7a5632' : kd === 'bounce' ? '#ff7bd5' : kd === 'ramp' ? '#26357a' : kd === 'finish' ? '#16204f' : '#17224f'; g.fill();
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    const line = (dy, col, lw, dash) => { g.beginPath(); g.moveTo(X(i0), p.ys[i0] + dy); for (let i = i0 + 1; i <= i1; i++) g.lineTo(X(i), p.ys[i] + dy); g.strokeStyle = col; g.lineWidth = lw; g.setLineDash(dash || []); g.stroke(); g.setLineDash([]); };
+    if (kd === 'bridge') {
+      line(0, '#ffd56a', 4); line(9, '#4a3320', 3);
+      for (let i = i0; i <= i1; i++) { if (i % 2) continue; const x = X(i); g.fillStyle = 'rgba(40,24,10,.5)'; g.fillRect(x - 1, p.ys[i], 2, 9); }
+      for (let i = i0 - (i0 % 3); i <= i1; i += 3) { const x = X(i); g.strokeStyle = '#ffe9a6'; g.lineWidth = 3; g.beginPath(); g.moveTo(x, p.ys[i]); g.lineTo(x, p.ys[i] - 44); g.stroke(); g.fillStyle = '#9fe4ff'; g.beginPath(); g.arc(x, p.ys[i] - 48, 4, 0, TAU); g.fill(); }
+      line(-44, 'rgba(255,233,166,.75)', 2);
+    } else if (kd === 'bounce') {
+      const sq = SR.bounceT > 0 ? Math.sin(SR.bounceT / .45 * Math.PI) * 10 : 0;
+      line(0, '#ffb3ec', 12 + sq * .3); line(0, 'rgba(255,255,255,.7)', 4);
+      for (let i = i0; i <= i1; i += 2) { const x = X(i), y = p.ys[i], rr = 22 + 6 * Math.sin(i * 1.7 + t * 2); g.fillStyle = 'rgba(255,255,255,.88)'; g.beginPath(); g.arc(x, y + 12 - sq * .3, rr, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,155,225,.5)'; g.beginPath(); g.arc(x, y + 22 - sq * .3, rr * .8, 0, TAU); g.fill(); }
+      g.save(); g.globalCompositeOperation = 'lighter'; for (let i = i0; i <= i1; i += 3) { const x = X(i), y = p.ys[i], a = (t * 2 + i * .4) % 1; g.strokeStyle = `rgba(255,190,240,${(1 - a) * .8})`; g.lineWidth = 3; g.beginPath(); g.moveTo(x - 10, y - 8 - a * 70); g.lineTo(x, y - 24 - a * 70); g.lineTo(x + 10, y - 8 - a * 70); g.stroke(); } g.restore();
+    } else {
+      line(0, kd === 'ramp' ? '#ff9a2e' : '#7fe3ff', 5); line(24, kd === 'ramp' ? '#ffe08a' : '#ffd56a', 3);
+      line(12, kd === 'ramp' ? 'rgba(255,214,120,.85)' : kd === 'finish' ? 'rgba(255,255,255,.9)' : 'rgba(255,240,180,.65)', kd === 'finish' ? 12 : 3, kd === 'ramp' ? [18, 18] : kd === 'finish' ? [24, 24] : [30, 26]);
+      if (kd === 'ramp') { const i = i1; if (i === n - 1) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(X(i), p.ys[i], 2, X(i), p.ys[i], 70); gr.addColorStop(0, 'rgba(255,200,90,.85)'); gr.addColorStop(1, 'rgba(255,160,40,0)'); g.fillStyle = gr; g.fillRect(X(i) - 70, p.ys[i] - 70, 140, 140); g.restore(); } }
+    }
+  }
+  // farolas, flechas y carteles
+  for (const x of T.lamps) { if (x < vx0 || x > vx1) continue; const y = srSurfY(x); if (y == null) continue; g.strokeStyle = '#e9eefc'; g.lineWidth = 5; g.beginPath(); g.moveTo(x, y); g.lineTo(x, y - 74); g.lineTo(x + 20, y - 80); g.stroke(); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x + 22, y - 78, 1, x + 22, y - 78, 34); gr.addColorStop(0, 'rgba(255,236,170,.95)'); gr.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = gr; g.fillRect(x - 14, y - 112, 72, 70); g.restore(); }
+  for (const sg of T.signs) {
+    if (sg.x < vx0 || sg.x > vx1) continue; const y = srSurfY(sg.x); if (y == null) continue; const x = sg.x;
+    g.fillStyle = '#e9eefc'; g.fillRect(x - 3, y - 96, 6, 96); g.fillStyle = '#ff7a1a'; g.strokeStyle = '#fff1d6'; g.lineWidth = 4; g.beginPath(); g.rect(x - 54, y - 150, 108, 60); g.fill(); g.stroke();
+    g.strokeStyle = '#fff'; g.lineWidth = 7; const ph = (t * 40) % 24; g.beginPath(); for (let k = -1; k < 3; k++) { const ax = x - 40 + k * 24 + ph; if (ax > x - 46 && ax < x + 36) { g.moveTo(ax, y - 136); g.lineTo(ax + 16, y - 120); g.lineTo(ax, y - 104); } } g.stroke();
+  }
+  // zonas de impulso (flechas animadas sobre la calzada)
+  g.save(); g.globalCompositeOperation = 'lighter';
+  for (const pd of T.pads) { if (pd.x1 < vx0 || pd.x0 > vx1) continue; for (let x = pd.x0; x < pd.x1; x += 34) { const y = srSurfY(x); if (y == null) continue; const a = ((x - pd.x0) / 34 - t * 6) % 3, al = .35 + .6 * Math.max(0, Math.sin(a * 2.1) * .5 + .5); g.strokeStyle = `rgba(127,227,255,${al.toFixed(2)})`; g.lineWidth = 6; g.beginPath(); g.moveTo(x, y - 14); g.lineTo(x + 16, y - 5); g.lineTo(x, y + 4); g.stroke(); } }
+  g.restore();
+}
+
+function srDrawItems(g) {
+  const T = SR.trk, cm = SR.cam, z = cm.z, w = SR.w, t = SR.anim;
+  const vx0 = cm.x - w / 2 / z - 200, vx1 = cm.x + w / 2 / z + 200;
+  // puntos de control: cortina de luz + mástil con bandera
+  for (let i = 0; i < T.cps.length; i++) {
+    const cp = T.cps[i], x = cp.x; if (x < vx0 || x > vx1) continue; const y = srSurfY(x); if (y == null) continue;
+    const on = cp.got, col = on ? '255,224,130' : '127,227,255';
+    g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, y - 230, 0, y); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(1, `rgba(${col},${on ? .4 : .3})`); g.fillStyle = gr; g.fillRect(x - 14, y - 230, 28, 230); g.restore();
+    g.fillStyle = '#e9eefc'; g.fillRect(x - 5, y - 200, 10, 200); g.fillStyle = on ? '#ffd56a' : '#7fe3ff';
+    g.beginPath(); g.moveTo(x + 5, y - 196); g.quadraticCurveTo(x + 40, y - 188 + Math.sin(t * 5 + i) * 6, x + 74, y - 176 + Math.sin(t * 5 + i + 1) * 8); g.lineTo(x + 5, y - 152); g.fill();
+    g.fillStyle = '#0b1a44'; g.font = '900 15px ' + SR.disp; g.textAlign = 'left'; g.fillText(String(i + 1), x + 18, y - 168);
+    g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${col},.8)`; g.beginPath(); g.arc(x, y - 206, 9 + Math.sin(t * 4) * 1.5, 0, TAU); g.fill(); g.restore();
+  }
+  // pórtico de salida
+  { const x = T.startX + 260, y = srSurfY(x); if (y != null && x > vx0 && x < vx1) {
+      g.fillStyle = '#e9eefc'; g.fillRect(x - 90, y - 210, 10, 210); g.fillRect(x + 80, y - 210, 10, 210);
+      const gr = g.createLinearGradient(0, y - 240, 0, y - 190); gr.addColorStop(0, '#2b6bd8'); gr.addColorStop(1, '#14307a'); g.fillStyle = gr; g.fillRect(x - 100, y - 240, 200, 48); g.strokeStyle = '#ffe08a'; g.lineWidth = 4; g.strokeRect(x - 100, y - 240, 200, 48);
+      g.fillStyle = '#fff6d8'; g.font = '900 italic 20px ' + SR.disp; g.textAlign = 'center'; g.fillText('SALIDA', x, y - 207);
+      g.fillStyle = 'rgba(255,255,255,.9)'; for (let k = 0; k < 8; k++) { g.fillRect(x - 60 + 0, y - 3 + (k % 2) * 0, 0, 0); }
+      g.fillStyle = '#fff'; g.fillRect(x - 6, y - 1, 12, 5); g.fillStyle = '#111'; g.fillRect(x - 6, y - 1, 6, 5 / 2); } }
+  // meta
+  { const x = T.finishX, y = srSurfY(x); if (y != null && x > vx0 && x < vx1) {
+      g.fillStyle = '#e9eefc'; g.fillRect(x - 70, y - 260, 12, 260); g.fillRect(x + 58, y - 260, 12, 260);
+      const sq = 16; for (let r = 0; r < 3; r++) for (let k = 0; k < 8; k++) { g.fillStyle = (r + k) % 2 ? '#101528' : '#fff'; g.fillRect(x - 64 + k * 16, y - 262 + r * sq, sq, sq); }
+      g.fillStyle = 'rgba(16,21,40,.88)'; g.fillRect(x - 64, y - 214, 128, 36); g.fillStyle = '#ffe08a'; g.font = '900 italic 24px ' + SR.disp; g.textAlign = 'center'; g.fillText('META', x, y - 188);
+      g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, y - 260, 0, y); gr.addColorStop(0, 'rgba(255,224,130,0)'); gr.addColorStop(1, 'rgba(255,224,130,.35)'); g.fillStyle = gr; g.fillRect(x - 58, y - 260, 116, 260); g.restore(); } }
+  // barreras de los extremos
+  for (const bx of [T.xmin - 14, T.xmax + 14]) { if (bx < vx0 || bx > vx1) continue; const y = srSurfY(Math.min(Math.max(bx, T.xmin), T.xmax)); if (y == null) continue; g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, y - 180, 0, y); gr.addColorStop(0, 'rgba(127,227,255,0)'); gr.addColorStop(1, 'rgba(127,227,255,.55)'); g.fillStyle = gr; g.fillRect(bx - 5, y - 180, 10, 180); g.restore(); }
+  // aros de impulso
+  for (let i = 0; i < T.rings.length; i++) {
+    const rg = T.rings[i]; if (rg.x < vx0 || rg.x > vx1) continue;
+    const used = rg.used, pul = 1 + .05 * Math.sin(t * 5 + i), fx = rg.fx > 0 ? rg.fx : 0, rr = rg.r * pul * (1 + (.6 - fx) * (used ? .5 : 0)), al = used ? Math.max(0, fx / .6) * .8 : 1;
+    if (used && al <= 0) continue;
+    g.save(); g.translate(rg.x, rg.y); g.rotate(rg.a * .35);
+    g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(0, 0, rr * .3, 0, 0, rr * 1.5); gr.addColorStop(0, `rgba(255,224,130,${.0 * al})`); gr.addColorStop(.7, `rgba(255,200,90,${.35 * al})`); gr.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(0, 0, rr * 1.5, rr * 1.5, 0, 0, TAU); g.fill();
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = al; g.lineWidth = 12; g.strokeStyle = '#ffcf4a'; g.beginPath(); g.ellipse(0, 0, 20, rr, 0, 0, TAU); g.stroke();
+    g.lineWidth = 4; g.strokeStyle = '#fff6d8'; g.beginPath(); g.ellipse(0, 0, 20, rr, 0, 0, TAU); g.stroke();
+    g.fillStyle = '#7fe3ff'; for (let k = 0; k < 6; k++) { const a = t * 2 + k / 6 * TAU; g.beginPath(); g.arc(Math.cos(a) * 20, Math.sin(a) * rr, 4, 0, TAU); g.fill(); }
+    g.restore(); if (rg.fx > 0) rg.fx -= 1 / 60;
+  }
+}
+function srDrawCar(g) {
+  const c = SR.car, bc = CAR_BY_ID[save.sel] || CAR_BY_ID.volt, col = paintCol(bc.id, bc.col), alt = bc.alt || '#fff', H = SRC.H;
+  g.save(); g.translate(c.x, c.y); g.rotate(c.a);
+  const sq = c.land > 0 ? c.land * .12 : 0; g.scale(1 + sq, 1 - sq);
+  if (c.nitOn || c.boostT > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fl = (c.nitOn ? 1 : .55) * (.7 + Math.random() * .6), gr = g.createLinearGradient(-44, 0, -44 - 90 * fl, 0); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.3, 'rgba(255,170,60,.85)'); gr.addColorStop(1, 'rgba(60,180,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(-44, -2); g.lineTo(-44 - 90 * fl, 4); g.lineTo(-44, 10); g.fill(); g.restore(); }
+  // luz inferior
+  g.save(); g.globalCompositeOperation = 'lighter'; const ug = g.createRadialGradient(0, H - 6, 2, 0, H - 6, 60); ug.addColorStop(0, 'rgba(127,227,255,.35)'); ug.addColorStop(1, 'rgba(127,227,255,0)'); g.fillStyle = ug; g.fillRect(-60, H - 50, 120, 60); g.restore();
+  // carrocería
+  const body = () => { g.beginPath(); g.moveTo(-44, 8); g.lineTo(-44, -2); g.quadraticCurveTo(-43, -9, -33, -10); g.lineTo(-20, -11); g.quadraticCurveTo(-12, -25, 3, -25); g.lineTo(10, -25); g.quadraticCurveTo(21, -24, 29, -12); g.lineTo(40, -8); g.quadraticCurveTo(47, -5, 47, 3); g.lineTo(45, 9); g.closePath(); };
+  body(); const gr = g.createLinearGradient(0, -26, 0, 10); gr.addColorStop(0, '#ffffffcc'); gr.addColorStop(.25, col); gr.addColorStop(1, '#0b1224'); g.fillStyle = col; g.fill(); g.fillStyle = gr; g.globalAlpha = .55; g.fill(); g.globalAlpha = 1;
+  g.lineWidth = 2; g.strokeStyle = 'rgba(8,14,34,.85)'; g.stroke();
+  g.fillStyle = alt; g.globalAlpha = .9; g.fillRect(-42, -1, 86, 3); g.globalAlpha = 1;
+  // cristales
+  g.beginPath(); g.moveTo(-18, -11); g.quadraticCurveTo(-11, -22, 2, -22); g.lineTo(9, -22); g.quadraticCurveTo(18, -21, 24, -12); g.closePath(); const wg = g.createLinearGradient(0, -22, 0, -10); wg.addColorStop(0, '#d6f2ff'); wg.addColorStop(1, '#2a4a8a'); g.fillStyle = wg; g.fill(); g.strokeStyle = 'rgba(8,14,34,.7)'; g.lineWidth = 1.5; g.stroke();
+  g.fillStyle = '#fff3b0'; g.fillRect(42, -3, 6, 4); g.fillStyle = '#ff4d5e'; g.fillRect(-46, -4, 4, 5);
+  g.save(); g.globalCompositeOperation = 'lighter'; const hg = g.createRadialGradient(46, -1, 1, 46, -1, 26); hg.addColorStop(0, 'rgba(255,245,190,.7)'); hg.addColorStop(1, 'rgba(255,245,190,0)'); g.fillStyle = hg; g.fillRect(40, -24, 40, 46); g.restore();
+  // ruedas
+  for (const wx of [-27, 28]) { g.save(); g.translate(wx, 9); g.fillStyle = '#0b0f1e'; g.beginPath(); g.arc(0, 0, 13.5, 0, TAU); g.fill(); g.rotate(c.wheel); g.fillStyle = '#9db4e8'; g.beginPath(); g.arc(0, 0, 7.5, 0, TAU); g.fill(); g.strokeStyle = '#2b3b6a'; g.lineWidth = 2; for (let k = 0; k < 5; k++) { g.rotate(TAU / 5); g.beginPath(); g.moveTo(0, 0); g.lineTo(7, 0); g.stroke(); } g.restore(); }
+  g.restore();
+}
+function srDrawParts(g) {
+  const N = SRP.N; g.save();
+  for (let i = 0; i < N; i++) {
+    const l = SRP.l[i]; if (l <= 0) continue; const k = l / SRP.m[i], tp = SRP.t[i], s = SRP.s[i];
+    if (tp === 0) { g.fillStyle = `rgba(255,255,255,${(k * .45).toFixed(3)})`; g.beginPath(); g.arc(SRP.x[i], SRP.y[i], s * (1.6 - k * .6), 0, TAU); g.fill(); }
+    else { g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${SRCOL[SRP.c[i]]},${k.toFixed(3)})`; g.beginPath(); g.arc(SRP.x[i], SRP.y[i], s * (.5 + k * .6), 0, TAU); g.fill(); g.globalCompositeOperation = 'source-over'; }
+  }
+  g.restore();
+}
+function srDrawFront(g) {   // nubes en primer plano, líneas de viento y viñeta (espacio de pantalla)
+  const w = SR.w, h = SR.h, c = SR.car, t = SR.anim, cm = SR.cam, sp = Math.hypot(c.g ? c.v : c.vx, c.g ? 0 : c.vy), spf = clamp(sp / 900, 0, 1.2);
+  srLayer(g, SR.art.puff, 1.35, 1.5, 1500, -400, 500, .45, .32, 77, 430, 20);
+  if (spf > .25) { g.save(); g.lineCap = 'round'; const n = 22, a0 = clamp((spf - .25) * .9, 0, .75); for (let i = 0; i < n; i++) { const ph = (t * (1.5 + (i % 5) * .45) + i * .37) % 1, x = w - ph * (w + 400) + 100, y = ((i * 0.618034) % 1) * h, ln = 90 + (i % 7) * 40 * spf; g.strokeStyle = `rgba(255,255,255,${(.22 * a0 * (i % 2 ? 1 : .6)).toFixed(3)})`; g.lineWidth = 1.5 + (i % 3); g.beginPath(); g.moveTo(x, y); g.lineTo(x + ln, y); g.stroke(); } g.restore(); }
+  if (c.nitOn || c.boostT > 0) { const gr = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .4, w / 2, h / 2, Math.hypot(w, h) * .62); gr.addColorStop(0, 'rgba(60,180,255,0)'); gr.addColorStop(1, 'rgba(60,180,255,.28)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }
+}
+function srHUD(g) {
+  const w = SR.w, h = SR.h, c = SR.car, T = SR.trk, u = clamp(Math.min(w, h) / 720, .62, 1.3), dsp = SR.disp, touch = document.body.classList.contains('touch'), pad = 14 * u, saT = 0;
+  g.save(); g.textBaseline = 'alphabetic'; g.shadowColor = 'rgba(0,20,70,.85)'; g.shadowBlur = 6;
+  const txt = (s, x, y, size, col, al) => { g.font = `900 italic ${size * u}px ${dsp}`; g.textAlign = al || 'left'; g.fillStyle = col; g.fillText(s, x, y); };
+  // tiempo y checkpoint (arriba-izquierda)
+  txt(fmtTime(SR.time), pad, pad + 30 * u, 34, '#fff6d8');
+  txt('PUNTO ' + Math.max(0, SR.cp + 1) + '/' + T.cps.length + ' · CAÍDAS ' + SR.falls, pad, pad + 52 * u, 15, '#bfe8ff');
+  // barra de progreso (arriba-centro)
+  { const bw = Math.min(w * .34, 420 * u), bx = w / 2 - bw / 2, by = pad + 10 * u; g.shadowBlur = 0; g.fillStyle = 'rgba(8,20,70,.65)'; g.fillRect(bx, by, bw, 8 * u); g.fillStyle = '#7fe3ff'; const pr = clamp(c.x / T.finishX, 0, 1); g.fillRect(bx, by, bw * pr, 8 * u);
+    for (const cp of T.cps) { g.fillStyle = cp.got ? '#ffd56a' : '#e9eefc'; g.fillRect(bx + bw * cp.x / T.finishX - 1.5, by - 4 * u, 3, 16 * u); }
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(bx + bw * pr, by + 4 * u, 7 * u, 0, TAU); g.fill(); g.fillStyle = '#ffd56a'; g.fillRect(bx + bw - 3, by - 6 * u, 6, 20 * u); g.shadowBlur = 6; }
+  // velocidad y nitro (arriba-derecha)
+  const kmh = Math.round(Math.abs(c.g ? c.v : Math.hypot(c.vx, c.vy)) * .36);
+  txt(String(kmh), w - pad - 62 * u, pad + 36 * u, 44, c.nitOn ? '#ffd56a' : '#fff', 'right'); txt('KM/H', w - pad, pad + 36 * u, 15, '#bfe8ff', 'right');
+  { const bw = 190 * u, bx = w - pad - bw, by = pad + 50 * u; g.shadowBlur = 0; g.fillStyle = 'rgba(8,20,70,.7)'; g.fillRect(bx, by, bw, 12 * u); const gr = g.createLinearGradient(bx, 0, bx + bw, 0); gr.addColorStop(0, '#ff9a2e'); gr.addColorStop(1, '#7fe3ff'); g.fillStyle = gr; g.fillRect(bx, by, bw * clamp(c.nit, 0, 1), 12 * u); g.strokeStyle = '#ffffff88'; g.lineWidth = 1.5; g.strokeRect(bx, by, bw, 12 * u); g.shadowBlur = 6; txt('NITRO', bx, by + 28 * u, 13, '#ffd9a0'); }
+  // altura sobre la pista cuando se vuela
+  if (!c.g && SR.state === 'run') { const ys = srSurfY(c.x), hh = ys == null ? null : Math.max(0, ys - (c.y + SRC.H)); txt(hh == null ? 'EN VUELO' : 'ALTURA ' + Math.round(hh / 10) + ' m', w - pad, pad + 98 * u, 15, '#bfe8ff', 'right'); }
+  g.shadowBlur = 8;
+  // mensajes
+  if (SR.msgT > 0 && SR.msg) { const a = clamp(SR.msgT / .4, 0, 1), s = 1 + (SR.msgT > (SR.msgDur || 1.5) - .15 ? .25 : 0); g.globalAlpha = a; txt(SR.msg, w / 2, h * .27, 36 * s, SR.msgCol, 'center'); g.globalAlpha = 1; }
+  // cuenta atrás
+  if (SR.state === 'count') { const n = Math.ceil(SR.cd - .0001), fr = SR.cd - Math.floor(SR.cd); if (n <= 3 && n >= 1) { g.globalAlpha = clamp(fr * 2 + .3, 0, 1); txt(String(n), w / 2, h * .42, 120 * (1 + (1 - fr) * .25), '#fff6d8', 'center'); g.globalAlpha = 1; } else txt('PREPÁRATE', w / 2, h * .4, 44, '#fff6d8', 'center'); }
+  // ayuda de controles (los primeros segundos, no en táctil)
+  if (!touch && SR.hint > 0) { g.globalAlpha = clamp(SR.hint / 1.2, 0, 1); txt('W acelerar · S frenar · A/D inclinar en el aire · ESPACIO nitro · R checkpoint · T inicio · P pausa', w / 2, h - 26 * u, 15, '#fff6d8', 'center'); g.globalAlpha = 1; }
+  g.restore();
+}
+function srDraw() {
+  const g = SR.g, w = SR.w, h = SR.h, k = SR.k, cm = SR.cam, z = cm.z;
+  g.setTransform(k, 0, 0, k, 0, 0); srDrawBack(g);
+  g.setTransform(k * z, 0, 0, k * z, k * (w / 2 - cm.x * z + cm.sx), k * (h / 2 - cm.y * z + cm.sy));
+  srDrawTrack(g); srDrawItems(g); srDrawCar(g); srDrawParts(g);
+  g.setTransform(k, 0, 0, k, 0, 0); srDrawFront(g); srHUD(g);
+  if (SR.flash > 0) { g.fillStyle = `rgba(255,248,220,${(SR.flash * .55).toFixed(3)})`; g.fillRect(0, 0, w, h); }
+  if (SR.fade > 0 || SR.state === 'fall') { const fa = SR.state === 'fall' ? clamp(SR.fallT / .55, 0, .85) : SR.fade; g.fillStyle = `rgba(6,12,40,${fa.toFixed(3)})`; g.fillRect(0, 0, w, h); }
+}
+
+/* ---------- entrada: teclado, táctil y mando (estado propio, nunca se mezcla con `keys` de la carrera) ---------- */
+function srPad() {
+  const g = save.pad && save.pad.on ? PAD.gp : null; if (!g) return null;
+  const dn = i => { const b = g.buttons[i]; return !!b && (b.pressed || b.value > .3); }, nin = padNin(g);
+  const A = nin ? dn(1) : dn(0), B = nin ? dn(0) : dn(1), X = nin ? dn(3) : dn(2);
+  const dz = save.pad.dz / 100, ax = g.axes[0] || 0; let str = Math.abs(ax) > dz ? Math.sign(ax) * (Math.abs(ax) - dz) / (1 - dz) : 0;
+  str = clamp(str * save.pad.sens / 100, -1, 1); if (dn(14) && !dn(15)) str = -1; else if (dn(15) && !dn(14)) str = 1;
+  return { thr: dn(7) || A, brk: dn(6) || B, nit: X || dn(5), str, start: dn(9), a: A, b: B };
+}
+function srReadInput(p) {
+  const k = SR.keys, I = SR.in;
+  if (SR.paused || !SR.run) { I.thr = I.brk = I.str = I.nit = 0; return; }
+  I.thr = (k.KeyW || k.ArrowUp || (p && p.thr)) ? 1 : 0; I.brk = (k.KeyS || k.ArrowDown || (p && p.brk)) ? 1 : 0;
+  let str = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0); if (p && Math.abs(p.str) > Math.abs(str)) str = p.str;
+  I.str = str; I.nit = (k.Space || (p && p.nit)) ? 1 : 0;
+}
+function srOverlayShown() { return SR.paused ? 'pause' : SR.state === 'fall' && SR.fallT > .55 ? 'fall' : SR.state === 'finish' && SR.finT > 1.7 ? 'fin' : ''; }
+function srPause(on) {
+  if (!SR.run || on === SR.paused) return; if (on && (SR.state === 'fall' || SR.state === 'finish')) return;
+  SR.paused = on; SR.keys = {}; SR.in.thr = SR.in.brk = SR.in.str = SR.in.nit = 0; if (on) Snd.silence(); else SR.last = performance.now();
+  document.querySelectorAll('#srTouch button').forEach(b => b.classList.remove('down'));
+}
+function srKeyDown(e) {
+  if (!SR.run) return;
+  e.stopImmediatePropagation();                         // el juego principal no debe ver ninguna tecla mientras dura el circuito
+  if (!e.isTrusted) { e.preventDefault(); return; }     // pulsaciones sintéticas del mando: se leen directamente con srPad()
+  const k = e.code; if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(k)) e.preventDefault();
+  Snd.init(); if (e.repeat) return;
+  if (k === 'KeyM') { toggleSound(); return; }
+  const ov = srOverlayShown();
+  if (ov === 'pause') { if (k === 'Escape' || k === 'KeyP' || k === 'Enter') srPause(false); else if (k === 'KeyR') srRespawn(false); else if (k === 'KeyT') srRespawn(true); return; }
+  if (ov === 'fall') { if (k === 'Enter' || k === 'Space' || k === 'KeyR') srRespawn(false); else if (k === 'KeyT') srRespawn(true); else if (k === 'Escape') srExit(); return; }
+  if (ov === 'fin') { if (k === 'Enter' || k === 'Space' || k === 'KeyR' || k === 'KeyT') srRespawn(true); else if (k === 'Escape') srExit(); return; }
+  SR.keys[k] = true;
+  if (k === 'Escape' || k === 'KeyP') srPause(true);
+  else if (k === 'KeyR' && SR.state === 'run') srRespawn(false);
+  else if (k === 'KeyT' && (SR.state === 'run' || SR.state === 'count' || SR.state === 'finish')) srRespawn(true);
+}
+function srKeyUp(e) { if (!SR.run) return; SR.keys[e.code] = false; if (e.code === 'Space' || e.code === 'Enter') e.preventDefault(); }
+function srBlur() { if (!SR.run) return; SR.keys = {}; SR.in.thr = SR.in.brk = SR.in.str = SR.in.nit = 0; srPause(true); }
+function srVis() { if (document.hidden) srBlur(); }
+function srResize() {
+  if (!SR.cv) return; const k = Math.min(window.devicePixelRatio || 1, 1.75), w = SR.cv.clientWidth || innerWidth, h = SR.cv.clientHeight || innerHeight;
+  SR.w = w; SR.h = h; SR.k = k; SR.cv.width = Math.round(w * k); SR.cv.height = Math.round(h * k); SR.skyG = null; if (SR.car && SR.trk) srCamSnap();
+}
+function srAddListeners() {
+  if (SR.listeners) return; SR.listeners = true;
+  addEventListener('keydown', srKeyDown, true); addEventListener('keyup', srKeyUp, true); addEventListener('blur', srBlur);
+  document.addEventListener('visibilitychange', srVis); addEventListener('resize', srResize); addEventListener('orientationchange', srResize);
+}
+function srRemoveListeners() {
+  if (!SR.listeners) return; SR.listeners = false;
+  removeEventListener('keydown', srKeyDown, true); removeEventListener('keyup', srKeyUp, true); removeEventListener('blur', srBlur);
+  document.removeEventListener('visibilitychange', srVis); removeEventListener('resize', srResize); removeEventListener('orientationchange', srResize);
+}
+
+/* ---------- sonido: reutiliza Snd (motor, viento, silbidos, barridos); los eventos los genera la física ---------- */
+function srSound(now) {
+  const c = SR.car; while (SR.evs.length) {
+    const e = SR.evs.shift();
+    if (e === 'count') Snd.beep(440, .18, .1, 'square');
+    else if (e === 'go') Snd.go();
+    else if (e === 'launch') { Snd.boost('medium'); Snd.whoosh(.7, .25, 300, 3000); }
+    else if (e === 'pad') Snd.boost('small');
+    else if (e === 'ring') { Snd.beep(880, .16, .1, 'triangle'); Snd.beep(1320, .3, .07, 'sine'); Snd.whoosh(.35, .16, 600, 3400); }
+    else if (e === 'cp') { Snd.beep(660, .2, .09, 'triangle'); Snd.beep(990, .4, .08, 'sine'); }
+    else if (e === 'land') Snd.crash(.22);
+    else if (e === 'landhard') { Snd.crash(.75); Snd.sweep(160, 60, .3, .08, 'square'); }
+    else if (e === 'bounce') { Snd.sweep(180, 1000, .5, .1, 'sine'); Snd.beep(520, .25, .08, 'triangle'); Snd.crash(.3); }
+    else if (e === 'fall') { Snd.sweep(900, 50, 1.1, .12, 'sawtooth'); Snd.whoosh(1.2, .2, 2400, 300); }
+    else if (e === 'finish') { [523, 659, 784, 1047].forEach((f, i) => { Snd.beep(f, 1.4 - i * .1, .07, 'triangle'); Snd.beep(f / 2, 1.4, .04, 'sine'); }); Snd.whoosh(1.2, .2, 400, 3600); }
+  }
+  if (now - SR.snd < 30) return; SR.snd = now;
+  if (SR.paused || SR.state === 'fall') { Snd.silence(); return; }
+  const air = !c.g, sp = air ? Math.hypot(c.vx, c.vy) : Math.abs(c.v), spf = clamp(sp / SRC.VMAX, 0, 1.4), thr = SR.state === 'count' ? (SR.in.thr ? .6 : .1) : SR.in.thr ? 1 : .25;
+  Snd.engine(air ? spf * .75 : spf, thr, c.nitOn);
+  if (Snd.ctx && Snd.wind && save.sound) {   // viento más fuerte y más agudo durante el vuelo
+    const vol = (air ? .05 + .1 * spf : .01 + .035 * spf) + (c.nitOn ? .03 : 0), t = Snd.ctx.currentTime;
+    Snd.wind.g.gain.setTargetAtTime(vol, t, .1); Snd.wind.f.frequency.setTargetAtTime(500 + spf * 1900 + (air ? 700 : 0), t, .1);
+  }
+}
+
+/* ---------- pantallas superpuestas (pausa / caída / meta) ---------- */
+function srOverlay() {
+  const ov = srOverlayShown();
+  if (ov === SR.ov) return; SR.ov = ov;
+  for (const [id, n] of [['srPause', 'pause'], ['srFall', 'fall'], ['srFin', 'fin']]) $(id).classList.toggle('on', ov === n);
+  if (ov === 'fall') { const cr = SR.fallWhy === 'crash'; $('srFallT').textContent = cr ? '¡VOLCASTE!' : '¡CAÍSTE AL VACÍO!'; $('srFallP').textContent = (cr ? 'Aterrizaste demasiado torcido. ' : '') + (SR.cp >= 0 ? 'Puedes volver a intentarlo desde el último punto de control (' + (SR.cp + 1) + '/' + SR.trk.cps.length + ') o desde el principio.' : 'Aún no has pasado ningún punto de control: reintentarás desde la salida.'); $('srFaCp').textContent = SR.cp >= 0 ? 'DESDE EL CHECKPOINT' : 'REINTENTAR'; $('srFaCp').focus({ preventScroll: true }); }
+  if (ov === 'fin') { $('srFiT').textContent = fmtTime(SR.time); $('srFiB').textContent = fmtTime(SR.best); $('srFiF').textContent = SR.falls; $('srFiR').textContent = SR.ringN + '/' + SR.trk.rings.length; $('srFiAgain').focus({ preventScroll: true }); }
+  if (ov === 'pause') $('srPzGo').focus({ preventScroll: true });
+}
+let srPadPrev = { a: false, b: false, s: false };
+function srPadNav(p) {   // mando en las pantallas superpuestas: A = principal, B = secundaria, Start = pausa
+  const a = !!(p && p.a), b = !!(p && p.b), s = !!(p && p.start), ov = srOverlayShown();
+  if (a && !srPadPrev.a) { if (ov === 'pause') srPause(false); else if (ov === 'fall') srRespawn(false); else if (ov === 'fin') srRespawn(true); }
+  if (b && !srPadPrev.b) { if (ov === 'pause') srRespawn(false); else if (ov === 'fall') srRespawn(true); else if (ov === 'fin') srExit(); }
+  if (s && !srPadPrev.s) { if (ov === 'pause') srPause(false); else if (!ov) srPause(true); }
+  srPadPrev = { a, b, s };
+}
+
+/* ---------- bucle propio ---------- */
+function srFrame(now) {
+  if (!SR.run) return;
+  SR.raf = requestAnimationFrame(srFrame);
+  let dt = (now - SR.last) / 1000; SR.last = now; if (document.hidden) return; dt = Math.min(dt, .05);
+  try {
+    const p = srPad(); srPadNav(p); SR.frames++;
+    if (!SR.paused) {
+      srReadInput(p);
+      const n = Math.max(1, Math.ceil(dt / .0085)), h = dt / n; for (let i = 0; i < n; i++) srStep(h);
+      srPartsStep(dt); srCamUpdate(dt);
+      if (SR.msgT > 0) SR.msgT -= dt; if (SR.state !== 'fall') SR.fade = Math.max(0, SR.fade - dt * 2.2); if (SR.flash > 0) SR.flash = Math.max(0, SR.flash - dt * 1.3); if (SR.state === 'run' && SR.hint > 0) SR.hint -= dt;
+    }
+    srOverlay(); srSound(now); srDraw();
+  } catch (err) { console.error(err); }
+}
+function srStart() {
+  if (SR.run || mode !== 'skycrown' || !skyOpen()) return;
+  if (!SR.cv) { SR.cv = $('srCv'); SR.g = SR.cv.getContext('2d'); }
+  if (!SR.trk) { SR.trk = srBuildTrack(); srPartsInit(); SR.car = srNewCar(); }
+  if (!SR.art) SR.art = srMakeArt();
+  SR.disp = (getComputedStyle(document.documentElement).getPropertyValue('--disp') || '').trim() || '"Segoe UI",Roboto,sans-serif';
+  mode = 'skyrace'; frozen = false; toggleCtl(false);
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on', 'out')); $('topbar').classList.remove('on');
+  document.documentElement.classList.add('sky-race-active'); $('skyRace').className = 'on';
+  SR.run = true; SR.keys = {}; SR.paused = false; SR.ov = ''; SR.anim = 0; SR.hint = 7; SR.snd = 0; SR.evs.length = 0; SR.lastN = 99; SR.frames = 0; srPadPrev = { a: true, b: true, s: true };
+  srAddListeners(); srResize(); Snd.init(); Snd.silence();
+  srRespawn(true); SR.last = performance.now(); cancelAnimationFrame(SR.raf); SR.raf = requestAnimationFrame(srFrame);
+}
+function srExit() {
+  if (!SR.run) return;
+  SR.run = false; cancelAnimationFrame(SR.raf); srRemoveListeners();
+  SR.keys = {}; SR.paused = false; SR.state = 'idle'; SR.ov = ''; SR.evs.length = 0; SR.in.thr = SR.in.brk = SR.in.str = SR.in.nit = 0;
+  for (const k in keys) keys[k] = false;                                    // ninguna tecla de la carrera queda «pulsada»
+  document.querySelectorAll('#srTouch button').forEach(b => b.classList.remove('down'));
+  for (const id of ['srPause', 'srFall', 'srFin']) $(id).classList.remove('on');
+  $('skyRace').className = ''; document.documentElement.classList.remove('sky-race-active');
+  Snd.silence(); Snd.squeal(0); if (SR.g) SR.g.clearRect(0, 0, SR.cv.width, SR.cv.height);
+  go('skycrown');                                                            // vuelve a la pantalla de la Corona de los Cielos
+}
+/* botones de las pantallas superpuestas y controles táctiles (los manejadores sólo actúan si SR.run) */
+{ const on = (id, fn) => $(id).addEventListener('click', e => { e.currentTarget.blur(); if (SR.run) fn(); });
+  on('srPzGo', () => srPause(false)); on('srPzCp', () => srRespawn(false)); on('srPzSt', () => srRespawn(true)); on('srPzQuit', srExit);
+  on('srFaCp', () => srRespawn(false)); on('srFaSt', () => srRespawn(true)); on('srFaQuit', srExit);
+  on('srFiAgain', () => srRespawn(true)); on('srFiBack', srExit);
+  $('srTcPause').addEventListener('click', () => { if (SR.run) srPause(true); });
+  document.querySelectorAll('#srTouch [data-k]').forEach(b => {
+    const code = b.dataset.k, dn = e => { e.preventDefault(); if (!SR.run || SR.paused) return; SR.keys[code] = true; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (x) { /* */ } }, up = () => { SR.keys[code] = false; b.classList.remove('down'); };
+    b.addEventListener('pointerdown', dn); b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up); b.addEventListener('contextmenu', e => e.preventDefault());
+  });
+}
+$('skGo').onclick = srStart;
 
 go(save.name ? 'menu' : 'welcome');
 requestAnimationFrame(frame);
 </script>
 <!-- ===== DEVTOOLS-BEGIN (JS) · TEMPORAL: eliminar este bloque de script completo antes de publicar ===== -->
 <script id="devtools">
-/* Panel de administrador: Ctrl+Shift+1+Q. Sólo cambia datos al pulsar expresamente sus botones. */
+/* Panel de administrador: Ctrl+Shift+1+Q o botón ⚙ del menú principal. Sólo cambia datos al pulsar expresamente sus botones. */
 (() => {
   'use strict';
   const root = document.getElementById('devpanel'), stEl = document.getElementById('dvState'), skEl = document.getElementById('dvSky'), msgEl = document.getElementById('dvMsg');
