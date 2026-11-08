@@ -326,6 +326,7 @@ setInterval(() => {
 /* ---------------------------------------------------------------------
    6. HTTP + SOCKET.IO
    --------------------------------------------------------------------- */
+const STATIC = { '/icon-192.png': 'image/png', '/icon-512.png': 'image/png', '/apple-touch-icon.png': 'image/png', '/manifest.webmanifest': 'application/manifest+json' };
 const server = http.createServer((req, res) => {
   const u = req.url.split('?')[0];
   if (u === '/health' || u === '/healthz') {
@@ -333,6 +334,11 @@ const server = http.createServer((req, res) => {
     return res.end(JSON.stringify({ ok: true, rooms: rooms.size, players: players.size, uptime: Math.round(process.uptime()), hash: HASH }));
   }
   if (u === '/' || u === '/index.html') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' }); return res.end(HTML); }
+  const st = STATIC[u];   // iconos y manifest de la app (PWA)
+  if (st) {
+    const f = path.join(__dirname, u.slice(1));
+    if (fs.existsSync(f)) { res.writeHead(200, { 'Content-Type': st, 'Cache-Control': 'public, max-age=86400' }); return res.end(fs.readFileSync(f)); }
+  }
   res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('404');
 });
 const io = new Server(server, { cors: { origin: '*' }, transports: ['websocket', 'polling'], pingInterval: 10000, pingTimeout: 25000, perMessageDeflate: false, httpCompression: false });
