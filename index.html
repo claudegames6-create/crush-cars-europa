@@ -685,6 +685,15 @@ body.inrace #netBadge{top:6px}
 .lb-code{font-family:var(--disp);font-size:clamp(34px,6vw,58px);font-weight:900;font-style:italic;letter-spacing:.1em;color:var(--orange2);text-shadow:0 0 26px #ff7a1a66;user-select:all}
 .lb-actions{display:flex;gap:8px;flex-wrap:wrap}.lb-mode{font-weight:900;letter-spacing:.08em;color:var(--blue)}.lb-net{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px}
 .grow{flex:1}
+.cf-r.crw{flex-direction:column;align-items:stretch}.cf-r.crw .cf-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.cf-r.crw .cf-g .btn{padding:8px 4px;font-size:12px;white-space:normal;line-height:1.15;text-align:center}
+@media(max-width:620px){.cf-r.crw .cf-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#mplobby.party .lb-right,#mplobby.party #lbReady,#mplobby.party #lbStart,#mplobby:not(.party) #lbCont,#mplobby.party #lbBack{display:none!important}
+#mplobby.party .lb-grid{grid-template-columns:minmax(0,1fr)}
+#ptyBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px;padding:10px 14px;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;background:#0a1226cc}
+#ptyBar[hidden]{display:none}#ptyBar .pb-t{font-family:var(--disp);font-size:12px;letter-spacing:.14em;color:var(--blue)}
+#ptyBar .pb-p{display:flex;align-items:center;gap:7px;padding:4px 10px 4px 5px;border-radius:99px;background:#ffffff10;font-weight:800;font-size:12.5px}
+#ptyBar .pb-p .tav{width:26px;height:26px;font-size:15px}#ptyBar .pb-p small{color:var(--dim);font-weight:600}#ptyBar .pb-p.off{opacity:.45}
+#modes.party .md-btn.lockd{opacity:.45;pointer-events:none}#ptyNote{color:var(--orange2);font-size:12.5px;margin:-6px 0 10px}
 .lb-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px;align-items:start}.lb-left,.lb-right{min-width:0}
 @media(max-width:900px){.lb-grid,.mp-cols{grid-template-columns:minmax(0,1fr)}.mp-conn,.mp-cols,.mp-err,#mpAdv{margin-left:0}}
 .lb-left h4,.lb-right h4{font-family:var(--disp);letter-spacing:.12em;margin:10px 0 8px;font-size:15px;color:var(--blue)}.lb-right h4 small{color:var(--dim);font-weight:600;letter-spacing:0;margin-left:8px}
@@ -986,6 +995,7 @@ body.touch #skyRace.on #srTouch{display:block}
   <div class="tagline">VELOCIDAD · NITRO · GLORIA</div>
   <div class="menu-btns">
     <button class="btn pri" data-go="modes">JUGAR <small id="mnCar">VOLT</small></button>
+    <button class="btn" data-go="mpmenu">MULTIJUGADOR <small>Online con amigos</small></button>
     <button class="btn" data-go="garage">GARAJE <small>Coches y mejoras</small></button>
     <button class="btn" data-go="shop">TIENDA <small>Estilos de nitro</small></button>
     <button class="btn" data-go="profile">PERFIL <small>Estadísticas</small></button>
@@ -1003,13 +1013,12 @@ body.touch #skyRace.on #srTouch{display:block}
 
 <section class="screen" id="modes">
   <div class="md-main">
+    <div id="ptyBar" hidden></div><div id="ptyNote" hidden></div>
     <h2 class="title">ELIGE <b>MODO</b></h2>
     <p class="sub">Elige cómo quieres correr. Pasa el cursor sobre un modo para ver cómo se juega.</p>
     <div class="md-btns">
       <button class="md-btn" data-mode="race" data-go="maps"><span class="md-ic">🏁</span><span class="md-tx"><b>CARRERA</b><small>Elige circuito y cilindrada · gana monedas y XP · sube de nivel</small></span><span class="md-tag">INDIVIDUAL</span><span class="md-ar">›</span></button>
       <button class="md-btn sv" data-mode="surv" data-go="survival"><span class="md-ic">💀</span><span class="md-tx"><b>SUPERVIVENCIA</b><small>12 pilotos · 4 rondas eliminatorias · solo queda un campeón</small></span><span class="md-tag">INDIVIDUAL</span><span class="md-ar">›</span></button>
-      <button class="md-btn on" data-mode="net" data-go="mpmenu"><span class="md-ic">🌐</span><span class="md-tx"><b>CARRERA ONLINE</b><small>Crea una sala privada y corre con tus amigos · bots opcionales · eventos</small></span><span class="md-tag">ONLINE · AMIGOS</span><span class="md-ar">›</span></button>
-      <button class="md-btn on sv" data-mode="snet" data-go="mpmenu"><span class="md-ic">☠️</span><span class="md-tx"><b>SUPERVIVENCIA ONLINE</b><small>Torneo eliminatorio con amigos: 12 → 9 → 6 → 3 → 1 campeón</small></span><span class="md-tag">ONLINE · AMIGOS</span><span class="md-ar">›</span></button>
     </div>
   </div>
   <div class="md-cap" id="mdCap"><i></i><span id="mdCapT">VISTA PREVIA · GAMEPLAY</span></div>
@@ -1184,11 +1193,7 @@ body.touch #skyRace.on #srTouch{display:block}
   <p class="sub">Corre online con tus amigos en salas privadas con código.</p>
   <div class="mp-conn"><span class="mp-dot" id="mpDot" data-s="x"></span><span id="mpConnTxt">SIN CONEXIÓN</span></div>
   <div class="mp-cols">
-    <div class="mp-card"><h3>CREAR SALA PRIVADA</h3><p>Elige el tipo de partida y comparte el código con tus amigos.</p>
-      <div class="mp-modes" id="mpModes">
-        <button class="btn on" data-mode="duel">DUELO 1 vs 1 <small>Dos jugadores · bots opcionales</small></button>
-        <button class="btn" data-mode="party">AMIGOS Y BOTS <small>Hasta 8 participantes</small></button>
-      </div>
+    <div class="mp-card"><h3>CREAR SALA PRIVADA</h3><p>Crea la sala, comparte el código y, cuando tus amigos entren, elegid el modo juntos.</p>
       <button class="btn pri" id="mpCreate">CREAR SALA</button></div>
     <div class="mp-card"><h3>UNIRSE CON CÓDIGO</h3><p>Escribe el código que te ha pasado tu amigo (por ejemplo CC-7K9P2).</p>
       <input class="inp" id="mpCode" maxlength="12" placeholder="CC-7K9P2" autocomplete="off" spellcheck="false" autocapitalize="characters">
@@ -1213,7 +1218,7 @@ body.touch #skyRace.on #srTouch{display:block}
     <div class="lb-right"><h4>CONFIGURACIÓN <small id="lbCfgNote"></small></h4><div id="lbCfg"></div></div>
   </div>
   <p class="lb-hint" id="lbHint"></p>
-  <div class="actions"><button class="btn danger" id="lbLeave">SALIR DE LA SALA</button><span class="grow"></span><button class="btn" id="lbReady">LISTO</button><button class="btn pri" id="lbStart">INICIAR CARRERA</button></div>
+  <div class="actions"><button class="btn danger" id="lbLeave">SALIR DE LA SALA</button><button class="btn" id="lbBack">‹ CAMBIAR MODO</button><span class="grow"></span><button class="btn" id="lbReady">LISTO</button><button class="btn pri" id="lbCont">CONTINUAR ›</button><button class="btn pri" id="lbStart">INICIAR CARRERA</button></div>
 </section>
 
 <section class="screen" id="results">
@@ -5315,7 +5320,6 @@ function burst(el, n, cls, base) {
 document.addEventListener('click', e => {
   Snd.init();
   const b = e.target.closest('[data-go]');
-  if (b && (b.dataset.mode === 'net' || b.dataset.mode === 'snet')) NET.kind = b.dataset.mode === 'snet' ? 'surv' : 'race';   // qué tipo de sala se crea desde el menú online
   if (b) go(b.dataset.go);
 });
 const backOf = m => m === 'paint' ? 'garage' : (m === 'maps' || m === 'survival') ? 'modes' : (m === 'crowns' || m === 'skycrown') ? 'survival' : 'menu';
@@ -5942,6 +5946,33 @@ function netGiveUp() {
   NET.wantOpen = false; NET.pid = NET.token = null; NET.room = null; netSetState('off'); toast('Conexión perdida con el servidor');
   if (race && race.net) { race = null; $('pause').classList.remove('on'); go('mpmenu'); } else if (mode === 'mplobby' || mode === 'results') go('mpmenu');
 }
+/* la sala manda: 'party' = elegir coche · 'menu' = el grupo elige modo · 'lobby' = configuración de la partida */
+function netRoute() {
+  const r = NET.room; if (!r) return;
+  const tgt = (r.phase || 'lobby') === 'menu' ? 'modes' : 'mplobby';
+  if (mode === 'mpmenu' || ((mode === 'mplobby' || mode === 'modes') && mode !== tgt)) go(tgt);
+  else if (mode === 'mplobby') lbSchedule(); else if (mode === 'modes') renderPartyBar();
+}
+function renderPartyBar() {
+  const bar = $('ptyBar'), note = $('ptyNote'), md = $('modes'), r = NET.room;
+  md.classList.toggle('party', !!r);
+  if (!r) { bar.hidden = true; note.hidden = true; md.querySelectorAll('.md-btn').forEach(b => b.classList.remove('lockd')); md.querySelectorAll('.md-tag').forEach(t => { t.textContent = 'INDIVIDUAL'; }); return; }
+  const host = r.host === NET.pid;
+  bar.hidden = false; note.hidden = false;
+  bar.innerHTML = '<span class="pb-t">JUGANDO CON</span>' + r.players.map(p => { const car = CAR_BY_ID[p.carId] || CARS[0];
+    return `<span class="pb-p ${p.connected ? '' : 'off'}"><span class="tav">${AVATARS[p.av] || '🏎️'}</span><b>${esc(p.name)}${p.host ? ' 👑' : ''}</b><small>${esc(car.name)}</small></span>`; }).join('') +
+    `<span style="flex:1"></span><span class="pb-t">${esc(r.code)}</span><button class="btn sm danger" data-pleave>SALIR</button>`;
+  note.textContent = host ? 'Elige el modo para todo el grupo.' : 'El anfitrión está eligiendo el modo…';
+  md.querySelectorAll('.md-btn').forEach(b => b.classList.toggle('lockd', !host));
+  md.querySelectorAll('.md-tag').forEach(t => { t.textContent = 'ONLINE · EN GRUPO'; });
+}
+$('modes').addEventListener('click', e => {
+  if (e.target.closest('[data-pleave]')) { e.stopPropagation(); netLeaveRoom(); go('menu'); return; }
+  const b = e.target.closest('.md-btn'); if (!b || !NET.room) return;
+  e.stopPropagation(); e.preventDefault(); Snd.init();
+  if (NET.room.host !== NET.pid) { toast('Solo el anfitrión elige el modo'); return; }
+  netSend({ t: 'mode', kind: b.dataset.mode === 'surv' ? 'surv' : 'race' });
+});
 function netLeaveRoom() { if (NET.room) { netSend({ t: 'leave' }); NET.room = null; } }
 function netPing() { netSend({ t: 'ping', c: performance.now() }); }
 
@@ -5961,8 +5992,7 @@ function netOnMsg(m) {
       netBadge(); break;
     }
     case 'room':
-      NET.room = m;
-      if (mode === 'mpmenu') go('mplobby'); else if (mode === 'mplobby') lbSchedule();
+      NET.room = m; netRoute();
       break;
     case 'noroom': NET.room = null; break;
     case 'err': mpShowErr(m.msg); if (mode !== 'mpmenu') toast(m.msg); break;
@@ -5992,7 +6022,7 @@ setInterval(() => { if (NET.st !== 'off') netBadge(); }, 1000);
 const mpProf = id => { id = id || save.sel; return { name: save.name, av: save.avatar, lvl: playerLevel(), owned: save.owned, carId: id, upg: upgOf(id), pfx: save.pfx.sel }; };
 function mpShowErr(msg) { const e = $('mpErr'); if (e) e.textContent = msg || ''; NET.lastErr = msg || ''; }
 async function mpEnsureConn() { NET.wantOpen = true; try { await netConnect(); } catch (e) { NET.wantOpen = false; throw e; } }
-async function mpCreate() { mpShowErr(''); try { await mpEnsureConn(); netSend({ t: 'create', kind: NET.kind, mode: NET.mode, prof: mpProf(), cfg: { mapId: save.map, rev: save.rev, cc: save.cc } }); } catch (e) { mpShowErr(e.message); } }
+async function mpCreate() { mpShowErr(''); try { await mpEnsureConn(); netSend({ t: 'create', kind: 'race', mode: 'party', prof: mpProf(), cfg: { mapId: save.map, rev: save.rev, cc: save.cc } }); } catch (e) { mpShowErr(e.message); } }
 async function mpJoin() {
   mpShowErr(''); const code = $('mpCode').value.trim(); if (!code) { mpShowErr('Escribe el código de la sala.'); return; }
   try { await mpEnsureConn(); netSend({ t: 'join', code, prof: mpProf() }); } catch (e) { mpShowErr(e.message); }
@@ -6011,13 +6041,9 @@ function mpShareLink() {
 function renderMpMenu() {
   const txt = { open: 'CONECTADO', connecting: 'CONECTANDO…', retry: 'RECONECTANDO…', off: 'SIN CONEXIÓN' }[NET.st];
   $('mpConnTxt').textContent = txt; netBadge();
-  $('mpModes').querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode === NET.mode));
-  { const sv = NET.kind === 'surv', pp = $('mpModes').previousElementSibling; $('mpModes').style.display = sv ? 'none' : '';
-    if (pp) { if (pp.dataset.o === undefined) pp.dataset.o = pp.textContent; pp.textContent = sv ? 'SUPERVIVENCIA ONLINE: torneo eliminatorio de 4 rondas (12 → 9 → 6 → 3 → 1). Hasta 8 amigos y bots hasta completar 12 pilotos.' : pp.dataset.o; } }
   const inp = $('mpSrv'); if (document.activeElement !== inp) inp.value = NET.url || netDefaultUrl();
   $('mpAdv').open = $('mpAdv').open || !netDefaultUrl();
 }
-$('mpModes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) { NET.mode = b.dataset.mode; renderMpMenu(); } });
 $('mpCreate').onclick = mpCreate; $('mpJoin').onclick = mpJoin;
 $('mpSrv').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('mpConnect').click(); } });
 $('mpCode').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); mpJoin(); } });
@@ -6061,9 +6087,10 @@ function lbSchedule() {   // varios mensajes 'room' seguidos se pintan una sola 
 function lbThumb(m, rev) { const k = m.id + (rev ? '_r' : ''); if (!lbThumbs[k]) { const c = document.createElement('canvas'); c.width = 220; c.height = 134; thumb(c, m, rev); lbThumbs[k] = c; } return lbThumbs[k]; }
 function renderLobby() {
   const r = NET.room; if (!r) return; let rebuilt = false;
-  const me = r.players.find(p => p.pid === NET.pid), host = r.host === NET.pid, cfg = r.cfg, hostP = r.players.find(p => p.host) || r.players[0];
-  lbSet('lbCode', r.code); lbSet('lbMode', r.kind === 'surv' ? 'SUPERVIVENCIA ONLINE' : r.mode === 'duel' ? 'DUELO 1 vs 1' : 'AMIGOS + BOTS'); lbSet('lbCount', r.players.length + '/' + r.maxHumans + (cfg.bots ? ' · +' + cfg.bots + ' BOTS' : ''));
-  const plSig = JSON.stringify([r.kind, cfg.bots, cfg.diff, NET.pid, host, r.players.map(p => [p.pid, p.name, p.av, p.lvl, p.carId, p.upg, p.ready, p.host, p.connected, p.block])]);
+  const me = r.players.find(p => p.pid === NET.pid), host = r.host === NET.pid, cfg = r.cfg, hostP = r.players.find(p => p.host) || r.players[0], phase = r.phase || 'lobby';
+  $('mplobby').classList.toggle('party', phase === 'party');
+  lbSet('lbCode', r.code); lbSet('lbMode', phase === 'party' ? 'SALA · ELIGE TU COCHE' : r.kind === 'surv' ? 'SUPERVIVENCIA ONLINE' : r.mode === 'duel' ? 'DUELO 1 vs 1' : 'AMIGOS + BOTS'); lbSet('lbCount', r.players.length + '/' + r.maxHumans + (cfg.bots ? ' · +' + cfg.bots + ' BOTS' : ''));
+  const plSig = JSON.stringify([phase, r.kind, cfg.bots, cfg.diff, NET.pid, host, r.players.map(p => [p.pid, p.name, p.av, p.lvl, p.carId, p.upg, p.ready, p.host, p.connected, p.block])]);
   if (lbS.pl !== plSig) { lbS.pl = plSig; rebuilt = true;
   $('lbPlayers').innerHTML = r.players.map(p => {
     const car = CAR_BY_ID[p.carId] || CARS[0], b = p.block;
@@ -6071,7 +6098,7 @@ function renderLobby() {
       <div class="lb-pn"><b>${esc(p.name)}</b>${p.host ? ' <span class="crown" title="Anfitrión">👑</span>' : ''}<small>NIVEL ${p.lvl}</small></div>
       <canvas width="140" height="84" data-car="${car.id}"></canvas>
       <div class="lb-pc"><b style="color:${car.col}">${esc(car.name)}</b><small>${car.ab ? esc(car.ab.name) : ''}</small><div class="lb-st">${ratingRows(car.id, p.upg)}</div></div>
-      <div class="lb-ps">${b ? `<span class="pill bad">${b.startsWith('nivel') ? 'NIVEL ' + b.slice(6) : 'COCHE BLOQUEADO'}</span>` : p.host ? '<span class="pill ok">ANFITRIÓN</span>' : p.ready ? '<span class="pill ok">PREPARADO</span>' : '<span class="pill">NO PREPARADO</span>'}
+      <div class="lb-ps">${b && phase !== 'party' ? `<span class="pill bad">${b.startsWith('nivel') ? 'NIVEL ' + b.slice(6) : 'COCHE BLOQUEADO'}</span>` : p.host ? '<span class="pill ok">ANFITRIÓN</span>' : phase === 'party' ? '' : p.ready ? '<span class="pill ok">PREPARADO</span>' : '<span class="pill">NO PREPARADO</span>'}
       <span class="mp-dot" data-s="${p.connected ? 'g' : 'x'}" title="${p.connected ? 'Conectado' : 'Desconectado'}"></span>${host && p.pid !== NET.pid ? `<button class="btn sm danger" data-kick="${p.pid}" aria-label="Expulsar">✕</button>` : ''}</div></div>`;
   }).join('') + (cfg.bots ? `<div class="lb-p bots"><div class="tav">🤖</div><div class="lb-pn"><b>+${cfg.bots} BOTS</b><small>${r.kind === 'surv' ? 'Completan los 12 pilotos del torneo' : MPC.DIFFS[cfg.diff].lbl + ' · usan todos los coches y habilidades'}</small></div></div>` : '');
   $('lbPlayers').querySelectorAll('canvas[data-car]').forEach(c => lbPrevDraw(c, CAR_BY_ID[c.dataset.car], -0.45, 1.05));
@@ -6092,7 +6119,7 @@ function renderLobby() {
   const cfSig = JSON.stringify([r.kind, r.mode, cfg, r.players.length, hostP.lvl, host, !!NET.evIgnored]);
   if (lbS.cfg !== cfSig) { lbS.cfg = cfSig; rebuilt = true;
   $('lbCfg').innerHTML = r.kind === 'surv' ? `<div class="rwd">${SURV_ROUNDS.map((x, i) => `<span class="chip2 ${i === 3 ? 'rv' : ''}">${i === 3 ? '🏆 FINAL · ' + x.n + ' → 1' : 'RONDA ' + (i + 1) + ' · ' + x.n + ' → ' + x.k}</span>`).join('')}</div><p class="lb-note">Cuatro pistas exclusivas, una por ronda. El servidor decide quién pasa; los eliminados ven los resultados hasta el final.</p>` +
-    seg('crown', 'CORONA', CROWNS.map(c => [c.id, c.emoji + ' ' + c.name.replace('CORONA ', '')]), (CROWNS.find(c => c.id === cfg.crown) || CROWNS[0]).id) +
+    seg('crown', 'CORONA', CROWNS.map(c => [c.id, c.emoji + ' ' + c.name.replace('CORONA ', '')]), (CROWNS.find(c => c.id === cfg.crown) || CROWNS[0]).id).replace('class="cf-r"', 'class="cf-r crw"') +
     `<p class="lb-note">${(CROWNS.find(c => c.id === cfg.crown) || CROWNS[0]).tracks.map((t, i) => (i === 3 ? '🏆 ' : (i + 1) + '. ') + esc(t.name)).join(' → ')}</p>` +
     seg('cc', 'CILINDRADA', CC_LIST.map(c => [c, c + 'cc']), cfg.cc) + seg('ev', 'EVENTOS', [['off', 'SIN EVENTOS'], ['one', 'UNO A LA VEZ'], ['chaos', 'CAOS']], cfg.ev || 'chaos') :
     `<div class="lb-maps">${MAPS.map(m => { const lock = !cfg.unlockAll && hostP.lvl < m.lvl; return `<div class="lb-map ${m.id === cfg.mapId ? 'sel' : ''} ${lock ? 'locked' : ''}" data-k="mapId" data-v="${m.id}"><canvas width="220" height="134"></canvas><b>${esc(m.name)}</b><small>${lock ? '🔒 NIVEL ' + m.lvl : 'NIVEL ' + m.lvl}</small></div>`; }).join('')}</div>` +
@@ -6111,6 +6138,12 @@ function renderLobby() {
   if (disc) why = 'Hay jugadores desconectados.'; else if (blocked) why = 'Algún jugador no cumple los requisitos (nivel o coche).'; else if (total < 2 && r.kind !== 'surv') why = 'Activa bots o espera a un amigo (mínimo 2 participantes).'; else if (!others.every(p => p.ready)) why = 'Faltan jugadores por marcar "LISTO".';
   $('lbReady').style.display = host ? 'none' : ''; lbSet('lbReady', me && me.ready ? 'NO PREPARADO' : 'LISTO'); $('lbReady').classList.toggle('pri', !(me && me.ready)); $('lbReady').disabled = !!(me && me.block);
   lbSet('lbStart', r.kind === 'surv' ? 'INICIAR TORNEO' : 'INICIAR CARRERA'); $('lbStart').style.display = host ? '' : 'none'; $('lbStart').disabled = !!why; lbSet('lbHint', host ? (why || '¡Todo listo! Pulsa ' + $('lbStart').textContent + '.') : (me && me.ready ? 'Esperando a que el anfitrión inicie…' : 'Marca LISTO cuando quieras correr.'));
+  if (phase === 'party') {
+    const okc = r.players.length >= 2 && !disc;
+    $('lbCont').style.display = host ? '' : 'none'; $('lbCont').disabled = !okc;
+    lbSet('lbHint', host ? (okc ? '¡Todos dentro! Pulsa CONTINUAR para elegir el modo.' : 'Esperando a que se una al menos un amigo… Comparte el código o el enlace.') : 'Elige tu coche. Esperando a que el anfitrión continúe…');
+  }
+  $('lbBack').style.display = host ? '' : 'none';
   if (rebuilt) navApply();
 }
 const API_MAX_PLAYERS = MPC.MAX_PLAYERS;
@@ -6131,6 +6164,8 @@ $('lbPlayers').addEventListener('click', e => { const b = e.target.closest('[dat
 $('lbReady').onclick = () => { const me = NET.room && NET.room.players.find(p => p.pid === NET.pid); if (me) netSend({ t: 'ready', v: !me.ready }); };
 $('lbStart').onclick = () => netSend({ t: 'start' });
 $('lbLeave').onclick = () => go('mpmenu');
+$('lbCont').onclick = () => netSend({ t: 'phase', v: 'menu' });
+$('lbBack').onclick = () => netSend({ t: 'phase', v: 'menu' });
 $('lbCopy').onclick = () => NET.room && mpCopy(NET.room.code, 'Código copiado: ' + NET.room.code);
 $('lbLink').onclick = () => { if (!NET.room) return; const l = mpShareLink(); if (navigator.share && touchDev()) navigator.share({ title: 'CRUSH CARS', text: 'Únete a mi sala ' + NET.room.code, url: /^http/.test(l) ? l : undefined }).catch(() => {}); else mpCopy(l, /^http/.test(l) ? 'Enlace copiado' : 'Código copiado'); };
 
@@ -6302,12 +6337,17 @@ MAPS.forEach(m => { if (!MAP_META[m.id]) MAP_META[m.id] = { c: m.th.cA || '#18c8
 const _go = go;
 go = function (name) {
   const prev = mode;
+  if (NET.room && prev === 'modes' && name === 'menu') {   // atrás desde «Elige modo» dentro de una sala: el anfitrión vuelve a la sala, el resto espera
+    if (NET.room.host === NET.pid) netSend({ t: 'phase', v: 'party' }); else toast('Solo el anfitrión puede volver atrás');
+    return;
+  }
   if (prev === 'mplobby' && (name === 'menu' || name === 'mpmenu')) { netLeaveRoom(); name = 'mpmenu'; }
   if (prev === 'mpmenu' && name === 'menu') netDisconnect();
   _go(name);
   document.body.classList.toggle('inrace', name === 'race');
   if (name === 'mpmenu') { renderMpMenu(); if (NET.st === 'off' && netDefaultUrl()) { NET.wantOpen = true; netConnect().catch(e => { NET.wantOpen = false; mpShowErr(e.message); }); } }
   else if (name === 'mplobby') renderLobby();
+  else if (name === 'modes') renderPartyBar();
   if (name === 'menu' && NET.pendingJoin && !NET._jt) {
     NET._jt = setTimeout(() => { NET._jt = 0; const c = NET.pendingJoin; NET.pendingJoin = null; if (mode !== 'menu') return; go('mpmenu'); $('mpCode').value = c; mpJoin(); }, 350);
   }
