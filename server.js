@@ -43,7 +43,7 @@ function loadCore(html) {
   if (!m) throw new Error('No encuentro el <script> principal en ' + GAME_FILE);
   let code = m[1].replace("go(save.name ? 'menu' : 'welcome');", '');
   code += `
-;globalThis.__G = { CARS, CAR_BY_ID, MAPS, SURV_MAPS, CROWNS, CROWN_MAPS, SURV_ROUNDS, SURV_NAMES, CC, CC_LIST, MPC, PFX_BY_ID,
+;globalThis.__G = { CARS, CAR_BY_ID, MAPS, SURV_MAPS, CROWNS, SKYCR: typeof SKYCR !== 'undefined' ? SKYCR : null, CROWN_MAPS, SURV_ROUNDS, SURV_NAMES, CC, CC_LIST, MPC, PFX_BY_ID,
   mpHash, mpCreateRace, mpCollide, mpEncode, mpDecode, mpApplyFlags, mpReward, mpCleanUpg,
   aiInput, stepCar, progress, collide, locate, pointAt, setEmitOff: v => { EMIT_OFF = v; } };`;
   const stub = mkStub();
@@ -140,8 +140,9 @@ function lobbyBots(count, diff) {
   return out;
 }
 /* pista de la ronda de supervivencia: las 4 pistas de la corona elegida (si no hay corona válida, las 4 clásicas) */
+const CROWN_ALL = G.SKYCR ? G.CROWNS.concat([G.SKYCR]) : G.CROWNS;   // 8 coronas + la de los cielos (secreta: solo la ofrece el cliente del anfitrión si la tiene desbloqueada)
 function survMap(cfg, round) {
-  const cr = G.CROWNS.find(c => c.id === cfg.crown);
+  const cr = CROWN_ALL.find(c => c.id === cfg.crown);
   return cr ? cr.tracks[round] : G.SURV_MAPS[round];
 }
 function survBots(count) {
@@ -389,8 +390,8 @@ io.on('connection', sock => {
     const r = P.room; if (!r || r.host !== P.pid || r.state !== 'lobby' || r.phase !== 'menu') return;
     const kind = m.kind === 'surv' ? 'surv' : 'race';
     r.kind = kind; r.mode = 'party'; r.phase = 'lobby';
-    r.cfg.bots = kind === 'surv' ? 0 : 3; r.cfg.unlockAll = false;
-    if (kind === 'surv' && !G.CROWNS.some(x => x.id === r.cfg.crown)) r.cfg.crown = G.CROWNS[0].id;
+    r.cfg.bots = kind === 'surv' ? 0 : (r.botsPref == null ? 3 : r.botsPref); r.cfg.unlockAll = false;
+    if (kind === 'surv' && !CROWN_ALL.some(x => x.id === r.cfg.crown)) r.cfg.crown = G.CROWNS[0].id;
     for (const p of r.players) p.ready = false;
     fixBots(r); broadcast(r);
   }));
@@ -401,13 +402,13 @@ io.on('connection', sock => {
     const r = P.room; if (!r || r.host !== P.pid || r.state !== 'lobby' || !m.cfg) return;
     const c = r.cfg, k = m.cfg;
     if ('mapId' in k && G.MAPS.some(x => x.id === k.mapId)) c.mapId = k.mapId;
-    if ('crown' in k && r.kind === 'surv' && G.CROWNS.some(x => x.id === k.crown)) c.crown = k.crown;
+    if ('crown' in k && r.kind === 'surv' && CROWN_ALL.some(x => x.id === k.crown)) c.crown = k.crown;
     if ('mode' in k && r.kind === 'race' && (k.mode === 'duel' || k.mode === 'party') && !(k.mode === 'duel' && r.players.length > 2)) r.mode = k.mode;
     if ('laps' in k) c.laps = clampI(k.laps, 1, G.MPC.LAPS_MAX, c.laps);
     if ('rev' in k) c.rev = !!k.rev;
     if ('cc' in k && G.CC_LIST.includes(+k.cc)) c.cc = +k.cc;
     if ('ev' in k && ['off', 'one', 'chaos'].includes(k.ev)) c.ev = k.ev;
-    if ('bots' in k) c.bots = clampI(k.bots, 0, 8, c.bots);
+    if ('bots' in k) { c.bots = clampI(k.bots, 0, 8, c.bots); if (r.kind !== 'surv') r.botsPref = c.bots; }
     if ('diff' in k) c.diff = clampI(k.diff, 0, 3, c.diff);
     if ('unlockAll' in k) c.unlockAll = !!k.unlockAll;
     fixBots(r); broadcast(r);
@@ -427,6 +428,7 @@ io.on('connection', sock => {
     if (r.kind !== 'surv' && r.players.length + r.cfg.bots < 2) return err('Necesitas al menos 2 participantes (activa bots o espera a un amigo).');
     startRoom(r);
   }));
+
   on('st', need(m => { const r = P.room, rc = r && r.race; if (rc && Array.isArray(m.s)) applyState(rc, P, m.s); }));
 
   sock.on('disconnect', () => {
