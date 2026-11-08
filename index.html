@@ -685,6 +685,11 @@ body.inrace #netBadge{top:6px}
 .lb-code{font-family:var(--disp);font-size:clamp(34px,6vw,58px);font-weight:900;font-style:italic;letter-spacing:.1em;color:var(--orange2);text-shadow:0 0 26px #ff7a1a66;user-select:all}
 .lb-actions{display:flex;gap:8px;flex-wrap:wrap}.lb-mode{font-weight:900;letter-spacing:.08em;color:var(--blue)}.lb-net{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px}
 .grow{flex:1}
+.st-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.st-tab{opacity:.75}.st-tab.on{opacity:1;background:linear-gradient(180deg,var(--orange),#e8660f);color:#1a0d00;border-color:transparent}
+#settings .st-p{display:none}#settings[data-tab=pad] .st-p.pad,#settings[data-tab=ctl] .st-p.ctl,#settings[data-tab=q] .st-p.q{display:block}
+.q-opts{display:grid;gap:10px}.q-o{display:flex;flex-direction:column;gap:4px;text-align:left;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:#0a1226;color:var(--text);cursor:pointer;font:inherit}
+.q-o b{font-family:var(--disp);letter-spacing:.1em;font-size:15px}.q-o small{color:var(--dim);font-size:12.5px;line-height:1.35}
+.q-o.on{border-color:var(--orange);background:linear-gradient(160deg,#2a1608,#0a1226);box-shadow:0 0 0 1px var(--orange) inset}.q-o.on b{color:var(--orange2)}
 .cf-r.crw{flex-direction:column;align-items:stretch}.cf-r.crw .cf-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.cf-r.crw .cf-g .btn{padding:8px 4px;font-size:12px;white-space:normal;line-height:1.15;text-align:center}
 @media(max-width:620px){.cf-r.crw .cf-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #maps.gro #mapGrid,#maps.gro #ccRow,#maps.gro #evRow,#survival.gro #cwList,#survival.gro #cwCc,#survival.gro #svEv,#survival.gro #cwGo,#maps.gro #btnStart{pointer-events:none}
@@ -924,45 +929,16 @@ html.sky-cinematic-active body>:not(#skyCine){visibility:hidden!important}
 @keyframes skyIn{to{opacity:1;transform:none;filter:blur(0)}}
 @keyframes skySub{to{opacity:1;transform:none}}
 @keyframes skyBtn{to{opacity:1}}
-/* ---- Corona de los Cielos · Parte 4 · circuito celestial (aislado: sólo existe mientras se juega) ---- */
-html.sky-race-active,html.sky-race-active body{background:#0b1a44!important}
-html.sky-race-active body>:not(#skyRace){visibility:hidden!important}
-#skyRace{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;z-index:2147483646;display:none;background:#5aa6ff;overflow:hidden;margin:0!important;padding:0!important;isolation:isolate;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-#skyRace.on{display:block}
-#srCv{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
-.srov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:radial-gradient(900px 600px at 50% 40%,#0a1a4acc,#050a24ee);padding:16px;z-index:3}
-.srov.on{display:flex}
-#srFall{background:radial-gradient(900px 600px at 50% 40%,#10163acc,#03061aee)}
-.srbox{width:min(520px,94vw);max-height:94vh;overflow:auto;text-align:center;padding:26px 24px;border:1px solid #ffd56a88;border-radius:16px;background:linear-gradient(180deg,#0f2160ee,#08123aee);box-shadow:0 0 40px #ffd56a33,0 20px 60px #000a;display:flex;flex-direction:column;gap:12px;align-items:stretch}
-.srbox h2{margin:0;font-family:var(--disp);font-size:clamp(24px,5vw,38px);font-style:italic;font-weight:900;letter-spacing:.08em;color:#fff6d8;text-shadow:0 0 18px #ffd56a,0 0 44px #5cc8ff}
-.srbox p{margin:0;color:#cfe3ff;font-size:15px;line-height:1.45}
-.srbox .btn{justify-content:center}
-.srbox kbd{background:#16213d;border:1px solid #2b4a88;border-bottom-width:3px;border-radius:5px;padding:1px 7px;color:#fff;font-family:inherit;font-weight:700}
-.srstats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 4px}
-.srstats div{padding:8px 10px;border:1px solid #2b4a88;border-radius:10px;background:#0a1640aa;text-align:left}
-.srstats small{display:block;font-size:11px;letter-spacing:.14em;color:#8fb0ff;font-weight:800}
-.srstats b{font-family:var(--disp);font-size:22px;color:#ffe9a6;font-style:italic}
-.srnote{font-size:12px!important;color:#8fb0ff!important;letter-spacing:.04em}
-#srTouch{display:none;position:absolute;inset:0;pointer-events:none;z-index:2}
-body.touch #skyRace.on #srTouch{display:block}
-#srTouch button{pointer-events:auto;touch-action:none;position:absolute;border-radius:50%;background:#0b1224aa;border:2px solid #ffd56aaa;color:#fff;font-weight:900;font-size:22px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;padding:0;font-family:inherit}
-#srTouch button.down{background:#ffd56a66;transform:scale(.94)}
-#srTouch{--tb:76px}
-#srTouch [data-k=KeyA]{left:calc(14px + env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:var(--tb);height:var(--tb)}
-#srTouch [data-k=KeyD]{left:calc(24px + var(--tb) + env(safe-area-inset-left,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:var(--tb);height:var(--tb)}
-#srTouch [data-k=KeyW]{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:calc(var(--tb)*1.15);height:calc(var(--tb)*1.15);border-color:#7fe3ffcc}
-#srTouch [data-k=KeyS]{right:calc(30px + var(--tb)*1.15 + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:var(--tb);height:var(--tb)}
-#srTouch [data-k=Space]{right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(36px + var(--tb)*1.15 + env(safe-area-inset-bottom,0px));width:calc(var(--tb)*.95);height:calc(var(--tb)*.95);font-size:13px;letter-spacing:.06em;border-color:#ff9a2ecc}
-#srTouch #srTcPause{left:calc(12px + env(safe-area-inset-left,0px));top:calc(62px + env(safe-area-inset-top,0px));width:44px;height:44px;font-size:15px}
-@media(max-height:480px){#srTouch{--tb:62px}}
-@media(prefers-reduced-motion:reduce){#srCv{filter:none}}
+/* ---- Corona de los Cielos · tarjeta de la corona secreta dentro de Supervivencia ---- */
+.cr-b.skyc{grid-column:1/-1;min-height:112px;border-top-color:#ffd25a;background:radial-gradient(520px 160px at 85% 0%,#ffe9a844,transparent 70%),linear-gradient(160deg,#16367f,#0a1738 80%)}
+.cr-b.skyc b{letter-spacing:.14em}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 
 <div id="topbar">
-  <div class="top-l"><button class="btn sm" id="btnBack">‹ MENÚ</button><button class="btn sm ghost" id="btnCtl" aria-label="Controles">⌨<span class="ctl-t"> CONTROLES</span></button></div>
+  <div class="top-l"><button class="btn sm" id="btnBack">‹ MENÚ</button></div>
   <div class="top-r hdr">
     <button class="userchip" data-go="profile" title="Perfil"><span class="tav" id="tbAv"></span><span id="tbName"></span></button>
     <div class="lvl" title="Nivel y experiencia">
@@ -1002,7 +978,7 @@ body.touch #skyRace.on #srTouch{display:block}
     <button class="btn" data-go="garage">GARAJE <small>Coches y mejoras</small></button>
     <button class="btn" data-go="shop">TIENDA <small>Estilos de nitro</small></button>
     <button class="btn" data-go="profile">PERFIL <small>Estadísticas</small></button>
-    <button class="btn" data-go="settings">AJUSTES <small>Mando y controles</small></button>
+    <button class="btn" data-go="settings">AJUSTES <small>Mando, controles y calidad</small></button>
   </div>
   </div>
   <aside class="pcard" id="mnCard">
@@ -1065,8 +1041,8 @@ body.touch #skyRace.on #srTouch{display:block}
     <div class="sk-eyebrow">✦ DESAFÍO SECRETO ✦</div>
     <div class="sk-crown" aria-hidden="true"><svg viewBox="0 0 200 150" width="100%" height="100%"><defs><linearGradient id="skG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbe6"/><stop offset=".45" stop-color="#ffd25a"/><stop offset="1" stop-color="#d98a12"/></linearGradient><linearGradient id="skB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9fe4ff"/><stop offset="1" stop-color="#2b7bff"/></linearGradient></defs><path d="M22 118 L12 44 L56 76 L100 20 L144 76 L188 44 L178 118 Z" fill="url(#skG)" stroke="#fff6d0" stroke-width="3" stroke-linejoin="round"/><rect x="22" y="118" width="156" height="16" rx="5" fill="url(#skG)" stroke="#fff6d0" stroke-width="3"/><circle cx="100" cy="86" r="11" fill="url(#skB)" stroke="#fff" stroke-width="2"/><circle cx="56" cy="100" r="6" fill="url(#skB)"/><circle cx="144" cy="100" r="6" fill="url(#skB)"/><circle cx="100" cy="14" r="6" fill="#fff"/><circle cx="12" cy="40" r="5" fill="#fff"/><circle cx="188" cy="40" r="5" fill="#fff"/></svg></div>
     <h2 class="sk-title">CORONA DE LOS CIELOS</h2>
-    <p class="sk-desc">Más allá de las nubes espera la prueba definitiva de CRUSH CARS: el desafío secreto reservado a quien ha conquistado las 8 coronas. Aquí solo hay una corona en juego, y no existe otra mayor.</p>
-    <div class="sk-chips"><span>UNA ÚNICA CORONA</span><span>RECOMPENSA: LA CORONA DE LOS CIELOS</span><span>DESAFÍO DEFINITIVO</span></div>
+    <p class="sk-desc">Más allá de las nubes espera la prueba definitiva de CRUSH CARS: la corona secreta reservada a quien ha conquistado las 8 coronas. Cuatro rondas de eliminación sobre plataformas flotantes, con huecos de cielo que se cruzan volando.</p>
+    <div class="sk-chips"><span>4 RONDAS · 12 → 9 → 6 → 3 → 1</span><span>4 PISTAS FLOTANTES</span><span>ALAS PARA VOLAR</span></div>
     <div class="sk-act"><button class="btn pri" id="skGo">EMPEZAR</button><button class="btn" id="skBack">‹ VOLVER A SUPERVIVENCIA</button></div>
   </div>
 </section>
@@ -1158,10 +1134,11 @@ body.touch #skyRace.on #srTouch{display:block}
 </section>
 
 <section class="screen opaque" id="settings">
-  <h2 class="title"><b>AJUSTES</b> Y CONTROLES</h2>
-  <p class="sub">Conecta un mando por USB o Bluetooth y pulsa cualquier botón para que el navegador lo detecte.</p>
+  <h2 class="title"><b>AJUSTES</b></h2>
+  <div class="st-tabs" role="tablist"><button class="btn st-tab" role="tab" data-tab="pad">🎮 MANDO</button><button class="btn st-tab" role="tab" data-tab="ctl">⌨ CONTROLES</button><button class="btn st-tab" role="tab" data-tab="q">✨ CALIDAD</button></div>
+  <p class="sub" id="stSub"></p>
   <div class="prof">
-    <div class="panel">
+    <div class="panel st-p pad">
       <div class="pad-h">MANDO</div>
       <div class="pad-st" id="stPad"><i class="pad-dot"></i><span id="stPadName">Ningún mando detectado</span></div>
       <div class="pad-row"><span>Usar mando</span><button class="btn sm" id="stOn">SÍ</button></div>
@@ -1175,7 +1152,7 @@ body.touch #skyRace.on #srTouch{display:block}
       <div class="pad-note">Mueve el stick y pulsa los botones para probarlos. El círculo punteado es la zona muerta.</div>
       <div class="actions" style="padding:0;margin-top:14px"><button class="btn sm" id="stReset">RESTABLECER MANDO</button></div>
     </div>
-    <div class="panel">
+    <div class="panel st-p pad">
       <div class="pad-h">CONTROLES DEL MANDO</div>
       <div class="ctl-r"><span>Stick izq. / cruceta ◀ ▶</span><em>Girar</em></div>
       <div class="ctl-r"><span>RT / A</span><em>Acelerar</em></div>
@@ -1189,6 +1166,32 @@ body.touch #skyRace.on #srTouch{display:block}
       <div class="ctl-r"><span>B</span><em>Atrás</em></div>
       <div class="pad-note">Las letras (A, B, X, Y) son las impresas en tu mando. En mandos Nintendo (Pro Controller) la distribución se detecta sola.</div>
       <div class="pad-note">Pensado para mandos con distribución estándar (Xbox, PlayStation, Switch Pro…). El teclado y los botones táctiles siguen funcionando a la vez.</div>
+    </div>
+    <div class="panel st-p ctl">
+      <div class="pad-h">TECLADO</div>
+      <div class="ctl-r"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd></span><em>Conducir</em></div>
+      <div class="ctl-r"><span><kbd>Espacio</kbd></span><em>Nitro</em></div>
+      <div class="ctl-r"><span><kbd>Shift</kbd> / <kbd>E</kbd></span><em>Habilidad</em></div>
+      <div class="ctl-r"><span><kbd>Esc</kbd> / <kbd>P</kbd></span><em>Pausa</em></div>
+      <div class="ctl-r"><span><kbd>M</kbd></span><em>Sonido</em></div>
+      <div class="ctl-r"><span><kbd>↑</kbd><kbd>↓</kbd><kbd>Enter</kbd></span><em>Moverse por menús</em></div>
+      <div class="ctl-r"><span><kbd>←</kbd><kbd>→</kbd></span><em>Coches (garaje)</em></div>
+      <div class="ctl-r"><span><kbd>C</kbd></span><em>Abrir estos controles</em></div>
+    </div>
+    <div class="panel st-p ctl">
+      <div class="pad-h">MÓVIL Y TABLET</div>
+      <div class="ctl-r"><span>Botones en pantalla</span><em>Aparecen durante la carrera</em></div>
+      <div class="ctl-r"><span>🎮 RT/A · LT/B · X · Y</span><em>Mando (pestaña MANDO)</em></div>
+      <div class="pad-note">El teclado, el mando y los botones táctiles funcionan a la vez: usa el que prefieras.</div>
+    </div>
+    <div class="panel st-p q">
+      <div class="pad-h">CALIDAD GRÁFICA</div>
+      <div class="q-opts" id="qOpts">
+        <button class="q-o" data-q="low"><b>BAJA</b><small>Para móviles o equipos que van justos. Prioriza la fluidez: 60 FPS máx., menos partículas y luces, resolución moderada y menús más ligeros. Se sigue viendo bien.</small></button>
+        <button class="q-o" data-q="mid"><b>MEDIA</b><small>Equilibrada (por defecto). Si el rendimiento cae mucho, quita sola algunos efectos.</small></button>
+        <button class="q-o" data-q="high"><b>ALTA</b><small>Máximo detalle: todos los efectos, resolución más nítida (hasta 2×) y sin límite de FPS en pantallas de 90/120 Hz. Si tu equipo no llega, baja sola la resolución.</small></button>
+      </div>
+      <div class="pad-note" id="qNote"></div>
     </div>
   </div>
 </section>
@@ -1298,39 +1301,6 @@ body.touch #skyRace.on #srTouch{display:block}
 <!-- ===== DEVTOOLS-END (HTML) ===== -->
 
 <div id="skyCine"><canvas id="skyCv"></canvas><div class="skyMsg"><h1>UN NUEVO CAMINO SE HA ABIERTO...</h1><p>ALGO TE ESPERA MÁS ALLÁ DE LAS NUBES</p><button class="btn pri" id="skyBtn">CONTINUAR</button></div></div>
-<div id="skyRace" aria-label="Circuito celestial">
-  <canvas id="srCv"></canvas>
-  <div id="srTouch" aria-hidden="true">
-    <button data-k="KeyA" aria-label="Inclinar hacia arriba / izquierda">◀</button><button data-k="KeyD" aria-label="Inclinar hacia abajo / derecha">▶</button>
-    <button data-k="KeyS" aria-label="Freno">▼</button><button data-k="KeyW" aria-label="Acelerar">▲</button>
-    <button data-k="Space" aria-label="Nitro">NITRO</button>
-    <button id="srTcPause" aria-label="Pausa">❚❚</button>
-  </div>
-  <div class="srov" id="srPause"><div class="srbox">
-    <h2>PAUSA</h2>
-    <button class="btn pri" id="srPzGo">CONTINUAR</button>
-    <button class="btn" id="srPzCp">REINICIAR DESDE EL CHECKPOINT</button>
-    <button class="btn" id="srPzSt">REINICIAR DESDE EL INICIO</button>
-    <button class="btn danger" id="srPzQuit">SALIR A LA CORONA</button>
-    <p class="srnote"><kbd>P</kbd> / <kbd>Esc</kbd> continuar · <kbd>R</kbd> checkpoint · <kbd>T</kbd> inicio</p>
-  </div></div>
-  <div class="srov" id="srFall"><div class="srbox">
-    <h2 id="srFallT">¡CAÍSTE AL VACÍO!</h2>
-    <p id="srFallP">Vuelve a intentarlo desde el último punto de control o desde el principio.</p>
-    <button class="btn pri" id="srFaCp">DESDE EL CHECKPOINT</button>
-    <button class="btn" id="srFaSt">DESDE EL INICIO</button>
-    <button class="btn danger" id="srFaQuit">SALIR A LA CORONA</button>
-    <p class="srnote"><kbd>R</kbd> / <kbd>Enter</kbd> checkpoint · <kbd>T</kbd> inicio</p>
-  </div></div>
-  <div class="srov" id="srFin"><div class="srbox">
-    <h2>¡CIRCUITO COMPLETADO!</h2>
-    <p>Has cruzado la meta de la Corona de los Cielos.</p>
-    <div class="srstats"><div><small>TIEMPO</small><b id="srFiT">--</b></div><div><small>MEJOR (SESIÓN)</small><b id="srFiB">--</b></div><div><small>CAÍDAS</small><b id="srFiF">0</b></div><div><small>AROS</small><b id="srFiR">0</b></div></div>
-    <button class="btn pri" id="srFiAgain">JUGAR DE NUEVO</button>
-    <button class="btn" id="srFiBack">VOLVER A LA CORONA</button>
-    <p class="srnote">Pantalla provisional · los rivales, la competición y las recompensas llegarán en la Parte 5.</p>
-  </div></div>
-</div>
 <div id="toast"></div>
 <div id="netBadge" hidden></div>
 <div id="touch" aria-hidden="true">
@@ -1548,7 +1518,7 @@ for (const p of PFX) {   // colores derivados una sola vez (cadenas 'r,g,b' para
   p.rs = ['rgb(' + p.g[1] + ')', 'rgb(' + p.g[2] + ')']; p.pre = 'rgba(' + p.smoke + ',';
 }
 const SAVE_KEY = 'crushcars.save.v1';
-const defaultSave = () => ({ coins: 250, xp: 0, owned: ['volt'], sel: 'volt', upg: {}, stats: { races: 0, wins: 0, podiums: 0, earned: 0 }, best: {}, bestLap: {}, sound: true, map: 'coast', name: '', avatar: 0, cc: 150, rev: false, ev: 'chaos', surv: { runs: 0, wins: 0, best: 0 }, champ: { st: {}, cur: {} }, sky: { on: false, seen: false }, paint: {}, pfx: { own: ['classic'], sel: 'classic' }, pad: { on: true, dz: 15, sens: 100, lay: 'auto' } });
+const defaultSave = () => ({ coins: 250, xp: 0, owned: ['volt'], sel: 'volt', upg: {}, stats: { races: 0, wins: 0, podiums: 0, earned: 0 }, best: {}, bestLap: {}, sound: true, quality: 'mid', qd: {}, map: 'coast', name: '', avatar: 0, cc: 150, rev: false, ev: 'chaos', surv: { runs: 0, wins: 0, best: 0 }, champ: { st: {}, cur: {} }, sky: { on: false, seen: false }, paint: {}, pfx: { own: ['classic'], sel: 'classic' }, pad: { on: true, dz: 15, sens: 100, lay: 'auto' } });
 function loadSave() {
   const d = defaultSave();
   try {
@@ -1595,7 +1565,8 @@ function loadSave() {
       d.pfx.own = [...new Set(['classic', ...own])]; d.pfx.sel = d.pfx.own.includes(s.pfx.sel) ? s.pfx.sel : 'classic';
     }
     if (s.pad && typeof s.pad === 'object') { d.pad.on = s.pad.on !== false; d.pad.dz = clamp(Math.round(n(s.pad.dz, 15) / 5) * 5, 5, 40); d.pad.sens = clamp(Math.round(n(s.pad.sens, 100) / 10) * 10, 50, 150); d.pad.lay = ['auto', 'xbox', 'nin'].includes(s.pad.lay) ? s.pad.lay : 'auto'; }
-    d.sound = s.sound !== false;
+    d.sound = s.sound !== false; d.quality = ['low', 'mid', 'high'].includes(s.quality) ? s.quality : 'mid';
+    if (s.qd && typeof s.qd === 'object') for (const k of ['low', 'mid', 'high']) if (Number.isFinite(s.qd[k])) d.qd[k] = clamp(s.qd[k], 0.75, 2);
     if (MAPS.some(m => m.id === s.map)) d.map = s.map;
     d.name = cleanName(s.name); d.avatar = Number.isInteger(s.avatar) ? clamp(s.avatar, 0, AVATARS.length - 1) : 0;
   } catch (e) { /* sin datos o localStorage no disponible */ }
@@ -1885,7 +1856,7 @@ function createRace(map, opts = {}) {
   if (R.rev) { R.msg = 'INVERTIDO · PREMIOS ×' + fm(REV_RW[cc]); R.msgT = 2.6; }
   const riv = opts.roster || null, tot = riv ? riv.length + 1 : GRID_SIZE, pSlot = riv ? (tot > 6 ? Math.min(tot - 1, 7) : Math.max(0, tot - 2)) : 4;
   if (opts.surv && riv) { R.surv = Object.assign({ end: false, ann: false }, opts.surv); R.msg = 'RONDA ' + (opts.surv.round + 1) + '/4 · PASAN ' + opts.surv.k; R.msgT = 2.8; }
-  if (opts.champ && riv) { R.champ = opts.champ; R.msg = R.surv ? 'RONDA ' + (opts.champ.r + 1) + '/4 · PASAN ' + R.surv.k + ' DE ' + tot : 'PISTA ' + (opts.champ.r + 1) + '/4 · ' + CROWNS[opts.champ.ci].name; R.msgT = 2.8; }
+  if (opts.champ && riv) { R.champ = opts.champ; R.msg = R.surv ? 'RONDA ' + (opts.champ.r + 1) + '/4 · PASAN ' + R.surv.k + ' DE ' + tot : 'PISTA ' + (opts.champ.r + 1) + '/4 · ' + crownOf(opts.champ.ci).name; R.msgT = 2.8; }
   const slots = Array.from({ length: tot }, (_, i) => i).filter(sl => R.demo || sl !== pSlot);
   for (let i = slots.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [slots[i], slots[j]] = [slots[j], slots[i]]; }
   const nRiv = riv ? riv.length : R.demo ? GRID_SIZE : GRID_SIZE - 1;
@@ -2190,6 +2161,7 @@ function readPlayerInput(c) {
 /* ---------- bucle de simulación ---------- */
 function updateRace(R, dt) {
   if (R.net) return netUpdateRace(R, dt);   // carrera online: ver módulo MULTIJUGADOR
+  swOf(R);   // pistas del cielo: huecos y plataformas de lanzamiento (no hace nada en las demás)
   R.clock += dt;
   R.shake = Math.max(0, R.shake - dt * 2.2); R.flash = Math.max(0, R.flash - dt); R.msgT = Math.max(0, R.msgT - dt);
   if (R.state === 'count') {
@@ -2206,6 +2178,7 @@ function updateRace(R, dt) {
         if (c.human && !c.finished) readPlayerInput(c);
         else { if (c.finished && c.human) c.ai.pace = Math.max(0.35, c.ai.pace - h * 0.15); aiInput(c, R, h); if (c.human) c.ai.auto = true; }
         if (c.human && R.launch && !c.finished) launchInput(c, R, h); else if (c.lq && !c.finished) launchBotInput(c, R, h);
+        if (R.skyc) swCarPre(c, R, h);   // cielo: lanzamiento, elevación y alas
         if (R.ev && evCarPre(c, R, h)) continue;   // eventos: coche inmovilizado por un rayo
         stepCar(c, c.inp, h, R);
       }
@@ -2309,11 +2282,14 @@ function spawnFx(R, dt) {
    ===================================================================== */
 let cv = $('c'), ctx = cv.getContext('2d', { alpha: false });
 let W = 0, H = 0, DPR = 1, frozen = false, FR = 0;
-const panelCache = new Map(), spriteCache = new Map(), Q = { lvl: 0, fx: 1, dprCap: 1.5, ema: 16.7, bad: 0 };
+const RACE_LIKE = ['race', 'pause', 'results', 'skyrace', 'skycine']; let lastRaceLike = false;
+const panelCache = new Map(), spriteCache = new Map(), Q = { lvl: 0, fx: 1, dprCap: 1.5, ema: 16.7, bad: 0, mode: 'mid', auto: true, nextF: 0, minI: 16.4, cool: 0 };
 function resize() {
   /* W/H = tamaño CSS real del canvas (position:fixed;inset:0): así el búfer interno (W·DPR × H·DPR) es siempre 1:1 con los píxeles
      físicos y el navegador no lo reescala (ni lo deforma) cuando la barra del navegador móvil cambia el alto visible */
-  DPR = Math.min(window.devicePixelRatio || 1, Q.dprCap); W = cv.clientWidth || innerWidth; H = cv.clientHeight || innerHeight;
+  // los fondos de los menús nunca bajan de 1,5× (se ve nítido y cuesta poco: una sola demo a 30 FPS); la carrera usa la resolución adaptativa
+  DPR = Math.min(window.devicePixelRatio || 1, lastRaceLike ? Q.dprCap : Math.max(Q.dprCap, 1.5));
+  W = cv.clientWidth || innerWidth; H = cv.clientHeight || innerHeight;
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   panelCache.clear(); spriteCache.clear(); frozen = false; for (const k in trackCache) trackCache[k].tiles = null;
 }
@@ -2330,11 +2306,21 @@ addEventListener('resize', onRs); addEventListener('orientationchange', onRs); r
    Nunca baja la resolución del canvas (eso desenfocaba toda la escena) y no mide cuando la pestaña/ventana
    no tiene el foco (el navegador la ralentiza, p. ej. dos ventanas en el mismo equipo). */
 function adapt(ms) {
+  if (!Q.auto) return;   // (sólo si el modo de calidad es adaptativo)
   if (ms > 250 || document.hidden || !document.hasFocus()) { Q.bad = 0; return; }
   Q.ema += (ms - Q.ema) * 0.04;
-  if (Q.ema > 20 && Q.lvl < 2) {
-    if (++Q.bad > 30) { Q.bad = 0; Q.lvl++; Q.fx = Q.lvl === 1 ? .6 : .3; Q.ema = 16.7; }
+  if (Q.ema > 20) {
+    Q.bad += Math.min(ms, 100);
+    if (Q.bad > 700 && performance.now() > Q.cool) { Q.bad = 0; Q.ema = 16.7; Q.cool = performance.now() + 3500; qualityStepDown(); }   // 0,7 s acumulados por debajo de ~50 FPS
   } else Q.bad = 0;
+}
+/* escalado dinámico: si el equipo no llega a ~60 FPS, primero baja un poco la resolución (la pérdida de nitidez es leve y es lo que más pesa en la GPU)
+   y, cuando ya no se puede bajar más, recorta efectos. Cada pantalla recuerda la resolución que aguanta (save.qd) para no volver a pasar por ello. */
+function qualityStepDown() {
+  const c = QUAL[Q.mode] || QUAL.mid, cur = Math.min(window.devicePixelRatio || 1, Q.dprCap), nx = Math.max(c.min, Math.round(cur * 0.8 * 100) / 100);
+  if (Q.dprCap > c.min && nx < cur - 0.04) { Q.dprCap = nx; save.qd[Q.mode] = nx; persist(); resize(); }
+  else if (Q.lvl < 2) { Q.lvl++; Q.fx = Q.lvl === 1 ? .6 : .3; }
+  else Q.auto = false;
 }
 
 const cam = { x: 0, y: 0, z: 1 };
@@ -3263,10 +3249,10 @@ function coneSprite() {   // haz de faros: se dibuja una sola vez (con desenfoqu
 }
 const GK = {};   // color del coche -> 'r,g,b' (antes se creaba una cadena nueva por coche y fotograma)
 function carShadow(g, c) {
-  g.save(); g.translate(c.x, c.y);
+  g.save(); g.translate(c.x, c.y); const lh = c.flyH || 0;   // lh: elevación en vuelo (0 = en el suelo)
   // sombra proyectada (luz fija arriba-izquierda: el desplazamiento va en coordenadas de mundo) + sombra de contacto; queda en la posición real de la parrilla
-  { const ga = (c.ghost ? .45 : 1) * LT.sh, a = shadowSpr(c.len, c.wid, false), b = shadowSpr(c.len, c.wid, true);
-    if (Q.lvl < 2) { g.save(); g.globalAlpha = ga; g.translate(8, 11); g.rotate(c.a); g.drawImage(a, -a.pw / 2, -a.ph / 2, a.pw, a.ph); g.restore(); }   // con calidad mínima sólo queda la sombra de contacto
+  { const ga = (c.ghost ? .45 : 1) * LT.sh * (1 - lh * .45), a = shadowSpr(c.len, c.wid, false), b = shadowSpr(c.len, c.wid, true);
+    if (Q.lvl < 2) { g.save(); g.globalAlpha = ga; g.translate(8 + lh * 34, 11 + lh * 46); g.rotate(c.a); g.drawImage(a, -a.pw / 2, -a.ph / 2, a.pw, a.ph); g.restore(); }   // con calidad mínima sólo queda la sombra de contacto
     g.save(); g.globalAlpha = ga; g.translate(2.5, 3.5); g.rotate(c.a); g.drawImage(b, -b.pw / 2, -b.ph / 2, b.pw, b.ph); g.restore(); }
   g.restore();
 }
@@ -3291,10 +3277,12 @@ function drawCar(g, c, t, pre) {   // pre = true: drawWorld ya pintó sombras y 
     if (Q.lvl < 2) { g.globalCompositeOperation = 'lighter'; carGlow(g, c); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; }
   }
   g.save(); g.translate(c.x, c.y);
+  { const lh = c.flyH || 0; if (lh > .01) { g.translate(-lh * 4, -lh * 12); g.scale(1 + .2 * lh, 1 + .2 * lh); } }   // cielo: el coche se eleva
   // reacción de salida: temblor/vaivén SÓLO DE DIBUJO (c.x, c.y y c.a no se tocan)
   const rf = c.fx, rv = rf && rf.rev > 0.01 ? rf.rev : 0;
   if (rv) { const o = prerollOffset(c, rf); g.translate(o.x, o.y); g.rotate(c.a + o.a); } else g.rotate(c.a);
   if (c.drift) g.rotate(Math.sin(t * 40) * 0.01);
+  if ((c.flyH || 0) > .02) swWings(g, c, t, c.flyH);   // alas animadas bajo la carrocería
   if (c.ghost) g.globalAlpha = .42;
   if (rv) drawCarSprite(g, c, t, { braking: c.braking, nitro: false, wj: rv, ph: rf.ph }); else drawCached(g, c, t);
   g.globalAlpha = 1;
@@ -3600,11 +3588,12 @@ function bakeStatic(g, T, vx0, vy0, vx1, vy1) {
   const outer = T.w + 2 * (WALL + LAND);
   if (th.foam) { g.strokeStyle = th.foam; g.lineWidth = outer + 34; g.stroke(T.pCenter); }
   const grain = grainPat(g);
-  g.strokeStyle = th.land; g.lineWidth = outer; g.stroke(T.pCenter);
-  g.strokeStyle = grain; g.stroke(T.pCenter);
+  if (th.sky) swUnder(g, T, th, vx0, vy0, vx1, vy1);   // cielo: sin terreno, plataformas flotantes
+  else { g.strokeStyle = th.land; g.lineWidth = outer; g.stroke(T.pCenter);
+  g.strokeStyle = grain; g.stroke(T.pCenter); }
   g.strokeStyle = th.off; g.lineWidth = T.w + 2 * WALL; g.stroke(T.pCenter);
   g.strokeStyle = grain; g.stroke(T.pCenter);
-  groundDetail(g, T, vx0, vy0, vx1, vy1);
+  if (th.sky) swTop(g, T, th); else groundDetail(g, T, vx0, vy0, vx1, vy1);
   // sombra bajo los bordillos
   g.lineWidth = 22; g.strokeStyle = 'rgba(0,0,0,.2)'; g.stroke(T.pCurbL); g.stroke(T.pCurbR);
   // bordillos
@@ -3663,6 +3652,7 @@ function bakeStatic(g, T, vx0, vy0, vx1, vy1) {
   g.lineWidth = 10; g.strokeStyle = night ? '#06101c' : th.wall; g.stroke(T.pWallL); g.stroke(T.pWallR);
   g.setLineDash([34, 34]); g.strokeStyle = th.wallB; g.stroke(T.pWallL); g.stroke(T.pWallR); g.setLineDash([]);
   g.lineWidth = 2.2; g.strokeStyle = night ? 'rgba(160,220,255,.16)' : 'rgba(255,255,255,.22)'; g.stroke(T.pWallL); g.stroke(T.pWallR);   // reflejo en la coronación del muro
+  if (th.sky) swOver(g, T, th);   // cielo: quita la máscara y marca los huecos
   // decoración
   for (const d of T.decor) {
     if (d.x < vx0 - (d.r * 1.4 + 100) || d.x > vx1 + (d.r * 1.4 + 100) || d.y < vy0 - (d.r * 1.4 + 100) || d.y > vy1 + (d.r * 1.4 + 100)) continue;
@@ -3831,6 +3821,7 @@ function drawWorld(R) {
   if (Q.lvl < 1 && !CROWD) { g.strokeStyle = night ? 'rgba(0,0,0,.22)' : 'rgba(10,10,14,.12)'; g.lineWidth = 7; g.stroke(); }   // halo suave (se omite si el equipo va justo)
   g.strokeStyle = night ? 'rgba(0,0,0,.5)' : 'rgba(10,10,14,.28)'; g.lineWidth = 3.6; g.stroke();   // núcleo del neumático
   g.lineCap = 'butt'; g.lineJoin = 'miter';
+  if (swOf(R)) swDrawGround(g, R, vx0, vy0, vx1, vy1);   // cielo: plataformas de lanzamiento
   if (R.ev) evDrawGround(g, R, vx0, vy0, vx1, vy1);   // eventos: plataformas y zonas de rayo en el suelo
   // faros (noche)
   if (night || LT.dusk) {   // haz cacheado (antes: 2 degradados por coche y fotograma); la ciudad lo usa más tenue
@@ -4064,7 +4055,7 @@ function drawHUD(R) {
   g.globalAlpha = 1;
   { const [dx, dy] = mArrow(p, 5.6 * u, '#ffffff', 1.6);   // jugador: siempre encima, con aro pulsante
     const pr = (9.5 + Math.sin(R.clock * 6) * 1.6) * u; g.strokeStyle = 'rgba(24,200,255,' + (.55 - Math.sin(R.clock * 6) * .15) + ')'; g.lineWidth = 1.6 * u; g.beginPath(); g.arc(dx, dy, pr, 0, TAU); g.stroke(); }
-  if (R.champ) { const C = CROWNS[R.champ.ci]; txt(C.emoji + ' ' + C.name + ' · RONDA ' + (R.champ.r + 1) + '/4 · ' + R.map.name, W / 2, M + 14 * u, 13 * u, '#ffb020', 'center'); }
+  if (R.champ) { const C = crownOf(R.champ.ci); txt(C.emoji + ' ' + C.name + ' · RONDA ' + (R.champ.r + 1) + '/4 · ' + R.map.name, W / 2, M + 14 * u, 13 * u, '#ffb020', 'center'); }
   if (R.surv) {
     const S = R.surv; txt('RONDA ' + (S.round + 1) + '/4 · ' + (S.k === 1 ? 'GANA UNO' : 'PASAN ' + S.k + ' DE ' + R.cars.length), W / 2, M + (R.champ ? 34 : 14) * u, 14 * u, '#ffb020', 'center');
     if (!S.end && !p.finished && p.pos > S.k && Math.floor(R.clock * 3) % 2) txt('¡ZONA DE ELIMINACIÓN!', W / 2, M + 104 * u, 20 * u, '#ff3b5c', 'center');
@@ -4204,7 +4195,8 @@ function buildStreaks(el) {
 document.querySelectorAll('[data-streaks]').forEach(buildStreaks);
 function go(name) {
   if (name === 'skycrown' && !skyOpen()) name = 'survival';   // sin las 8 coronas + secreto desbloqueado no se puede entrar
-  mode = name; frozen = false; if (name !== 'survival') { MINI.list = []; MINI.cache = {}; }
+  mode = name; frozen = false;
+  { const rl = RACE_LIKE.includes(name); if (rl !== lastRaceLike) { lastRaceLike = rl; resize(); } }   // la resolución de carrera (adaptativa) y la de menús son independientes if (name !== 'survival') { MINI.list = []; MINI.cache = {}; }
   for (const id of ['mapGrid', 'shopGrid']) { const g = $(id); g.classList.remove('settled'); clearTimeout(g._t); g._t = setTimeout(() => g.classList.add('settled'), 1100); }
   toggleCtl(false);
   document.querySelectorAll('.screen').forEach(s => {
@@ -4977,6 +4969,243 @@ CROWNS.forEach((cr, ci) => cr.tracks.forEach((t, k) => {
 }));
 
 /* =====================================================================
+   CORONA DE LOS CIELOS · corona secreta de Supervivencia (cámara cenital, como las demás coronas)
+   ---------------------------------------------------------------------
+   - Mismo formato que el resto de coronas: 4 rondas de eliminación (12 → 9 → 6 → 3 → 1), 4 pistas propias, mismos premios y guardado
+     (save.champ.st / save.champ.cur con id 'cielos'). Se reutiliza champRace / champShowResults / renderCrowns mediante crownOf().
+   - Vista desde arriba, sin físicas laterales: las pistas son plataformas flotantes (th.sky) con huecos de cielo. Unas plataformas de
+     lanzamiento hacen que el coche «vuele» el hueco: sólo cambia lo que se VE (elevación, sombra lejana y alas animadas) + un pequeño empuje.
+   - No se toca MP-CORE / mpHash (buildTrack, stepCar, IA…): la geometría de huecos se calcula aparte a partir de T, y los decorados
+     nuevos entran por DEC2 / CRAD, igual que los de las otras coronas. No forma parte de CROWNS (el desbloqueo de las 8 coronas no cambia).
+   ===================================================================== */
+const SKY_CI = CROWNS.length;
+const SKY_SHAPES = [
+  { sc: 1.7, sh: { rx: 1500, ry: 1180, f: 1, h: [[2, 0.09, 0.6], [3, 0.05, 2.1], [5, 0.025, 4.2]] } },
+  { sc: 1.75, sh: { rx: 1620, ry: 1150, f: 1, h: [[3, 0.10, 1.1], [2, 0.06, 3.4], [6, 0.025, 0.5]] } },
+  { sc: 1.8, sh: { rx: 1450, ry: 1300, f: 1, h: [[4, 0.085, 0.3], [2, 0.07, 5.0], [7, 0.02, 1.9]] } },
+  { sc: 1.85, sh: { rx: 1560, ry: 1280, f: 1, h: [[5, 0.075, 2.2], [3, 0.08, 0.9], [2, 0.05, 4.1], [8, 0.015, 3.0]] } },
+];
+const SKYCR = {
+  id: 'cielos', name: 'CORONA DE LOS CIELOS', emoji: '☁️', col: '#7fc8ff', col2: '#ffd25a', mult: 6.6, xpm: 5.6,
+  lore: 'Más allá de las nubes: plataformas flotantes, huecos de cielo y alas para cruzarlos. La corona definitiva de CRUSH CARS.',
+  pat: 'radial-gradient(circle at 86% 18%,#ffe9a888,transparent 46%),radial-gradient(circle at 14% 92%,#ffffff33,transparent 50%),linear-gradient(160deg,#1c3f9a,#5aa6ff)',
+  tracks: [
+    tk('cr_sk1', 'ISLAS DEL ALBA', 'Plataformas de hierba flotando en un cielo de amanecer.', 310, { bg: '#ff9f7e', land: '#ffd9b0', off: '#86cf6a', road: '#4d5470', lane: 'rgba(255,255,255,.9)', cA: '#ffd23f', cB: '#ffffff', wall: '#fff1d6', wallB: '#ff7a5a',
+      sky: { gaps: [[.17, 380], [.52, 420], [.80, 380]], rock: '#5e4034', rock2: '#86614a', rock3: '#a8835f', puff: 'rgba(255,255,255,.7)', cl: '255,236,220', cla: .5, tree: ['#2f9a4e', '#6fd470'], lane: 'rgba(255,225,120,.95)' } },
+      ['#ffd23f', '#ff7a5a', '#fff1d6'], '255,200,150', 'clouds', ['rgba(255,255,255,.5)', 'rgba(255,240,220,.4)'], ['skyisle', 'cloud', 'windmill', 'skyisle', 'cloud', 'birdv', 'rainbow'], false),
+    tk('cr_sk2', 'ARCHIPIÉLAGO DE NUBES', 'Plataformas de nube y roca flotante entre dirigibles.', 300, { bg: '#5fb0ff', land: '#eaf5ff', off: '#eef7ff', road: '#56648a', lane: 'rgba(255,255,255,.92)', cA: '#ffffff', cB: '#5fa0ff', wall: '#ffffff', wallB: '#7fb8ff',
+      sky: { gaps: [[.14, 400], [.38, 420], [.62, 420], [.84, 380]], rock: '#8196bd', rock2: '#a6b8dc', rock3: '#cddaf2', puff: 'rgba(255,255,255,.9)', cl: '255,255,255', cla: .55, tree: ['#58b86a', '#9be07a'], lane: 'rgba(255,255,255,.95)' } },
+      ['#ffffff', '#ff7a5a', '#ffd23f'], '255,255,255', 'clouds', ['rgba(255,255,255,.85)', 'rgba(220,235,255,.6)'], ['cloud', 'skyisle', 'airship', 'cloud', 'birdv', 'temple', 'airship'], false),
+    tk('cr_sk3', 'TORMENTA CELESTIAL', 'Losas de piedra suspendidas en plena tormenta, con rayos entre las nubes.', 290, { bg: '#232a4e', land: '#3a4670', off: '#59698a', road: '#20242e', lane: 'rgba(190,225,255,.9)', cA: '#8fd8ff', cB: '#20242e', wall: '#8a9ab8', wallB: '#ffe45a',
+      sky: { gaps: [[.12, 420], [.33, 440], [.55, 420], [.78, 460]], rock: '#1e2538', rock2: '#2c3752', rock3: '#44527a', puff: 'rgba(190,225,255,.4)', cl: '60,70,110', cla: .6, tree: ['#28485a', '#4b8aa0'], lane: 'rgba(255,240,150,.95)', stars: true } },
+      ['#3a4468', '#2e3656', '#ffe45a'], '150,210,255', 'clouds', ['rgba(150,170,230,.3)', 'rgba(255,240,150,.4)'], ['stormcloud', 'stormcloud', 'floatrock', 'skyisle', 'airship', 'cloud', 'birdv'], true),
+    tk('cr_sk4', 'TRONO DE LAS ESTRELLAS', 'La última prueba: plataformas doradas sobre un atardecer estrellado.', 300, { bg: '#35205f', land: '#5a3a98', off: '#f0d98e', road: '#3a2f58', lane: '#fff3b0', cA: '#ffd23f', cB: '#3a2f58', wall: '#ffe9a8', wallB: '#b07aff',
+      sky: { gaps: [[.10, 440], [.27, 460], [.44, 460], [.61, 480], [.80, 480]], rock: '#2a1c4a', rock2: '#4a3480', rock3: '#7a58b8', puff: 'rgba(255,240,180,.75)', cl: '190,150,255', cla: .45, tree: ['#d8a82a', '#ffe27a'], lane: '#fff3b0', stars: true } },
+      ['#ffd23f', '#b07aff', '#fff3b0'], '255,215,120', 'clouds', ['rgba(255,240,180,.4)', 'rgba(190,150,255,.4)'], ['temple', 'column', 'skyisle', 'rainbow', 'cloud', 'star', 'birdv', 'floatrock'], true),
+  ],
+};
+const crownOf = ci => ci === SKY_CI ? SKYCR : CROWNS[ci];
+SKYCR.tracks.forEach((t, k) => {   // cada pista = «mapa» completo, igual que las de CROWNS (pero fuera de CROWN_MAPS: no es una corona de sala online)
+  const q = SKY_CI * CH_N + k, S = SKY_SHAPES[k], lo = +(0.86 + q * 0.0036).toFixed(3);
+  Object.assign(t, { lvl: 1, laps: k === 3 ? 3 : 2, mult: 1, xpm: 1, scale: S.sc, w: t.w, ai: [lo, Math.min(1.08, +(lo + 0.09).toFixed(3))], pool: [0, 1, 2], shape: S.sh, seed: (q + 1) * 65537, crown: SKY_CI, idx: k });
+  MAP_META[t.id] = { c: SKYCR.col, tag: 'CIELOS' };
+  const th = t.th; AMB[t.id] = { e: hx2rgb(th.bg), ea: th.night ? .5 : .34, l: [[th.gl, .1, .08, th.night ? .1 : .08], [hx2rgb(th.cA), .9, .92, .06]] };
+});
+
+/* ---------- geometría de plataformas y huecos (sólo a partir de T; se guarda en T para no recalcular) ---------- */
+function swGeo(T) {
+  if (T._swg) return T._swg;
+  const S = T.th.sky, N = T.N, ds = T.ds, L = T.L, gaps = [], pads = [], ix = s => ((Math.round(s / ds) % N) + N) % N;
+  for (const [f, gl] of S.gaps) { const s0 = f * L, s1 = s0 + gl; gaps.push({ s0, s1, len: gl, i0: ix(s0), i1: ix(s1) }); pads.push({ s: s0 - 170, len: 140, gEnd: s1, i: ix(s0 - 170) }); }
+  return T._swg = { gaps, pads };
+}
+function swPath(T, a, b, d) {   // línea abierta desde el índice a hasta el b (con vuelta), desplazada d en la normal
+  const p = new Path2D(), N = T.N, n = ((b - a) % N + N) % N;
+  for (let k = 0; k <= n; k++) { const i = (a + k) % N, x = T.X[i] + T.NX[i] * d, y = T.Y[i] + T.NY[i] * d; k ? p.lineTo(x, y) : p.moveTo(x, y); }
+  return p;
+}
+const swSegs = T => { const G = swGeo(T).gaps, o = []; for (let k = 0; k < G.length; k++) o.push([G[k].i1, G[(k + 1) % G.length].i0]); return o; };   // tramos de plataforma entre huecos
+function swClip(T) {   // región donde hay plataforma (excluye los huecos): se usa de máscara al hornear el suelo
+  if (T._swc) return T._swc;
+  const p = new Path2D(), m = T.wall + 34, N = T.N;
+  for (const [a, b] of swSegs(T)) {
+    const n = ((b - a) % N + N) % N;
+    for (let k = 0; k <= n; k++) { const i = (a + k) % N, x = T.X[i] - T.NX[i] * m, y = T.Y[i] - T.NY[i] * m; k ? p.lineTo(x, y) : p.moveTo(x, y); }
+    for (let k = n; k >= 0; k--) { const i = (a + k) % N; p.lineTo(T.X[i] + T.NX[i] * m, T.Y[i] + T.NY[i] * m); }
+    p.closePath();
+  }
+  return T._swc = p;
+}
+function swLoop(T, d) { const p = new Path2D(); for (let i = 0; i < T.N; i++) { const x = T.X[i] + T.NX[i] * d, y = T.Y[i] + T.NY[i] * d; i ? p.lineTo(x, y) : p.moveTo(x, y); } p.closePath(); return p; }
+const swFr = v => v - Math.floor(v);
+function swFar(g, S, vx0, vy0, vx1, vy1) {   // cielo: nubes lejanas (y estrellas en las pistas nocturnas), deterministas por celda
+  if (S.stars) {
+    const C = 150; g.fillStyle = '#fff';
+    for (let gx = Math.floor(vx0 / C) - 1; gx <= Math.ceil(vx1 / C); gx++) for (let gy = Math.floor(vy0 / C) - 1; gy <= Math.ceil(vy1 / C); gy++) {
+      const h1 = swFr(Math.sin(gx * 127.1 + gy * 311.7) * 43758.5453), h2 = swFr(Math.sin(gx * 269.5 + gy * 183.3) * 24634.6345), h3 = swFr(Math.sin(gx * 419.2 + gy * 371.9) * 31415.9265);
+      if (h3 < .45) continue; g.globalAlpha = .35 + h3 * .6; const z = h3 > .9 ? 3.2 : 1.8; g.fillRect(gx * C + h1 * C, gy * C + h2 * C, z, z);
+    }
+    g.globalAlpha = 1;
+  }
+  const C = 560;
+  for (let gx = Math.floor(vx0 / C) - 1; gx <= Math.ceil(vx1 / C); gx++) for (let gy = Math.floor(vy0 / C) - 1; gy <= Math.ceil(vy1 / C); gy++) {
+    const h1 = swFr(Math.sin(gx * 91.3 + gy * 207.7) * 43758.5453), h2 = swFr(Math.sin(gx * 163.5 + gy * 98.3) * 24634.6345), h3 = swFr(Math.sin(gx * 311.2 + gy * 271.9) * 31415.9265);
+    if (h3 < .3) continue;
+    const x = gx * C + h1 * C, y = gy * C + h2 * C, s = .7 + h3 * 1.1;
+    for (let pass = 0; pass < 2; pass++) {
+      g.fillStyle = 'rgba(' + S.cl + ',' + (pass ? S.cla : S.cla * .55).toFixed(2) + ')';
+      for (let k = 0; k < 5; k++) { const q = Math.abs(k - 2); g.beginPath(); g.ellipse(x + (k - 2) * 46 * s + (pass ? 0 : 14 * s), y + Math.sin(k * 2.1 + h1 * 9) * 18 * s + (pass ? 0 : 12 * s), (52 - q * 9) * s, (30 - q * 4) * s, 0, 0, TAU); g.fill(); }
+    }
+  }
+}
+/* plataformas: nubes lejanas, sombra sobre las nubes de abajo y grosor de roca bajo cada tramo; deja activa una máscara que excluye los huecos */
+function swUnder(g, T, th, vx0, vy0, vx1, vy1) {
+  const S = th.sky, W = 2 * T.wall;
+  swFar(g, S, vx0, vy0, vx1, vy1);
+  const paths = swSegs(T).map(s => swPath(T, s[0], s[1], 0));
+  g.lineJoin = 'round'; g.lineCap = 'butt';
+  for (const l of [['rgba(10,24,60,.20)', 52, 104, W + 14], [S.rock, 17, 34, W], [S.rock2, 11, 22, W], [S.rock3, 5, 11, W]]) {
+    g.strokeStyle = l[0]; g.lineWidth = l[3]; g.save(); g.translate(l[1], l[2]); for (const p of paths) g.stroke(p); g.restore();
+  }
+  g.lineCap = 'round'; g.strokeStyle = S.rock2; g.lineWidth = 34;   // témpanos de roca que cuelgan bajo los bordes
+  for (const d of [-T.wall + 6, T.wall - 6]) { g.save(); g.translate(14, 40); g.setLineDash([1, 170]); g.lineDashOffset = d > 0 ? 60 : 0; for (const s of swSegs(T)) g.stroke(swPath(T, s[0], s[1], d)); g.restore(); }
+  g.setLineDash([]); g.lineCap = 'butt';
+  g.save(); g.clip(swClip(T));
+}
+/* detalle de la cara superior (sustituye a groundDetail): meseta más clara, borde más oscuro y motas de hierba/nube junto al borde */
+function swTop(g, T, th) {
+  const S = th.sky, W = 2 * T.wall;
+  g.save();
+  g.strokeStyle = 'rgba(255,255,255,.16)'; g.lineWidth = W - 44; g.stroke(T.pCenter);
+  g.lineCap = 'round'; g.strokeStyle = S.puff; g.lineWidth = 9; g.setLineDash([1, 52]); g.stroke(T._swm || (T._swm = swLoop(T, T.hw + 58))); g.stroke(T._swn || (T._swn = swLoop(T, -T.hw - 58)));
+  g.setLineDash([1, 131]); g.lineDashOffset = 40; g.lineWidth = 15; g.strokeStyle = S.tree[1]; g.globalAlpha = .55; g.stroke(T._swm); g.stroke(T._swn);
+  g.restore();
+}
+/* tras dibujar el suelo: se quita la máscara y se marcan los huecos (rieles de viento, nubes de abajo, caras de roca cortadas) */
+function swOver(g, T, th) {
+  g.restore();
+  const S = th.sky, geo = swGeo(T), N = T.N;
+  g.save(); g.lineJoin = 'round';
+  for (const gp of geo.gaps) {
+    g.fillStyle = 'rgba(' + S.cl + ',.5)';   // bruma de nubes en el fondo del hueco
+    for (let k = 0; k < 7; k++) { const f = (k + .5) / 7, i = (gp.i0 + Math.round(f * (((gp.i1 - gp.i0) % N + N) % N))) % N, o = Math.sin(k * 3.1 + gp.s0) * T.wall * .6; g.beginPath(); g.ellipse(T.X[i] + T.NX[i] * o, T.Y[i] + T.NY[i] * o, 70 + (k % 3) * 18, 34 + (k % 2) * 10, 0, 0, TAU); g.fill(); }
+    g.lineCap = 'round'; g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 3; g.setLineDash([16, 22]);
+    for (const d of [-T.wall, T.wall]) g.stroke(swPath(T, gp.i0, gp.i1, d));
+    g.strokeStyle = S.lane; g.lineWidth = 4; g.setLineDash([10, 44]); g.stroke(swPath(T, gp.i0, gp.i1, 0)); g.setLineDash([]);
+    g.lineCap = 'butt';
+    for (const i of [gp.i0, gp.i1]) {   // canto de la plataforma en cada extremo del hueco
+      const x = T.X[i], y = T.Y[i], nx = T.NX[i], ny = T.NY[i], w = T.wall;
+      g.strokeStyle = S.rock; g.lineWidth = 9; g.beginPath(); g.moveTo(x - nx * w + 4, y - ny * w + 7); g.lineTo(x + nx * w + 4, y + ny * w + 7); g.stroke();
+      g.strokeStyle = S.rock3; g.lineWidth = 6; g.beginPath(); g.moveTo(x - nx * w, y - ny * w); g.lineTo(x + nx * w, y + ny * w); g.stroke();
+    }
+  }
+  g.restore();
+}
+
+/* ---------- vuelo: sólo cambia lo que se ve (elevación + alas) y un pequeño empuje al pisar la plataforma de lanzamiento ---------- */
+const swOf = R => R.skyc || (R.T && R.T.th && R.T.th.sky ? (R.skyc = { geo: swGeo(R.T) }) : null);
+function swLaunch(c, R, p) {
+  const T = R.T, ca = Math.cos(c.a), sa = Math.sin(c.a), vf = c.vx * ca + c.vy * sa;
+  if (vf < c.st.vmax * 1.25) { c.vx += ca * 120; c.vy += sa * 120; }
+  const left = evWrap(p.gEnd - c.s, T.L), v = Math.max(420, Math.hypot(c.vx, c.vy));
+  c.fly = clamp((left + 90) / v, .7, 1.9); c.skCd = c.fly + .6;
+  if (c.human) { R.shake = Math.max(R.shake, .25); if (Snd.gate('skf', 200)) { Snd.whoosh(.5, .2, 400, 2800); Snd.sweep(260, 1300, .4, .08, 'triangle'); } }
+  for (let i = 0; i < 8; i++) emit(0, c.x + (Math.random() - .5) * 30, c.y + (Math.random() - .5) * 30, (Math.random() - .5) * 120, (Math.random() - .5) * 120, .6, 8 + Math.random() * 8, 'rgba(255,255,255,');
+}
+function swCarPre(c, R, h) {
+  const T = R.T, geo = R.skyc.geo;
+  c.flyPh = (c.flyPh || 0) + h * (c.fly > 0 ? 17 : 8);
+  if (c.skCd > 0) c.skCd -= h;
+  if (c.fly > 0) c.fly -= h;
+  if (!c.finished) {
+    if (!(c.skCd > 0)) for (const p of geo.pads) { const d = evWrap(c.s - p.s, T.L); if (d > -p.len * .5 && d < p.len * .5 && Math.abs(c.off) < T.hw) { swLaunch(c, R, p); break; } }
+    if (!(c.fly > .22)) for (const gp of geo.gaps) { const d = evWrap(c.s - gp.s0, T.L); if (d > -30 && d < gp.len + 30) { c.fly = .22; break; } }   // cruzar un hueco siempre es volando
+  }
+  const up = c.fly > 0, f0 = c.flyH || 0; c.flyH = f0 + ((up ? 1 : 0) - f0) * (1 - Math.exp(-h * (up ? 9 : 5)));
+  if (c.flyH > .3 && Math.random() < h * (c.human ? 55 : 14)) {   // estela de nubes y destellos dorados
+    const ca = Math.cos(c.a), sa = Math.sin(c.a), s = (Math.random() - .5) * c.wid * 1.6;
+    emit(0, c.x - ca * c.len * .3 - sa * s, c.y - sa * c.len * .3 + ca * s, -ca * 40 + (Math.random() - .5) * 50, -sa * 40 + (Math.random() - .5) * 50, .7, 5 + Math.random() * 6, Math.random() < .5 ? 'rgba(255,255,255,' : 'rgba(255,226,130,');
+  }
+}
+/* alas animadas (se dibujan en el sistema local del coche: +x = morro). op = apertura 0..1; el aleteo cambia la envergadura y el barrido */
+function swWings(g, c, t, lh) {
+  const f = .62 + .38 * Math.sin(c.flyPh || 0), op = lh * lh * (3 - 2 * lh), len = c.len, wid = c.wid;
+  g.save(); g.lineJoin = 'round';
+  for (let s = -1; s <= 1; s += 2) {
+    const rx = len * .04, ry = s * wid * .42; let tx0 = 0, ty0 = 0;
+    for (let i = 6; i >= 0; i--) {
+      const a = s * (Math.PI / 2 + .12 + i * .15 + (1 - f) * .28), L = (len * (1.05 - i * .09) * (.65 + .35 * f) * op) + 4, ca = Math.cos(a), sa = Math.sin(a), nx = -sa, ny = ca, w = len * .085 * op + 1;
+      const px = rx + ca * L, py = ry + sa * L; if (i === 0) { tx0 = px; ty0 = py; }
+      g.beginPath(); g.moveTo(rx, ry); g.quadraticCurveTo(rx + ca * L * .55 + nx * w * 1.6, ry + sa * L * .55 + ny * w * 1.6, px, py); g.quadraticCurveTo(rx + ca * L * .5 - nx * w, ry + sa * L * .5 - ny * w, rx, ry); g.closePath();
+      g.fillStyle = i % 2 ? '#ffffff' : '#e6f4ff'; g.fill(); g.lineWidth = 1.2; g.strokeStyle = 'rgba(80,120,190,.8)'; g.stroke();
+    }
+    g.strokeStyle = '#ffd25a'; g.lineWidth = 2.6; g.lineCap = 'round'; g.beginPath(); g.moveTo(rx, ry); g.lineTo(tx0, ty0); g.stroke();
+  }
+  g.restore();
+}
+/* plataformas de lanzamiento: se animan en el suelo antes de los coches */
+function swDrawGround(g, R, vx0, vy0, vx1, vy1) {
+  const T = R.T, t = R.clock, geo = R.skyc.geo;
+  for (const p of geo.pads) {
+    const i = p.i, x = T.X[i], y = T.Y[i];
+    if (x < vx0 - 220 || x > vx1 + 220 || y < vy0 - 220 || y > vy1 + 220) continue;
+    const L2 = p.len / 2, hw = T.hw - 16, pulse = .5 + .5 * Math.sin(t * 6 + p.s * .01), ph = (t * 1.4) % 1;
+    g.save(); g.translate(x, y); g.rotate(T.TA[i]);
+    const gr = g.createLinearGradient(-L2, 0, L2, 0); gr.addColorStop(0, 'rgba(255,255,255,.12)'); gr.addColorStop(.55, 'rgba(255,226,130,.42)'); gr.addColorStop(1, 'rgba(255,255,255,.7)');
+    rr(g, -L2, -hw, p.len, hw * 2, 16); g.fillStyle = gr; g.fill(); g.lineWidth = 4; g.strokeStyle = 'rgba(255,255,255,' + (.55 + .4 * pulse).toFixed(2) + ')'; g.stroke();
+    g.lineCap = 'round'; g.lineJoin = 'round'; g.lineWidth = 9;
+    for (let k = 0; k < 3; k++) { const u = (k + ph) / 3, cx = -L2 + 14 + u * (p.len - 28); g.strokeStyle = 'rgba(255,255,255,' + (Math.sin(u * Math.PI) * .9).toFixed(2) + ')'; g.beginPath(); g.moveTo(cx - 20, -hw * .78); g.lineTo(cx, 0); g.lineTo(cx - 20, hw * .78); g.stroke(); }
+    g.restore();
+  }
+}
+/* decorados de cielo (entran por DEC2 / CRAD, como los de las demás coronas) */
+Object.assign(CRAD, { skyisle: 70, airship: 82, stormcloud: 70, windmill: 56, rainbow: 70, birdv: 30 });
+const swIsle = (g, d, T, R, k) => {   // isla flotante: sombra lejana, tres capas de roca desplazadas y cara superior con vegetación
+  const s = d.s, S = T.th.sky;
+  g.fillStyle = 'rgba(10,24,60,.17)'; g.beginPath(); g.ellipse(46 * s, 92 * s, R * 1.1 * s, R * .62 * s, 0, 0, TAU); g.fill();
+  [[S.rock, 3], [S.rock2, 2], [S.rock3, 1]].forEach(([col, q]) => { g.save(); g.translate(q * 6 * s, q * 10 * s); g.fillStyle = col; blob(g, 11, R * s, .13, d.v, d.a); g.fill(); g.restore(); });
+  g.fillStyle = T.th.off; blob(g, 11, R * s, .13, d.v, d.a); g.fill(); g.fillStyle = 'rgba(255,255,255,.14)'; blob(g, 11, R * .78 * s, .13, d.v, d.a); g.fill();
+  for (let i = 0; i < k; i++) { const a = d.a + i * 2.3 + d.v * 5, r = (8 + (i % 3) * 12) * s; circ(g, Math.cos(a) * r, Math.sin(a) * r, (8 + i % 2 * 3) * s, S.tree[i % 2]); circ(g, Math.cos(a) * r - 1.5 * s, Math.sin(a) * r - 2 * s, 3 * s, 'rgba(255,255,255,.35)'); }
+};
+Object.assign(DEC2, {
+  skyisle(g, d, T) { swIsle(g, d, T, 50, 5); const s = d.s; for (let i = 0; i < 4; i++) { const a = d.a * 1.7 + i * 1.9; circ(g, Math.cos(a) * 30 * s, Math.sin(a) * 26 * s, 2.2 * s, i % 2 ? '#ffd23f' : '#ff7ab8'); } },
+  windmill(g, d, T) {
+    swIsle(g, d, T, 40, 2); const s = d.s;
+    circ(g, 0, 0, 12 * s, '#d8c8a8'); circ(g, 0, 0, 8 * s, T.th.dc[1]); g.save(); g.rotate(d.a);
+    for (let i = 0; i < 4; i++) { g.rotate(Math.PI / 2); g.fillStyle = '#fff'; g.strokeStyle = 'rgba(70,50,30,.6)'; g.lineWidth = 1.4; g.fillRect(4 * s, -4 * s, 32 * s, 8 * s); g.strokeRect(4 * s, -4 * s, 32 * s, 8 * s); }
+    g.restore(); circ(g, 0, 0, 4 * s, '#5a3a22');
+  },
+  airship(g, d, T) {
+    const s = d.s, c = T.th.dc;
+    g.fillStyle = 'rgba(10,24,60,.16)'; g.beginPath(); g.ellipse(44 * s, 84 * s, 74 * s, 22 * s, d.a, 0, TAU); g.fill();
+    g.rotate(d.a);
+    g.fillStyle = '#6a4a32'; g.beginPath(); g.moveTo(-70 * s, 0); g.lineTo(-92 * s, -22 * s); g.lineTo(-84 * s, -3 * s); g.lineTo(-84 * s, 3 * s); g.lineTo(-92 * s, 22 * s); g.closePath(); g.fill();
+    g.save(); g.beginPath(); g.ellipse(0, 0, 80 * s, 32 * s, 0, 0, TAU); g.clip();
+    for (let i = -4; i < 4; i++) { g.fillStyle = i % 2 ? c[1] : c[0]; g.fillRect(i * 20 * s, -34 * s, 20 * s, 68 * s); }
+    g.fillStyle = 'rgba(255,255,255,.22)'; g.beginPath(); g.ellipse(-6 * s, -12 * s, 62 * s, 10 * s, 0, 0, TAU); g.fill(); g.restore();
+    g.strokeStyle = 'rgba(40,50,80,.6)'; g.lineWidth = 2; g.beginPath(); g.ellipse(0, 0, 80 * s, 32 * s, 0, 0, TAU); g.stroke();
+    g.fillStyle = '#4a3422'; rr(g, -22 * s, 30 * s, 44 * s, 10 * s, 4); g.fill(); circ(g, -26 * s, 38 * s, 5 * s, '#fff'); circ(g, 26 * s, 38 * s, 5 * s, '#fff');
+  },
+  stormcloud(g, d, T) {
+    const s = d.s;
+    g.fillStyle = 'rgba(4,8,24,.25)'; g.beginPath(); g.ellipse(40 * s, 72 * s, 66 * s, 30 * s, 0, 0, TAU); g.fill();
+    for (let i = 0; i < 8; i++) { const a = d.a + i * 2.4, r = (10 + (i % 3) * 12) * s; circ(g, Math.cos(a) * r * 1.5, Math.sin(a) * r, (28 - i * 1.4) * s, i % 2 ? '#3a4468' : '#2e3656'); }
+    for (let i = 0; i < 4; i++) { const a = d.a + i * 2.4 + 4.8; circ(g, Math.cos(a) * 14 * s - 6 * s, Math.sin(a) * 12 * s - 6 * s, 12 * s, 'rgba(160,180,230,.22)'); }
+    if (d.v > .4) { g.strokeStyle = '#fff3a0'; g.lineWidth = 3 * s; g.lineJoin = 'round'; g.beginPath(); g.moveTo(-4 * s, -14 * s); g.lineTo(5 * s, -2 * s); g.lineTo(-3 * s, 2 * s); g.lineTo(6 * s, 16 * s); g.stroke(); glw(g, 52 * s, '255,236,140', .4); }
+  },
+  rainbow(g, d, T) {
+    const s = d.s, cols = ['#ff5a5a', '#ff9a3a', '#ffe23a', '#5ad86a', '#4aa8ff', '#9a6aff'];
+    g.rotate(d.a); g.lineCap = 'round'; g.globalAlpha = .85;
+    for (let i = 0; i < 6; i++) { g.strokeStyle = cols[i]; g.lineWidth = 7 * s; g.beginPath(); g.arc(0, 8 * s, (60 - i * 7) * s, Math.PI, TAU); g.stroke(); }
+    g.globalAlpha = 1; for (const q of [-1, 1]) { circ(g, q * 50 * s, 12 * s, 14 * s, 'rgba(255,255,255,.85)'); circ(g, q * 36 * s, 14 * s, 11 * s, 'rgba(255,255,255,.7)'); }
+  },
+  birdv(g, d, T) {
+    const s = d.s; g.rotate(d.a); g.strokeStyle = 'rgba(30,40,70,.75)'; g.lineWidth = 2 * s; g.lineCap = 'round'; g.lineJoin = 'round';
+    for (let i = 0; i < 5; i++) { const x = -Math.abs(i - 2) * 12 * s - 6 * s, y = (i - 2) * 12 * s, w = 7 * s; g.beginPath(); g.moveTo(x - 3 * s, y - w); g.lineTo(x + 3 * s, y); g.lineTo(x - 3 * s, y + w); g.stroke(); }
+  },
+});
+
+/* =====================================================================
    CORONAS · campeonatos de Supervivencia (solo): 12 pilotos · 4 pistas · puntos acumulados · recompensas al final
    Reutiliza createRace/getTrack/thumb, el orden de carrera (R.order) y la economía existente (CC.rw, COINS_BY_POS, XP_BY_POS, XP_BASE, save.coins/save.xp).
    No toca el servidor, MP-CORE ni mpHash: es un modo individual, igual que la Supervivencia clásica.
@@ -4984,14 +5213,14 @@ CROWNS.forEach((cr, ci) => cr.tracks.forEach((t, k) => {
 MENU_SCREENS.push('crowns');
 const CH_COINS = COINS_BY_POS.concat([60, 45, 35, 25, 18, 10]), CH_XP = XP_BY_POS.concat([6, 4, 3, 2, 1, 0]);   // la tabla existente (1.º–6.º) ampliada a 12 puestos
 const chName = i => i === 0 ? (save.name || 'TÚ') : SURV_NAMES[i - 1][0];
-const crownReward = (ci, pos, cc) => { const c = CROWNS[ci], f = CC[cc].rw; return { coins: Math.round(CH_COINS[pos - 1] * c.mult * f), xp: Math.round((XP_BASE + CH_XP[pos - 1]) * c.xpm * f) }; };
+const crownReward = (ci, pos, cc) => { const c = crownOf(ci), f = CC[cc].rw; return { coins: Math.round(CH_COINS[pos - 1] * c.mult * f), xp: Math.round((XP_BASE + CH_XP[pos - 1]) * c.xpm * f) }; };
 function champRoster(seed) {
   const r = rng(seed | 0), q = SURV_NAMES.map((_, i) => i / (SURV_NAMES.length - 1));
   for (let i = q.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [q[i], q[j]] = [q[j], q[i]]; }
   return SURV_NAMES.map((n, i) => ({ rid: i, name: n[0], col: n[1], bi: i % CARS.length, q: q[i] }));
 }
 function champRace(ci) {
-  const cr = CROWNS[ci], cur = save.champ.cur[cr.id]; if (!cur) return;
+  const cr = crownOf(ci), cur = save.champ.cur[cr.id]; if (!cur) return;
   const map = cr.tracks[cur.r];
   lastMap = map; lastRev = false; lastCc = cur.cc;
   const SR = SURV_ROUNDS[cur.r], roster = champRoster(cur.seed).filter(e => !(e.rid in cur.out));   // sólo siguen los pilotos que no han sido eliminados
@@ -5001,11 +5230,11 @@ function champRace(ci) {
   go('race'); if (document.activeElement) document.activeElement.blur();
 }
 function champStart(ci) {
-  const cr = CROWNS[ci]; save.champ.cur[cr.id] = { r: 0, seed: Date.now() & 0xfffff, cc: save.cc, hist: [], out: {} }; persist(); champRace(ci);
+  const cr = crownOf(ci); save.champ.cur[cr.id] = { r: 0, seed: Date.now() & 0xfffff, cc: save.cc, hist: [], out: {} }; persist(); champRace(ci);
 }
 function champShowResults(R) {
   R.settled = true;
-  const ci = R.champ.ci, cr = CROWNS[ci], cur = save.champ.cur[cr.id];
+  const ci = R.champ.ci, cr = crownOf(ci), cur = save.champ.cur[cr.id];
   if (!cur || cur.r !== R.champ.r || !R.surv) { race = null; go('survival'); return; }   // la ronda ya se había contabilizado
   const S = R.surv, p = R.player, k = S.k, order = R.order, ok = order.slice(0, k).includes(p), pos = order.indexOf(p) + 1, rd = cur.r, last = rd >= CH_N - 1, cc = cur.cc, map = R.map;
   const st = save.stats; st.races++; if (pos === 1) st.wins++; if (pos <= 3) st.podiums++;
@@ -5115,6 +5344,7 @@ function crownEmblem(c) {
     case 'infernal': return `<path d="M32 22 C33 26.5 38.5 27.5 38.5 33 C38.5 36.8 35.6 39 32 39 C28.4 39 25.5 36.8 25.5 33 C25.5 30 27.4 29 28.4 26.2 C29.8 27.8 30.6 27.6 32 22 Z" fill="#ff6a00" ${k} stroke-linejoin="round"/><path d="M32 29 C33 31.6 35.4 32.4 35.4 35 C35.4 36.8 33.9 37.8 32 37.8 C30.1 37.8 28.6 36.8 28.6 35 C28.6 33.4 30.8 32.2 32 29 Z" fill="#ffe066"/>`;
     case 'champ': return `<path d="M26.5 24 h11 v4.6 c0 3.6 -2.4 5.6 -5.5 5.6 c-3.1 0 -5.5 -2 -5.5 -5.6 Z" fill="#ffe27a" ${k} stroke-linejoin="round"/><path d="M26.5 25.5 h-3 c0 4 1.6 5.6 4 5.8 M37.5 25.5 h3 c0 4 -1.6 5.6 -4 5.8" fill="none" stroke="#ffe27a" stroke-width="1.5"/><rect x="31" y="34" width="2" height="2.6" fill="#e8b923"/><rect x="28.5" y="36" width="7" height="2.2" rx=".8" fill="#ffe27a" ${k}/>`;
     case 'colossal': return `<path d="M27 38 L27.8 23.5 Q32 21 36.2 23.5 L37 38 Z" fill="#d5dbe8" ${k} stroke-linejoin="round"/><path d="M28.6 27.2 h2.8 M32.6 27.2 h2.8" stroke="#3a4560" stroke-width="1.6" stroke-linecap="round"/><path d="M32 27.5 v6 l-1.3 .3" fill="none" stroke="#5a6580" stroke-width="1.2" stroke-linecap="round"/><path d="M29.6 35.6 h4.8" stroke="#3a4560" stroke-width="1.3" stroke-linecap="round"/>`;
+    case 'cielos': return `<path d="M32 31 C26 22 19 22 14 26 C19 27 21 29 22 32 C19 32 17 34 16 37 C22 35 27 35 32 37 Z" fill="#fff" ${k} stroke-linejoin="round"/><path d="M32 31 C38 22 45 22 50 26 C45 27 43 29 42 32 C45 32 47 34 48 37 C42 35 37 35 32 37 Z" fill="#fff" ${k} stroke-linejoin="round"/><circle cx="32" cy="31" r="3.4" fill="#ffd25a" ${k}/>`;
     default: return `<path d="M32 24 L37 31 L32 38 L27 31 Z" fill="${c.col}" ${k}/>`;
   }
 }
@@ -5128,6 +5358,7 @@ const CROWN_SHAPES = {
   champ: { d: 'M5 38 L6 22 L16 30 L22 14 L27 27 L32 8 L37 27 L42 14 L48 30 L58 22 L59 38 Z', t: [[6, 20, 3], [22, 12, 3.2], [32, 6, 3.6], [42, 12, 3.2], [58, 20, 3]] },    /* escalonada hacia el centro con bolas doradas */
   colossal: { d: 'M5 38 L5 14 L15 14 L15 22 L23 22 L23 10 L41 10 L41 22 L49 22 L49 14 L59 14 L59 38 Z', t: [] },                                                 /* almenas de piedra */
 };
+CROWN_SHAPES.cielos = { d: 'M5 38 L4 16 Q12 9 18 22 L24 8 Q28 3 32 13 Q36 3 40 8 L46 22 Q52 9 60 16 L59 38 Z', t: [[4, 16, 2.6], [24, 8, 2.8], [40, 8, 2.8], [60, 16, 2.6]] };   /* alas y picos de nube */
 /* corona de trofeo (SVG) con los colores de cada corona */
 function crownSvg(c, i) {
   const a = c.col, b = c.col2, id = 'cg' + i;
@@ -5154,13 +5385,13 @@ function crownSvg(c, i) {
 let CW = { sel: -1, ask: false };
 function renderCrowns() {
   const ch = save.champ, se = $('skyEntry');
-  se.hidden = !skyOpen() || !!NET.room; se.innerHTML = skyOpen() && !NET.room ? '<button type="button" class="btn" id="skyOpen">✦ CORONA SECRETA ✦</button>' : '';   // sólo con las 8 coronas ganadas y el secreto desbloqueado
-  $('cwList').innerHTML = CROWNS.map((c, i) => {
+  se.hidden = true; se.innerHTML = '';   // sin botón «CORONA SECRETA»: la corona de los cielos ya aparece como tarjeta en la lista   // sólo con las 8 coronas ganadas y el secreto desbloqueado
+  $('cwList').innerHTML = (skyOpen() && !NET.room ? CROWNS.concat([SKYCR]) : CROWNS).map((c, i) => {
     const cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], done = cur ? cur.r : (st && st.wins ? CH_N : 0);
-    return `<button type="button" class="cr-b ${i === CW.sel ? 'sel' : ''} ${st && st.wins ? 'won' : ''}" data-ci="${i}" style="--c:${c.col}"><span class="cr-em">${c.emoji}</span>${st && st.wins ? `<span class="cr-trophy" title="¡Corona conseguida!">${crownSvg(c, i)}</span>` : ''}<b>${c.name}</b><small>${cur ? 'EN CURSO · RONDA ' + (cur.r + 1) + '/4' : st && st.wins ? '🏆 ×' + st.wins + ' · MEJOR ' + st.bp + '.º' : st && st.runs ? 'JUGADA · MEJOR ' + (st.bp || '—') + '.º' : '12 → 9 → 6 → 3 → 1'}</small><span class="cw-dots">${[0, 1, 2, 3].map(k => `<i class="${k < done ? 'on' : ''}"></i>`).join('')}</span></button>`;
+    return `<button type="button" class="cr-b ${c.id === 'cielos' ? 'skyc' : ''} ${i === CW.sel ? 'sel' : ''} ${st && st.wins ? 'won' : ''}" data-ci="${i}" style="--c:${c.col}"><span class="cr-em">${c.emoji}</span>${st && st.wins ? `<span class="cr-trophy" title="¡Corona conseguida!">${crownSvg(c, i)}</span>` : ''}<b>${c.name}</b><small>${cur ? 'EN CURSO · RONDA ' + (cur.r + 1) + '/4' : st && st.wins ? '🏆 ×' + st.wins + ' · MEJOR ' + st.bp + '.º' : st && st.runs ? 'JUGADA · MEJOR ' + (st.bp || '—') + '.º' : '12 → 9 → 6 → 3 → 1'}</small><span class="cw-dots">${[0, 1, 2, 3].map(k => `<i class="${k < done ? 'on' : ''}"></i>`).join('')}</span></button>`;
   }).join('');
-  if (CW.sel < 0 || CW.sel >= CROWNS.length) { $('cwDet').innerHTML = ''; MINI.list = []; MINI.cache = {}; navApply(); return; }
-  const ci = CW.sel, c = CROWNS[ci], cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], cc = cur ? cur.cc : save.cc;
+  if (CW.sel < 0 || !crownOf(CW.sel) || (CW.sel === SKY_CI && (!skyOpen() || NET.room))) { $('cwDet').innerHTML = ''; MINI.list = []; MINI.cache = {}; navApply(); return; }
+  const ci = CW.sel, c = crownOf(ci), cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], cc = cur ? cur.cc : save.cc;
   const pl = Array.from({ length: 12 }, (_, i) => ({ i, out: cur && i > 0 && (i - 1) in cur.out ? cur.out[i - 1] : -1 })).sort((x, y) => (x.out >= 0) - (y.out >= 0) || (y.out - x.out) || x.i - y.i);   // los que siguen en carrera primero; luego los eliminados, los últimos en caer arriba
   $('cwDet').style.setProperty('--c', c.col);
   $('cwDet').innerHTML = `
@@ -5198,8 +5429,8 @@ $('survival').addEventListener('click', e => {
   const t = e.target.closest('.cr-b'); if (t) { CW.sel = +t.dataset.ci; CW.ask = false; renderCrowns(); netPartySync(); $('cwDet').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
   const ev = e.target.closest('#svEv [data-ev]'); if (ev) { save.ev = ev.dataset.ev; persist(); renderEv(); netPartySync(); return; }
   const k = e.target.closest('[data-cwcc]'); if (k && !k.disabled) { save.cc = +k.dataset.cwcc; persist(); renderCrowns(); netPartySync(); return; }
-  if (e.target.closest('#cwReset')) { if (!CW.ask) { CW.ask = true; renderCrowns(); } else { delete save.champ.cur[CROWNS[CW.sel].id]; CW.ask = false; persist(); renderCrowns(); toast('Campeonato reiniciado'); } return; }
-  if (e.target.closest('#cwGo')) { const c = CROWNS[CW.sel]; if (NET.room) { netPartyStart({ crown: c.id, cc: save.cc, ev: save.ev }); return; } if (save.champ.cur[c.id]) champRace(CW.sel); else champStart(CW.sel); }
+  if (e.target.closest('#cwReset')) { if (!CW.ask) { CW.ask = true; renderCrowns(); } else { delete save.champ.cur[crownOf(CW.sel).id]; CW.ask = false; persist(); renderCrowns(); toast('Campeonato reiniciado'); } return; }
+  if (e.target.closest('#cwGo')) { const c = crownOf(CW.sel); if (NET.room) { netPartyStart({ crown: c.id, cc: save.cc, ev: save.ev }); return; } if (save.champ.cur[c.id]) champRace(CW.sel); else champStart(CW.sel); }
 });
 
 function survShowResults(R) {
@@ -5325,7 +5556,6 @@ function menuNav(e) {
 /* ---------- panel de controles ---------- */
 const ctlEl = $('ctl');
 function toggleCtl(f) { ctlEl.classList.toggle('on', f === undefined ? !ctlEl.classList.contains('on') : f); }
-$('btnCtl').onclick = e => { e.stopPropagation(); toggleCtl(); $('btnCtl').blur(); };
 $('ctlX').onclick = () => toggleCtl(false);
 document.addEventListener('click', e => { if (!e.target.closest('#ctl')) toggleCtl(false); });
 
@@ -5352,7 +5582,7 @@ addEventListener('keydown', e => {
   Snd.init();
   if (e.target.tagName === 'INPUT') return;
   if (ctlEl.classList.contains('on') && (e.code === 'Escape' || e.code === 'KeyC' || e.code === 'Enter')) { toggleCtl(false); e.preventDefault(); return; }
-  if (e.code === 'KeyC' && !e.repeat && MENU_SCREENS.includes(mode)) { toggleCtl(); return; }
+  if (e.code === 'KeyC' && !e.repeat && MENU_SCREENS.includes(mode)) { ST_TAB = 'ctl'; go('settings'); return; }   // la C abre Ajustes › Controles
   if (menuNav(e)) return;
   if (mode === 'race' && ['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
   keys[e.code] = true;
@@ -5362,7 +5592,7 @@ addEventListener('keydown', e => {
   else if (mode === 'race' && race && !e.repeat && specOn(race)) {   // espectador: cambiar de coche / saltar a resultados
     if (e.code === 'ArrowLeft' || e.code === 'KeyA') specStep(race, -1); else if (e.code === 'ArrowRight' || e.code === 'KeyD') specStep(race, 1); else if (e.code === 'Enter' || e.code === 'NumpadEnter') specSkip(race);
   }
-  else if (mode === 'survival' && !e.repeat && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) { const L = navList(); if (L[nav.i] && L[nav.i].classList.contains('cr-b')) { nav.i = clamp(nav.i + (e.code === 'ArrowRight' ? 1 : -1), 0, CROWNS.length - 1); navApply(true); } }
+  else if (mode === 'survival' && !e.repeat && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) { const L = navList(); if (L[nav.i] && L[nav.i].classList.contains('cr-b')) { nav.i = clamp(nav.i + (e.code === 'ArrowRight' ? 1 : -1), 0, $('cwList').children.length - 1); navApply(true); } }
   else if (mode === 'paint' && !e.repeat) { if (e.code === 'ArrowLeft') { pt.idx--; renderPaint(); } else if (e.code === 'ArrowRight') { pt.idx++; renderPaint(); } }
   else if (mode === 'garage' && !e.repeat) { if (e.code === 'ArrowLeft') { gv.idx--; renderGarage(); } else if (e.code === 'ArrowRight') { gv.idx++; renderGarage(); } }
 });
@@ -5453,8 +5683,29 @@ function padLive(down, rx, ry) {
   const a = { acc: down[7] || down[0], brk: down[6] || down[1], nit: down[2] || down[5], ab: down[3] || down[4], pau: down[9] };
   for (const el of $('stChips').children) { const on = !!a[el.dataset.a]; if (on !== (PAD.act[el.dataset.a] || false)) { PAD.act[el.dataset.a] = on; el.classList.toggle('on', on); } }
 }
+/* calidad elegida en Ajustes: baja = fluidez (móviles) · media = equilibrada y adaptativa · alta = todo el detalle */
+const QUAL = {
+  low: { lvl: 2, fx: .3, base: 1.25, min: 1, fps: 60 },     // fluidez ante todo: 60 FPS máx., efectos mínimos
+  mid: { lvl: 0, fx: 1, base: 1.5, min: 1, fps: 60 },
+  high: { lvl: 0, fx: 1, base: 2, min: 1.25, fps: 0 },       // sin límite de FPS (pantallas de 90/120 Hz)
+};
+function applyQuality(k, fresh) {
+  const c = QUAL[k] || QUAL.mid, old = Q.dprCap; k = QUAL[k] ? k : 'mid';
+  if (fresh) delete save.qd[k];   // al elegirla a mano se vuelve a intentar con la resolución completa
+  Q.mode = k; Q.lvl = c.lvl; Q.fx = c.fx; Q.auto = true; Q.bad = 0; Q.ema = 16.7; Q.cool = performance.now() + 4000; Q.minI = c.fps ? 1000 / c.fps : 0;
+  Q.dprCap = clamp(save.qd[k] || c.base, c.min, c.base);
+  if (old !== Q.dprCap) resize();
+}
+let ST_TAB = 'pad';
+const ST_SUB = { pad: 'Conecta un mando por USB o Bluetooth y pulsa cualquier botón para que el navegador lo detecte.', ctl: 'Controles de teclado y táctiles.', q: 'Elige cuánto detalle quieres. Si el juego va a tirones, prueba con Baja.' };
+$('settings').querySelector('.st-tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) { ST_TAB = b.dataset.tab; renderSettings(); navApply(); } });
+$('qOpts').addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (!b) return; save.quality = b.dataset.q; applyQuality(save.quality, true); persist(); renderSettings(); toast('Calidad ' + ({ low: 'baja', mid: 'media', high: 'alta' })[save.quality]); });
 function renderSettings() {
   const C = save.pad;
+  $('settings').dataset.tab = ST_TAB; $('stSub').textContent = ST_SUB[ST_TAB];
+  $('settings').querySelectorAll('.st-tab').forEach(b => b.classList.toggle('on', b.dataset.tab === ST_TAB));
+  $('qOpts').querySelectorAll('.q-o').forEach(b => b.classList.toggle('on', b.dataset.q === save.quality));
+  $('qNote').textContent = 'En las tres el juego vigila los FPS: si tu equipo va justo, baja un poco la resolución (y, si hace falta, algunos efectos) para que siga fluido, y recuerda hasta dónde aguanta.';
   $('stOn').textContent = C.on ? 'SÍ' : 'NO';
   $('stDz').textContent = C.dz + '%'; $('stSn').textContent = C.sens + '%';
   $('stRing').style.width = $('stRing').style.height = Math.max(6, C.dz) + '%';
@@ -5471,6 +5722,7 @@ function renderSettings() {
   $('stSnM').onclick = () => { save.pad.sens = clamp(save.pad.sens - 10, 50, 150); upd(); };
   $('stSnP').onclick = () => { save.pad.sens = clamp(save.pad.sens + 10, 50, 150); upd(); };
   $('stReset').onclick = () => { save.pad = { on: true, dz: 15, sens: 100, lay: 'auto' }; PAD.id = '__'; upd(); toast('Mando restablecido'); }; }
+applyQuality(save.quality);
 addEventListener('gamepadconnected', e => { if (save.pad.on) toast('Mando conectado: ' + padName(e.gamepad)); padStatus(); });
 addEventListener('gamepaddisconnected', () => { if (save.pad.on) toast('Mando desconectado'); PAD.id = ''; });
 
@@ -5479,6 +5731,7 @@ let lastT = performance.now(), acc = 0; const pre = { i: 0, t: 1500 };
 let sndT = 0;
 function frame(now) {
   requestAnimationFrame(frame);
+  if (Q.minI) { if (now < Q.nextF - 1) return; Q.nextF = Math.max(Q.nextF + Q.minI, now); }   // limitador de FPS: en pantallas de 120/144 Hz se dibuja a 60 (la mitad de trabajo de GPU, mismo aspecto)
   const raw = now - lastT; lastT = now;
   if (document.hidden) return;
   padPoll(now);
@@ -5500,14 +5753,16 @@ function frame(now) {
     } else if (mode === 'menu' || mode === 'modes' || mode === 'garage' || mode === 'paint' || mode === 'shop') {
       acc += raw; if (acc < 28) return;          // demo y vista previa a ~30 FPS
       const dt = Math.min(0.05, acc / 1000); acc = 0;
+      const qL = Q.lvl, qF = Q.fx; if (Q.mode === 'low') { Q.lvl = 0; Q.fx = 1; }   // los fondos de los menús se ven igual en todas las calidades
       if (mode === 'menu') { if (demo) { updateRace(demo, dt); updateCamera(demo, dt); drawWorld(demo); prebakeAhead(demo, 1); drawPreview($('mnCarCv'), paintedCar(CAR_BY_ID[save.sel]), -0.5 + Math.sin(now / 1600) * 0.14, 2.5, now / 1000); } }
       else if (mode === 'modes') { const d = MD.view && modeDemo(MD.view); if (d) { updateRace(d, dt); updateCamera(d, dt); drawWorld(d); prebakeAhead(d, 1); } }
       else if (mode === 'garage') drawPreview($("gvCanvas"), paintedCar(gv.car), now / 1000 * 0.5, 3.7, now / 1000);
       else if (mode === 'shop') shopTick(dt);
       else drawPreview($('ptCanvas'), pt.view, now / 1000 * 0.5, 3.7, now / 1000);
+      Q.lvl = qL; Q.fx = qF;
     } else if (mode === 'survival') {
       acc += raw; if (acc < 33) return;          // gameplay de las 4 pistas a ~30 FPS
-      const dt = Math.min(0.05, acc / 1000); acc = 0; miniTick(dt);
+      const dt = Math.min(0.05, acc / 1000); acc = 0; const qL = Q.lvl, qF = Q.fx; if (Q.mode === 'low') { Q.lvl = 0; Q.fx = 1; } miniTick(dt); Q.lvl = qL; Q.fx = qF;
     } else if ((mode === 'pause' || mode === 'results') && race) {
       if (!frozen) { drawWorld(race); if (mode === 'pause') drawHUD(race); frozen = true; }   // un solo dibujado
     }
@@ -6863,701 +7118,13 @@ function skyEnd() {
   race = null; go('menu');                                // vuelve al menú normal: no se abre ninguna corona
 }
 $('skyBtn').onclick = skyEnd;
-/* #skGo («EMPEZAR») lo gestiona el módulo del circuito celestial (Parte 4/6), más abajo */
 $('skBack').onclick = () => go('survival');
 addEventListener('keydown', e => { if (SKY.run) { if (SKY.done && (e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space')) skyEnd(); e.stopImmediatePropagation(); e.preventDefault(); } }, true);
 setTimeout(() => { if (mode === 'menu') skyCheck(); }, 1500);   // cuentas que ya tenían las 8 coronas antes de esta función: la ven una vez
 
 
-/* =====================================================================
-   CORONA DE LOS CIELOS · PARTE 4/6 · circuito celestial + físicas de vuelo
-   ---------------------------------------------------------------------
-   AISLAMIENTO: todo vive en este bloque (prefijo SR / sr). No toca save, MP-CORE, mpHash, las físicas de carrera
-   (stepCar, updateRace…), los circuitos, las 8 coronas ni la cinemática. Sólo se activa desde el botón de la pantalla
-   «CORONA DE LOS CIELOS» (mode = 'skyrace'); usa su propio canvas (#srCv), su propio bucle requestAnimationFrame, su
-   propio estado de teclas (SR.k) y registra sus eventos sólo mientras dura (srExit los retira todos).
-   Vista lateral 2D: x avanza hacia la derecha, y crece hacia abajo; el ángulo a es el giro del canvas (a<0 = morro arriba).
-   ===================================================================== */
-const SRC = {
-  G: 1150, VMAX: 720, ACC: 560, BRK: 1300, DRAG: .16, ROLL: 40, SLOPE_G: .45, REV: 170,
-  NIT_MUL: 1.36, NIT_ACC: 1.9, NIT_USE: .26, NIT_REGEN: .03,
-  ROT: 3.1, LIFT: .5, STEP: 32, H: 22, RAMP_VY: 240, BOUNCE_VY: 1300, PAD_V: 600, RING_V: 250,
-};
-const SR = {
-  run: false, raf: 0, last: 0, cv: null, g: null, w: 0, h: 0, k: 1, art: null, trk: null, state: 'idle', paused: false,
-  car: null, cam: { x: 0, y: 0, z: 1, sx: 0, sy: 0 }, in: { thr: 0, brk: 0, str: 0, nit: 0 }, keys: {}, pad: { p9: false, p0: false, p1: false },
-  time: 0, cd: 0, cp: -1, falls: 0, ringN: 0, best: null, msg: '', msgT: 0, msgCol: '#fff', fade: 0, flash: 0, shake: 0, fallT: 0, fallWhy: '', finT: 0, finShown: false,
-  fx: { n: 0 }, anim: 0, snd: 0, hint: 0, evs: [], bounceT: 0, listeners: false, disp: 'sans-serif', frames: 0,
-};
-const SRE = { l: u => u, s: u => u * u * (3 - 2 * u), i: u => u * u, o: u => 1 - (1 - u) * (1 - u) };
-const srH = (a, b) => { let h = Math.imul(a | 0, 374761393) + Math.imul(b | 0, 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
-
-/* ---------- construcción de la pista (una sola vez) ---------- */
-function srBuildTrack() {
-  const S = SRC.STEP, plats = [], rings = [], pads = [], cps = [], lamps = [], signs = [], r = rng(4242);
-  let cx = 0, cy = 0, cur = null;
-  const begin = (kind, thick) => { cur = { kind, thick, x0: cx, ys: [cy] }; };
-  const seg = (len, dy, e = SRE.s) => { const n = Math.max(1, Math.round(len / S)); for (let i = 1; i <= n; i++) cur.ys.push(cy + dy * e(i / n)); cx += n * S; cy += dy; };
-  const end = () => {
-    const p = cur, n = p.ys.length; p.x1 = p.x0 + (n - 1) * S; p.ys = Float32Array.from(p.ys); p.bot = new Float32Array(n);
-    for (let i = 0; i < n; i++) {
-      const edge = Math.min(i, n - 1 - i) / Math.max(1, Math.min(8, (n - 1) / 2)), tp = Math.min(1, .35 + edge * .65);
-      p.bot[i] = p.kind === 'bridge' ? 14 : p.kind === 'bounce' ? 34 : p.thick * (.55 + .45 * r()) * tp;
-    }
-    let lo = 1e9, hi = -1e9; for (let i = 0; i < n; i++) { lo = Math.min(lo, p.ys[i]); hi = Math.max(hi, p.ys[i] + p.bot[i]); } p.ylo = lo; p.yhi = hi; p.maxy = Math.max(...p.ys);
-    plats.push(p); cur = null;
-  };
-  const gap = (w, dy) => { cx += w; cy += dy; };
-  const lamp = (x0, x1, every) => { for (let x = x0; x < x1; x += every) lamps.push(x); };
-
-  // 1 · SALIDA y colinas suspendidas
-  begin('start', 340); seg(1500, 0, SRE.l); const startEnd = cx; end();
-  pads.push({ x0: 1060, x1: 1240 });
-  begin('road', 300); seg(700, -120); seg(380, 0); seg(800, 100); seg(300, 0); seg(520, -50); seg(420, 0); const r1 = cx; end();
-  // 2 · primera rampa y salto
-  signs.push({ x: r1 - 260, a: 'ramp' });
-  begin('ramp', 200); seg(380, -170, SRE.i); end();
-  const g1x = cx; gap(640, 70);
-  rings.push({ x: g1x + 300, y: cy - 330, r: 78, a: -.25 });
-  // 3 · isla B: curvas y cambios de altura (CP1)
-  begin('road', 300); seg(520, 0); cps.push({ x: cx - 300, got: false }); seg(900, 180); seg(420, 0); seg(760, -150); seg(360, 0);
-  pads.push({ x0: cx - 300, x1: cx - 130 }); end();
-  // 4 · puente estrecho con tablones rotos
-  gap(120, 0); begin('bridge', 14); seg(520, -40); end(); gap(120, 0); begin('bridge', 14); seg(380, 30); end(); gap(140, 0); begin('bridge', 14); seg(420, -20); seg(260, 0); end();
-  // 5 · nube de rebote → plataforma alta
-  begin('bounce', 34); seg(320, 0, SRE.l); const bx1 = cx; end();
-  gap(430, -430);
-  // 6 · isla C elevada (CP2): curvas, bajada y rampa grande
-  begin('road', 320); seg(560, 0); cps.push({ x: cx - 330, got: false }); seg(760, -110); seg(300, 0); seg(900, 210); seg(500, 0); seg(520, -70);
-  pads.push({ x0: cx - 560, x1: cx - 380 }); seg(420, 0); const r2 = cx; end();
-  signs.push({ x: r2 - 300, a: 'ramp' });
-  begin('ramp', 220); seg(430, -240, SRE.i); end();
-  const g2x = cx; gap(1260, 260);
-  rings.push({ x: g2x + 330, y: cy - 700, r: 84, a: -.45 }, { x: g2x + 700, y: cy - 640, r: 84, a: -.1 }, { x: g2x + 1050, y: cy - 440, r: 84, a: .35 });
-  // 7 · isla D (CP3): descenso largo veloz
-  begin('road', 340); seg(640, 0); cps.push({ x: cx - 320, got: false }); seg(1100, 250); seg(520, 0); seg(700, -60); seg(300, 0); const dEnd = cx; end();
-  pads.push({ x0: dEnd - 560, x1: dEnd - 380 });
-  // 8 · segundo puente
-  gap(130, 0); begin('bridge', 14); seg(640, 0); end(); gap(150, 20); begin('bridge', 14); seg(500, -40); end(); gap(130, 0); begin('bridge', 14); seg(540, 20); seg(260, 0); const r3 = cx; end();
-  signs.push({ x: r3 - 220, a: 'ramp' });
-  // 9 · rampa final y gran salto a la meta
-  begin('ramp', 240); seg(480, -270, SRE.i); end();
-  const g3x = cx; gap(1060, 150);
-  rings.push({ x: g3x + 330, y: cy - 600, r: 86, a: -.4 }, { x: g3x + 720, y: cy - 470, r: 86, a: .15 });
-  begin('finish', 360); seg(700, 0, SRE.l); const finX = cx - 120; seg(900, 0, SRE.l); end();
-
-  for (const p of plats) if (p.kind === 'road' || p.kind === 'start') lamp(Math.ceil(p.x0 / 480) * 480 + 120, p.x1 - 60, 480);
-  const T = { plats, rings, pads, cps, lamps: lamps.filter(x => { const p = srPlatAtT(plats, x); return p && p.kind !== 'bridge'; }), signs, startX: 220, xmin: 60, finishX: finX, xmax: plats[plats.length - 1].x1 - 80, bounceEnd: bx1, len: plats[plats.length - 1].x1 };
-  // altura del vacío en cada tramo: el punto más bajo cercano + margen
-  T.voidBin = 400; T.voidY = new Float32Array(Math.ceil(T.len / T.voidBin) + 2);
-  for (let b = 0; b < T.voidY.length; b++) { const bx = b * T.voidBin; let lo = -1e9; for (const p of plats) if (p.x1 > bx - 3200 && p.x0 < bx + 3200) lo = Math.max(lo, p.maxy); T.voidY[b] = lo + 820; }
-  return T;
-}
-function srPlatAtT(P, x) {
-  let lo = 0, hi = P.length - 1, r = -1;
-  while (lo <= hi) { const m = (lo + hi) >> 1; if (P[m].x0 <= x) { r = m; lo = m + 1; } else hi = m - 1; }
-  return r >= 0 && x <= P[r].x1 ? P[r] : null;
-}
-const srPlatAt = x => srPlatAtT(SR.trk.plats, x);
-function srY(p, x) {
-  const f = (x - p.x0) / SRC.STEP, i = Math.max(0, Math.min(p.ys.length - 2, Math.floor(f))), t = Math.max(0, Math.min(1, f - i));
-  return p.ys[i] + (p.ys[i + 1] - p.ys[i]) * t;
-}
-function srSurfY(x) { const p = srPlatAt(x); return p ? srY(p, x) : null; }
-function srSlope(x) {
-  const p = srPlatAt(x); if (!p) return 0;
-  const a = Math.max(p.x0, x - 24), b = Math.min(p.x1, x + 24); if (b - a < 4) return 0;
-  return Math.atan2(srY(p, b) - srY(p, a), b - a);
-}
-const srVoidAt = x => { const T = SR.trk, i = clamp(Math.floor(x / T.voidBin), 0, T.voidY.length - 1); return T.voidY[i]; };
-
-/* ---------- coche (estado) ---------- */
-function srNewCar() {
-  return { x: 0, y: 0, v: 0, vx: 0, vy: 0, a: 0, w: 0, lean: 0, g: true, air: 0, nit: 1, nitOn: false, boostT: 0, padId: -1, wheel: 0, land: 0, trail: 0 };
-}
-function srPlace(x, v) {
-  const c = SR.car, ys = srSurfY(x);
-  c.x = x; c.y = (ys == null ? 0 : ys) - SRC.H; c.g = true; c.v = v; c.vx = c.vy = 0; c.a = srSlope(x); c.w = 0; c.lean = 0; c.air = 0; c.boostT = 0; c.padId = -1; c.nitOn = false; c.trail = 0;
-}
-function srMsg(t, col, dur) { SR.msg = t; SR.msgCol = col || '#fff6d8'; SR.msgT = SR.msgDur = dur || 1.6; }
-function srShake(a) { SR.shake = Math.min(1, Math.max(SR.shake, a)); }
-const srEvt = n => { if (SR.evs.length < 12) SR.evs.push(n); };   // sonidos pendientes (se reproducen en el bucle de render)
-
-/* ---------- partículas (reserva fija: no se crean objetos en el bucle) ---------- */
-const SRP = { N: 320, x: null, y: null, vx: null, vy: null, l: null, m: null, s: null, t: null, c: null, i: 0 };
-function srPartsInit() { const N = SRP.N; SRP.x = new Float32Array(N); SRP.y = new Float32Array(N); SRP.vx = new Float32Array(N); SRP.vy = new Float32Array(N); SRP.l = new Float32Array(N); SRP.m = new Float32Array(N); SRP.s = new Float32Array(N); SRP.t = new Uint8Array(N); SRP.c = new Uint8Array(N); SRP.i = 0; }
-const SRCOL = ['255,255,255', '255,214,106', '127,227,255', '255,154,46', '255,255,214', '255,123,213'];
-function srEmit(t, x, y, vx, vy, life, s, c) { const i = SRP.i; SRP.i = (i + 1) % SRP.N; SRP.t[i] = t; SRP.x[i] = x; SRP.y[i] = y; SRP.vx[i] = vx; SRP.vy[i] = vy; SRP.l[i] = SRP.m[i] = life; SRP.s[i] = s; SRP.c[i] = c; }
-function srPartsStep(dt) {
-  const N = SRP.N, dmp = Math.exp(-2.2 * dt);
-  for (let i = 0; i < N; i++) {
-    if (SRP.l[i] <= 0) continue; SRP.l[i] -= dt; SRP.x[i] += SRP.vx[i] * dt; SRP.y[i] += SRP.vy[i] * dt;
-    if (SRP.t[i] === 0) { SRP.vx[i] *= dmp; SRP.vy[i] = SRP.vy[i] * dmp - 90 * dt; }        // polvo: sube suave
-    else if (SRP.t[i] === 1) { SRP.vy[i] += 700 * dt; SRP.vx[i] *= dmp; }                     // chispas: caen
-    else { SRP.vx[i] *= dmp; SRP.vy[i] *= dmp; }
-  }
-}
-function srBurst(x, y, n, t, c, sp, life, s) { for (let i = 0; i < n; i++) { const a = Math.random() * TAU, v = sp * (.3 + Math.random() * .7); srEmit(t, x, y, Math.cos(a) * v, Math.sin(a) * v, life * (.6 + Math.random() * .6), s * (.7 + Math.random() * .6), c); } }
-function srDust(x, y, n, dir, power) { for (let i = 0; i < n; i++) srEmit(0, x + (Math.random() - .5) * 30, y - 2, (Math.random() - .5) * 140 * power - dir * 40, -(20 + Math.random() * 120) * power, .5 + Math.random() * .5, 5 + Math.random() * 8, 0); }
-
-/* ---------- reinicio ---------- */
-function srRespawn(toStart) {
-  const T = SR.trk, c = SR.car, cpt = !toStart && SR.cp >= 0 ? T.cps[SR.cp] : null;
-  if (toStart) { SR.cp = -1; SR.time = 0; SR.falls = 0; SR.ringN = 0; for (const cpp of T.cps) cpp.got = false; c.nit = 1; }
-  else c.nit = Math.max(c.nit, .7);
-  const x = cpt ? cpt.x : T.startX;
-  srPlace(x, cpt ? 260 : 0);
-  for (const rg of T.rings) if (toStart || rg.x > x - 4) { rg.used = false; rg.fx = 0; }
-  SR.state = toStart ? 'count' : 'run'; SR.cd = toStart ? 2.7 : 0; SR.paused = false; SR.fade = 1; SR.flash = 0; SR.shake = 0; SR.fallT = 0; SR.finT = 0; SR.finShown = false; SR.bounceT = 0;
-  SR.msgT = 0; SR.in.thr = SR.in.brk = SR.in.str = SR.in.nit = 0; SRP.l.fill(0);
-  srCamSnap(); if (SR.ui) SR.ui();
-}
-
-/* ---------- física ---------- */
-function srFail(why) {
-  if (SR.state !== 'run') return;
-  SR.state = 'fall'; SR.fallT = 0; SR.fallWhy = why; SR.falls++; srShake(.5); srEvt('fall');
-}
-function srBounce(c, ys, vt, vyIn) {   // nube elástica: rebote vertical con impulso (al caer sobre ella o al rodar sobre ella)
-  c.y = ys - SRC.H; c.g = false; c.vx = Math.max(vt, 200) * .8 + 40; c.vy = -Math.max(Math.abs(vyIn || 0) * .92, SRC.BOUNCE_VY); c.air = .01; c.a = -.25; c.w = 0; c.v = 0;
-  SR.bounceT = .45; srBurst(c.x, ys, 22, 2, 5, 420, .6, 5); srBurst(c.x, ys, 10, 2, 2, 300, .5, 4); srShake(.45); srEvt('bounce'); srMsg('¡REBOTE!', '#ff9be0', 1.2);
-}
-function srLand(c, p, ys, vxIn, vyIn) {
-  const s = srSlope(c.x), cs = Math.cos(s), sn = Math.sin(s), vn = -vxIn * sn + vyIn * cs, vt = vxIn * cs + vyIn * sn;
-  const diff = Math.abs(angDiff(c.a, s)), big = c.air > .32 || vn > 420, air = c.air;
-  c.y = ys - SRC.H; c.g = true; c.v = vt; c.vx = c.vy = 0; c.w *= .3; c.air = 0;
-  if (p.kind === 'bounce') { srBounce(c, ys, vt, vyIn); return; }
-  if (!big) { c.land = .12; return; }
-  let q = 'good', loss = .97;
-  if (diff < .2) { q = 'perfect'; loss = 1; } else if (diff < .5) { q = 'good'; loss = .96; } else if (diff < 1.0) { q = 'rough'; loss = .74; } else if (diff < 1.35) { q = 'hard'; loss = .5; } else q = 'crash';
-  c.v = vt * loss; c.land = .25;
-  const pw = clamp(vn / 1100, .12, 1);
-  srDust(c.x, ys, Math.round(8 + 22 * pw), Math.sign(c.v) || 1, .6 + pw); srBurst(c.x, ys - 4, Math.round(4 + 10 * pw), 1, 1, 380 * pw + 120, .45, 3);
-  srShake((q === 'rough' || q === 'hard' ? .55 : .3) * (.4 + pw)); srEvt(q === 'perfect' || q === 'good' ? 'land' : 'landhard');
-  if (q === 'crash') { srFail('crash'); return; }
-  if (air > .55) { if (q === 'perfect') { srMsg('ATERRIZAJE PERFECTO', '#ffe08a', 1.5); c.nit = Math.min(1, c.nit + .08); } else if (q === 'good') srMsg('BUEN ATERRIZAJE', '#bfe8ff', 1.2); else srMsg('ATERRIZAJE BRUSCO', '#ff9a6a', 1.3); }
-}
-function srTakeoff(c, fromRamp) {
-  const s = srSlope(c.x), cs = Math.cos(s), sn = Math.sin(s);
-  c.g = false; c.vx = c.v * cs; c.vy = c.v * sn; c.air = 0;
-  c.vy += c.lean * c.v * .28;                                // inclinación previa: el morro arriba da más altura
-  if (fromRamp) { c.vy -= SRC.RAMP_VY; c.vx += 30; srEvt('launch'); srBurst(c.x, c.y + SRC.H, 16, 3, 3, 380, .5, 4); srBurst(c.x, c.y + SRC.H, 10, 2, 1, 300, .5, 4); srShake(.3); srMsg('¡DESPEGUE!', '#ffe08a', 1.1); }
-}
-function srStep(dt) {
-  const c = SR.car, I = SR.in, T = SR.trk, H = SRC.H;
-  SR.anim += dt; if (SR.bounceT > 0) SR.bounceT -= dt; if (c.land > 0) c.land -= dt;
-  if (SR.state === 'count') { SR.cd -= dt; if (SR.cd <= 0) { SR.state = 'run'; srEvt('go'); srMsg('¡YA!', '#7dffb0', .9); } else { const n = Math.ceil(SR.cd - .0); if (n !== SR.lastN && n <= 3) { SR.lastN = n; srEvt('count'); } } }
-  if (SR.state === 'fall') { SR.fallT += dt; c.vy += SRC.G * dt; c.y += c.vy * dt; c.x += c.vx * dt; return; }
-  const active = SR.state === 'run' || SR.state === 'finish', fin = SR.state === 'finish';
-  const thr = active && !fin ? I.thr : 0, brk = fin ? 1 : active ? I.brk : 0, str = active && !fin ? I.str : 0;
-  const nitWant = active && !fin && I.nit && c.nit > .02;
-  c.nitOn = nitWant; if (nitWant) c.nit = Math.max(0, c.nit - SRC.NIT_USE * dt); else if (!fin) c.nit = Math.min(1, c.nit + SRC.NIT_REGEN * dt);
-  if (c.boostT > 0) c.boostT -= dt;
-  if (SR.state === 'run') SR.time += dt;
-  const px = c.x;
-  if (c.g) {
-    const sl = srSlope(c.x), vmax = SRC.VMAX * (c.nitOn ? SRC.NIT_MUL : 1) * (c.boostT > 0 ? 1.2 : 1);
-    if (thr) { const f = Math.max(0, 1 - Math.pow(Math.max(c.v, 0) / vmax, 2.2)); c.v += SRC.ACC * (c.nitOn ? SRC.NIT_ACC : 1) * (c.boostT > 0 ? 1.4 : 1) * f * dt; }
-    if (c.v > vmax) c.v -= (c.v - vmax) * 1.4 * dt;
-    if (brk) { if (c.v > 0) c.v = Math.max(0, c.v - SRC.BRK * dt); else c.v = Math.max(-SRC.REV, c.v - SRC.ACC * .5 * dt); }
-    else if (!thr) c.v -= Math.sign(c.v) * Math.min(Math.abs(c.v), (SRC.ROLL + Math.abs(c.v) * SRC.DRAG) * dt);
-    c.v += SRC.G * SRC.SLOPE_G * Math.sin(sl) * dt;
-    c.lean += (str * .32 - c.lean) * Math.min(1, 10 * dt);
-    c.a += angDiff(c.a, sl + c.lean * .9) * Math.min(1, 13 * dt);
-    c.wheel += c.v * dt / 13;
-    let dx = c.v * Math.cos(sl) * dt, nx = c.x + dx;
-    if (nx < T.xmin) { nx = T.xmin; if (c.v < 0) c.v = 0; }
-    if (nx > T.xmax) { nx = T.xmax; if (c.v > 0) c.v = 0; }
-    const p0 = srPlatAt(c.x); let p1 = srPlatAt(nx), edge = false;
-    if (!p1 && p0) { nx = dx > 0 ? p0.x1 : p0.x0; edge = true; p1 = p0; }          // borde de la plataforma: se despega justo en el borde
-    c.x = nx; const ys = p1 ? srY(p1, nx) : null;
-    if (ys == null) { srTakeoff(c, false); }
-    else {
-      const nsl = srSlope(nx), dsl = nsl - sl, ady = Math.abs(nx - px);
-      c.y = ys - H;
-      if (edge && p1 === p0 && dx > 0) srTakeoff(c, p0.kind === 'ramp');
-      else if (edge) srTakeoff(c, false);
-      else if (ady > .3 && dsl > 0 && c.v * c.v * (dsl / ady) > SRC.G * 1.05 && c.v > 250) srTakeoff(c, false);   // cresta pronunciada a velocidad: se despega
-      // zonas de impulso
-      if (c.g && p1.kind === 'bounce' && nx > p1.x0 + 24 && c.v > 120) srBounce(c, ys, c.v, 0);
-      if (c.g) {
-        let pid = -1; for (let i = 0; i < T.pads.length; i++) if (nx >= T.pads[i].x0 && nx <= T.pads[i].x1) { pid = i; break; }
-        if (pid >= 0 && pid !== c.padId) { c.v = Math.max(c.v, SRC.PAD_V) + 110; c.boostT = 1.4; c.nit = Math.min(1, c.nit + .1); srEvt('pad'); srBurst(c.x, c.y + H, 14, 2, 2, 380, .45, 3); srShake(.2); }
-        c.padId = pid;
-      }
-    }
-  } else {
-    c.air += dt;
-    // control de inclinación: A = morro arriba · D = morro abajo; sin teclas se estabiliza suavemente
-    const spd = Math.hypot(c.vx, c.vy), phi = Math.atan2(c.vy, c.vx);
-    c.w += (str * SRC.ROT - c.w) * Math.min(1, 12 * dt);
-    if (!str) { c.w *= Math.exp(-5 * dt); c.a += angDiff(c.a, clamp(phi * .8, -.9, 1.0)) * Math.min(1, .9 * dt); }
-    c.a = clamp(c.a + c.w * dt, -1.6, 1.6);
-    const ysN = srSurfY(c.x), hgt = ysN == null ? 1e9 : ysN - (c.y + H);
-    if (ysN != null && hgt < 150 && c.vy > 0 && !str) c.a += angDiff(c.a, srSlope(c.x) + .1) * Math.min(1, 5 * dt);   // ayuda al aterrizar
-    if (thr) { const T2 = SRC.ACC * .5 * (c.nitOn ? 2.2 : 1); c.vx += Math.cos(c.a) * T2 * dt; c.vy += Math.sin(c.a) * T2 * dt; }
-    else if (c.nitOn) { c.vx += Math.cos(c.a) * SRC.ACC * 1.1 * dt; c.vy += Math.sin(c.a) * SRC.ACC * 1.1 * dt; }
-    if (brk) { const k = Math.exp(-1.3 * dt); c.vx *= k; c.vy = c.vy * Math.exp(-.4 * dt); }
-    if (spd > 40) {   // sustentación según el ángulo de ataque + resistencia inducida
-      const al = clamp(phi - c.a, -.6, .6), sf = Math.min(1, spd / SRC.VMAX), lift = SRC.G * SRC.LIFT * sf * sf * (al / .6) * (al < 0 ? .45 : 1);
-      c.vx += Math.sin(phi) * lift * dt; c.vy += -Math.cos(phi) * lift * dt;
-      const dr = (.06 + Math.abs(al) * .22) * dt; c.vx -= c.vx * dr; c.vy -= c.vy * dr;
-    }
-    c.vy += SRC.G * dt;
-    if (c.vy > 1500) c.vy = 1500;
-    let nx = c.x + c.vx * dt, ny = c.y + c.vy * dt;
-    if (nx < T.xmin) { nx = T.xmin; c.vx = Math.abs(c.vx) * .2; }
-    if (nx > T.xmax) { nx = T.xmax; c.vx = -Math.abs(c.vx) * .2; }
-    const p = srPlatAt(nx);
-    if (p) {
-      const ys = srY(p, nx), pen = ny + H - ys, prevPen = c.y + H - ys;
-      if (pen >= 0 && pen < p.thick + 40) {
-        if (prevPen <= 34 + Math.max(0, c.vy) * dt) { c.x = nx; srLand(c, p, ys, c.vx, c.vy); }   // 34: las ruedas «trepan» por el borde de la plataforma
-        else { nx = c.x; c.vx = -Math.abs(c.vx) * .3 - 20; srShake(.35); srEvt('landhard'); srBurst(c.x + 30, ny, 8, 1, 1, 260, .35, 3); c.x = nx; c.y = ny; }
-      } else { c.x = nx; c.y = ny; }
-    } else { c.x = nx; c.y = ny; }
-  }
-  // aros de impulso
-  if (active) for (let i = 0; i < T.rings.length; i++) {
-    const rg = T.rings[i]; if (rg.used || Math.abs(c.x - rg.x) > 60) continue;
-    if ((px - rg.x) * (c.x - rg.x) <= 0 && Math.abs(c.y - rg.y) <= rg.r + 12) {
-      rg.used = true; rg.fx = .6; SR.ringN++;
-      if (c.g) c.v += SRC.RING_V; else { const sp = Math.max(Math.hypot(c.vx, c.vy), 520) + SRC.RING_V, ph = Math.atan2(c.vy, c.vx), nph = ph + angDiff(ph, rg.a) * .4; c.vx = Math.cos(nph) * sp; c.vy = Math.sin(nph) * sp; }
-      c.nit = Math.min(1, c.nit + .2); c.boostT = Math.max(c.boostT, 1.0);
-      srBurst(rg.x, rg.y, 26, 2, 1, 520, .7, 4); srBurst(rg.x, rg.y, 16, 2, 2, 380, .6, 4); srShake(.18); srEvt('ring'); srMsg('¡IMPULSO!', '#ffe08a', 1.0);
-    }
-  }
-  // puntos de control (en orden)
-  if (active && !fin) { const nx = SR.cp + 1; if (nx < T.cps.length && c.x >= T.cps[nx].x) { T.cps[nx].got = true; SR.cp = nx; srEvt('cp'); srMsg('PUNTO DE CONTROL ' + (nx + 1) + '/' + T.cps.length, '#9fe4ff', 1.8); srBurst(T.cps[nx].x, c.y, 18, 2, 2, 360, .7, 4); } }
-  // meta
-  if (SR.state === 'run' && c.x >= T.finishX) {
-    SR.state = 'finish'; SR.finT = 0; SR.flash = 1; if (SR.best == null || SR.time < SR.best) SR.best = SR.time; srEvt('finish'); srMsg('¡META!', '#ffe08a', 3);
-    for (let i = 0; i < 70; i++) srEmit(1, T.finishX + (Math.random() - .5) * 200, c.y - 200 - Math.random() * 120, (Math.random() - .5) * 700, -200 - Math.random() * 500, 1.6 + Math.random(), 4 + Math.random() * 4, 1 + (i % 5));
-  }
-  if (SR.state === 'finish') SR.finT += dt;
-  // vacío
-  if (SR.state === 'run' && c.y - H > srVoidAt(c.x)) srFail('void');
-  // rastro y partículas continuas
-  if (c.nitOn && Math.random() < dt * 90) srEmit(2, c.x - Math.cos(c.a) * 44, c.y - Math.sin(c.a) * 44, -Math.cos(c.a) * 300 + (Math.random() - .5) * 60, -Math.sin(c.a) * 300 + (Math.random() - .5) * 60, .3, 6, Math.random() < .5 ? 3 : 2);
-  if (c.g && Math.abs(c.v) > 260 && Math.random() < dt * 30) srEmit(0, c.x - 40, c.y + H - 3, -c.v * .08, -10 - Math.random() * 40, .35, 3 + Math.random() * 4, 0);
-}
-
-/* ---------- arte precalculado (una vez): montañas y estructuras, islas flotantes, nubes volumétricas, sol ---------- */
-function srMakeArt() {
-  const mk = (w, h) => { const cv = document.createElement('canvas'); cv.width = w; cv.height = h; return cv; };
-  const A = { far: null, isl: [], puff: [], sun: null };
-  // horizonte: tres cordilleras azuladas + torres y arcos celestiales (se repite sin costuras: senos de ciclos enteros)
-  { const W0 = 1800, H0 = 560, cv = A.far = mk(W0, H0), g = cv.getContext('2d'), r = rng(11);
-    const ridge = (base, amp, c0, c1, cyc) => {
-      const ph = [r() * 6, r() * 6, r() * 6]; g.beginPath(); g.moveTo(0, H0);
-      for (let x = 0; x <= W0; x += 10) { const t = x / W0 * TAU; g.lineTo(x, base - amp * (.55 * Math.sin(t * cyc + ph[0]) + .3 * Math.sin(t * cyc * 2 + ph[1]) + .15 * Math.sin(t * cyc * 5 + ph[2]) + .5)); }
-      g.lineTo(W0, H0); g.closePath(); const gr = g.createLinearGradient(0, base - amp * 1.2, 0, H0); gr.addColorStop(0, c0); gr.addColorStop(1, c1); g.fillStyle = gr; g.fill();
-    };
-    ridge(330, 150, 'rgba(180,212,255,.75)', 'rgba(205,228,255,.2)', 3);
-    ridge(380, 150, 'rgba(120,165,245,.85)', 'rgba(170,205,255,.25)', 4);
-    const tower = (x, base, hh, ww, col) => {
-      g.fillStyle = col; g.beginPath(); g.moveTo(x - ww, base); g.lineTo(x - ww * .55, base - hh); g.lineTo(x, base - hh - ww * 1.6); g.lineTo(x + ww * .55, base - hh); g.lineTo(x + ww, base); g.closePath(); g.fill();
-      g.fillStyle = 'rgba(255,230,150,.9)'; g.beginPath(); g.arc(x, base - hh - ww * 1.7, ww * .22, 0, TAU); g.fill();
-      g.fillStyle = 'rgba(255,240,190,.55)'; g.fillRect(x - ww * .08, base - hh * .8, ww * .16, hh * .35);
-    };
-    for (let i = 0; i < 9; i++) { const x = 100 + i * 190 + r() * 60, b = 330 + r() * 40; tower(x, b + 70, 70 + r() * 150, 10 + r() * 10, 'rgba(110,150,235,.9)'); }
-    ridge(430, 130, 'rgba(70,110,215,.95)', 'rgba(110,160,240,.4)', 5);
-    for (let i = 0; i < 4; i++) {   // arcos celestiales dorados
-      const x = 220 + i * 440 + r() * 80, b = 410, rr = 55 + r() * 30; g.strokeStyle = 'rgba(255,224,150,.85)'; g.lineWidth = 7; g.beginPath(); g.arc(x, b - rr, rr, Math.PI, 0); g.stroke();
-      g.fillStyle = 'rgba(255,224,150,.85)'; g.fillRect(x - rr - 4, b - rr, 8, rr + 40); g.fillRect(x + rr - 4, b - rr, 8, rr + 40);
-    }
-    ridge(480, 110, 'rgba(50,85,190,1)', 'rgba(90,140,230,.55)', 6);
-  }
-  // islas flotantes (3 variantes)
-  for (let n = 0; n < 3; n++) {
-    const cv = mk(520, 340), g = cv.getContext('2d'), r = rng(90 + n * 7);
-    g.beginPath(); g.moveTo(24, 96);
-    const pts = 14; for (let i = 1; i < pts; i++) { const u = i / pts, x = 24 + u * 472, depth = Math.sin(u * Math.PI) ** .8 * (170 + r() * 90); g.lineTo(x, 96 + depth * (.75 + r() * .25)); }
-    g.lineTo(496, 96); g.closePath(); const gr = g.createLinearGradient(0, 96, 0, 330); gr.addColorStop(0, '#9fb4e8'); gr.addColorStop(.5, '#5f74c4'); gr.addColorStop(1, '#2a3475'); g.fillStyle = gr; g.fill();
-    g.fillStyle = n === 1 ? '#ffe9a6' : '#8fe8b8'; g.beginPath(); g.ellipse(260, 96, 238, 28, 0, 0, TAU); g.fill();
-    g.fillStyle = n === 1 ? '#ffcf70' : '#54c996'; g.beginPath(); g.ellipse(260, 100, 222, 16, 0, 0, TAU); g.fill();
-    for (let i = 0; i < 5; i++) { const x = 90 + r() * 340, hh = 24 + r() * 40; g.fillStyle = n === 2 ? '#bfe8ff' : '#2f9c78'; g.beginPath(); g.moveTo(x - 10, 92); g.lineTo(x, 92 - hh); g.lineTo(x + 10, 92); g.fill(); }
-    g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(430 + r() * 30, 100, 5, 120 + r() * 60);   // cascada
-    g.fillStyle = 'rgba(255,224,150,.9)'; g.fillRect(250, 40, 10, 56); g.beginPath(); g.moveTo(240, 40); g.lineTo(255, 8); g.lineTo(270, 40); g.fill();   // pequeña torre
-    A.isl.push(cv);
-  }
-  // nubes volumétricas: sombra azulada abajo + volumen blanco arriba
-  for (let n = 0; n < 3; n++) {
-    const cv = mk(320, 150), g = cv.getContext('2d'), r = rng(500 + n * 13), bl = 6 + n * 2, pts = [];
-    for (let i = 0; i < bl; i++) pts.push([60 + r() * 200, 62 + (r() - .4) * 26, 26 + r() * 30]);
-    for (const [x, y, rad] of pts) { const gr = g.createRadialGradient(x, y + 16, 2, x, y + 16, rad * 1.1); gr.addColorStop(0, 'rgba(130,160,215,.7)'); gr.addColorStop(1, 'rgba(130,160,215,0)'); g.fillStyle = gr; g.fillRect(0, 0, 320, 150); }
-    for (const [x, y, rad] of pts) { const gr = g.createRadialGradient(x, y - 4, 2, x, y, rad); gr.addColorStop(0, 'rgba(255,255,255,.98)'); gr.addColorStop(.6, 'rgba(244,250,255,.8)'); gr.addColorStop(1, 'rgba(240,248,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 320, 150); }
-    A.puff.push(cv);
-  }
-  { const cv = A.sun = mk(512, 512), g = cv.getContext('2d'), gr = g.createRadialGradient(256, 256, 4, 256, 256, 256);
-    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.08, 'rgba(255,250,220,1)'); gr.addColorStop(.18, 'rgba(255,230,150,.7)'); gr.addColorStop(.5, 'rgba(255,200,110,.18)'); gr.addColorStop(1, 'rgba(255,200,110,0)'); g.fillStyle = gr; g.fillRect(0, 0, 512, 512); }
-  return A;
-}
-
-/* ---------- cámara ---------- */
-function srCamTarget() {
-  const c = SR.car, cm = SR.cam, w = SR.w, h = SR.h, spf = clamp(Math.hypot(c.vx || c.v, c.vy) / (SRC.VMAX * 1.4), 0, 1);
-  const baseZ = Math.min(h / 680, w / 1000), z = baseZ * (1 - .2 * spf - (SR.state === 'finish' ? .05 : 0));
-  const vw = w / z, vh = h / z, vx = c.g ? c.v : c.vx;
-  return { z, x: c.x + vw * .15 + clamp(vx, -120, 1000) * .17, y: c.y - vh * .09 + clamp(c.vy, -1200, 1200) * (c.g ? 0 : .13) };
-}
-function srCamSnap() { const t = srCamTarget(), cm = SR.cam; cm.x = t.x; cm.y = t.y; cm.z = t.z; }
-function srCamUpdate(dt) {
-  const c = SR.car, cm = SR.cam, t = srCamTarget(), vh = SR.h / cm.z;
-  cm.x += (t.x - cm.x) * (1 - Math.exp(-5.2 * dt)); cm.z += (t.z - cm.z) * (1 - Math.exp(-2.2 * dt));
-  cm.y += (t.y - cm.y) * (1 - Math.exp(-(c.g ? 3.4 : 5.2) * dt));
-  const lim = vh * .34; cm.y = clamp(cm.y, c.y - lim - vh * .09, c.y + lim - vh * .09 + 0);   // el coche nunca sale de la pantalla
-  SR.shake = Math.max(0, SR.shake - dt * 3.2);
-  const a = SR.shake * SR.shake * 9; cm.sx = (Math.random() - .5) * 2 * a; cm.sy = (Math.random() - .5) * 2 * a;   // vibración muy moderada (≤ 9 px)
-}
-
-/* ---------- dibujo ---------- */
-function srLayer(g, spr, f, sc, cw, y0, y1, prob, alpha, seed, base, wob) {
-  const cm = SR.cam, z = cm.z * sc, w = SR.w, h = SR.h, fx = cm.x * f, fy = cm.y * f * .8, half = w / 2 / z + base, c0 = Math.floor((fx - half) / cw), c1 = Math.floor((fx + half) / cw), t = SR.anim;
-  g.globalAlpha = alpha;
-  for (let ci = c0; ci <= c1; ci++) {
-    if (srH(ci, seed) > prob) continue;
-    const X = ci * cw + srH(ci, seed + 1) * cw * .8 + t * wob * (.4 + srH(ci, seed + 5)), Y = y0 + srH(ci, seed + 2) * (y1 - y0), v = Math.floor(srH(ci, seed + 3) * spr.length), s = base * (.7 + srH(ci, seed + 4) * .7), im = spr[v];
-    const sx = w / 2 + (X - fx) * z, sy = h / 2 + (Y - fy) * z, dw = s * z, dh = dw * im.height / im.width;
-    if (sx + dw < 0 || sx - dw > w || sy + dh < -50 || sy - dh > h + 50) continue;
-    g.drawImage(im, sx - dw / 2, sy - dh * .35, dw, dh);
-  }
-  g.globalAlpha = 1;
-}
-function srDrawBack(g) {
-  const w = SR.w, h = SR.h, cm = SR.cam, A = SR.art, t = SR.anim, alt = clamp(-cm.y / 1100, 0, 1);
-  if (!SR.skyG || SR.skyH !== h) { const gr = SR.skyG = g.createLinearGradient(0, 0, 0, h); SR.skyH = h; gr.addColorStop(0, '#0f4fd8'); gr.addColorStop(.38, '#2f8cff'); gr.addColorStop(.72, '#85c6ff'); gr.addColorStop(1, '#dff0ff'); }
-  g.fillStyle = SR.skyG; g.fillRect(0, 0, w, h);
-  if (alt > 0) { g.fillStyle = `rgba(8,30,120,${(alt * .28).toFixed(3)})`; g.fillRect(0, 0, w, h * .7); }   // más altura = azul más profundo
-  // sol, resplandor y rayos
-  const sx = w * .78 - cm.x * .004 % 40, sy = h * (.2 + alt * .03), sz = Math.min(w, h) * .85;
-  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .8; g.drawImage(A.sun, sx - sz / 2, sy - sz / 2, sz, sz);
-  g.translate(sx, sy); g.rotate(t * .025); const R = Math.hypot(w, h);
-  for (let i = 0; i < 9; i++) { const a = i / 9 * TAU, wd = .07 + .02 * Math.sin(i * 2.7 + t * .5); g.fillStyle = 'rgba(255,240,190,.06)'; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a - wd) * R, Math.sin(a - wd) * R); g.lineTo(Math.cos(a + wd) * R, Math.sin(a + wd) * R); g.closePath(); g.fill(); }
-  g.restore();
-  // horizonte lejano (se repite): cordilleras y estructuras celestiales emergiendo del mar de nubes
-  { const dh = h * .62, sc = dh / 560, tw = 1800 * sc, yb = h * .93 + clamp(-cm.y, -300, 900) * cm.z * .035 * 0 + (cm.y * .03) * cm.z, off = ((cm.x * .035 * cm.z) % tw + tw) % tw;
-    for (let x = -off; x < w; x += tw) g.drawImage(A.far, x, yb - dh, tw + 1, dh);
-    const gr = g.createLinearGradient(0, yb - h * .08, 0, yb + h * .1); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(.5, 'rgba(240,248,255,.9)'); gr.addColorStop(1, 'rgba(240,248,255,1)'); g.fillStyle = gr; g.fillRect(0, yb - h * .08, w, h - (yb - h * .08)); }
-  srLayer(g, A.puff, .08, .55, 700, -420, 520, .8, .85, 31, 360, 6);
-  srLayer(g, A.isl, .13, .5, 1700, -480, 420, .8, .75, 41, 330, 0);
-  srLayer(g, A.puff, .2, .8, 600, -700, 640, .75, .9, 32, 340, 9);
-  srLayer(g, A.isl, .3, .8, 1500, -700, 640, .7, .92, 42, 400, 0);
-  srLayer(g, A.puff, .42, 1, 650, -900, 800, .7, .95, 33, 380, 12);
-}
-function srDrawTrack(g) {
-  const T = SR.trk, cm = SR.cam, z = cm.z, w = SR.w, h = SR.h, S = SRC.STEP, t = SR.anim, c = SR.car;
-  const vx0 = cm.x - w / 2 / z - 160, vx1 = cm.x + w / 2 / z + 160;
-  for (const p of T.plats) {
-    if (p.x1 < vx0 || p.x0 > vx1) continue;
-    const n = p.ys.length, i0 = Math.max(0, Math.floor((vx0 - p.x0) / S)), i1 = Math.min(n - 1, Math.ceil((vx1 - p.x0) / S));
-    if (i1 <= i0) continue;
-    const X = i => p.x0 + i * S, kd = p.kind;
-    if (kd !== 'bridge' && kd !== 'bounce') {   // cuerpo rocoso flotante
-      if (!p.gr) { const gr = p.gr = g.createLinearGradient(0, p.ylo, 0, p.yhi); gr.addColorStop(0, '#b6c8f2'); gr.addColorStop(.18, '#7188d6'); gr.addColorStop(.6, '#3b4a9c'); gr.addColorStop(1, '#1b2260'); }
-      g.beginPath(); g.moveTo(X(i0), p.ys[i0]); for (let i = i0 + 1; i <= i1; i++) g.lineTo(X(i), p.ys[i]);
-      for (let i = i1; i >= i0; i--) g.lineTo(X(i), p.ys[i] + p.bot[i]); g.closePath(); g.fillStyle = p.gr; g.fill();
-      g.strokeStyle = 'rgba(210,225,255,.22)'; g.lineWidth = 3; g.stroke();
-    }
-    // calzada
-    const th = kd === 'bridge' ? 9 : 24;
-    g.beginPath(); g.moveTo(X(i0), p.ys[i0]); for (let i = i0 + 1; i <= i1; i++) g.lineTo(X(i), p.ys[i]); for (let i = i1; i >= i0; i--) g.lineTo(X(i), p.ys[i] + th); g.closePath();
-    g.fillStyle = kd === 'bridge' ? '#7a5632' : kd === 'bounce' ? '#ff7bd5' : kd === 'ramp' ? '#26357a' : kd === 'finish' ? '#16204f' : '#17224f'; g.fill();
-    g.lineJoin = 'round'; g.lineCap = 'round';
-    const line = (dy, col, lw, dash) => { g.beginPath(); g.moveTo(X(i0), p.ys[i0] + dy); for (let i = i0 + 1; i <= i1; i++) g.lineTo(X(i), p.ys[i] + dy); g.strokeStyle = col; g.lineWidth = lw; g.setLineDash(dash || []); g.stroke(); g.setLineDash([]); };
-    if (kd === 'bridge') {
-      line(0, '#ffd56a', 4); line(9, '#4a3320', 3);
-      for (let i = i0; i <= i1; i++) { if (i % 2) continue; const x = X(i); g.fillStyle = 'rgba(40,24,10,.5)'; g.fillRect(x - 1, p.ys[i], 2, 9); }
-      for (let i = i0 - (i0 % 3); i <= i1; i += 3) { const x = X(i); g.strokeStyle = '#ffe9a6'; g.lineWidth = 3; g.beginPath(); g.moveTo(x, p.ys[i]); g.lineTo(x, p.ys[i] - 44); g.stroke(); g.fillStyle = '#9fe4ff'; g.beginPath(); g.arc(x, p.ys[i] - 48, 4, 0, TAU); g.fill(); }
-      line(-44, 'rgba(255,233,166,.75)', 2);
-    } else if (kd === 'bounce') {
-      const sq = SR.bounceT > 0 ? Math.sin(SR.bounceT / .45 * Math.PI) * 10 : 0;
-      line(0, '#ffb3ec', 12 + sq * .3); line(0, 'rgba(255,255,255,.7)', 4);
-      for (let i = i0; i <= i1; i += 2) { const x = X(i), y = p.ys[i], rr = 22 + 6 * Math.sin(i * 1.7 + t * 2); g.fillStyle = 'rgba(255,255,255,.88)'; g.beginPath(); g.arc(x, y + 12 - sq * .3, rr, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,155,225,.5)'; g.beginPath(); g.arc(x, y + 22 - sq * .3, rr * .8, 0, TAU); g.fill(); }
-      g.save(); g.globalCompositeOperation = 'lighter'; for (let i = i0; i <= i1; i += 3) { const x = X(i), y = p.ys[i], a = (t * 2 + i * .4) % 1; g.strokeStyle = `rgba(255,190,240,${(1 - a) * .8})`; g.lineWidth = 3; g.beginPath(); g.moveTo(x - 10, y - 8 - a * 70); g.lineTo(x, y - 24 - a * 70); g.lineTo(x + 10, y - 8 - a * 70); g.stroke(); } g.restore();
-    } else {
-      line(0, kd === 'ramp' ? '#ff9a2e' : '#7fe3ff', 5); line(24, kd === 'ramp' ? '#ffe08a' : '#ffd56a', 3);
-      line(12, kd === 'ramp' ? 'rgba(255,214,120,.85)' : kd === 'finish' ? 'rgba(255,255,255,.9)' : 'rgba(255,240,180,.65)', kd === 'finish' ? 12 : 3, kd === 'ramp' ? [18, 18] : kd === 'finish' ? [24, 24] : [30, 26]);
-      if (kd === 'ramp') { const i = i1; if (i === n - 1) { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(X(i), p.ys[i], 2, X(i), p.ys[i], 70); gr.addColorStop(0, 'rgba(255,200,90,.85)'); gr.addColorStop(1, 'rgba(255,160,40,0)'); g.fillStyle = gr; g.fillRect(X(i) - 70, p.ys[i] - 70, 140, 140); g.restore(); } }
-    }
-  }
-  // farolas, flechas y carteles
-  for (const x of T.lamps) { if (x < vx0 || x > vx1) continue; const y = srSurfY(x); if (y == null) continue; g.strokeStyle = '#e9eefc'; g.lineWidth = 5; g.beginPath(); g.moveTo(x, y); g.lineTo(x, y - 74); g.lineTo(x + 20, y - 80); g.stroke(); g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x + 22, y - 78, 1, x + 22, y - 78, 34); gr.addColorStop(0, 'rgba(255,236,170,.95)'); gr.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = gr; g.fillRect(x - 14, y - 112, 72, 70); g.restore(); }
-  for (const sg of T.signs) {
-    if (sg.x < vx0 || sg.x > vx1) continue; const y = srSurfY(sg.x); if (y == null) continue; const x = sg.x;
-    g.fillStyle = '#e9eefc'; g.fillRect(x - 3, y - 96, 6, 96); g.fillStyle = '#ff7a1a'; g.strokeStyle = '#fff1d6'; g.lineWidth = 4; g.beginPath(); g.rect(x - 54, y - 150, 108, 60); g.fill(); g.stroke();
-    g.strokeStyle = '#fff'; g.lineWidth = 7; const ph = (t * 40) % 24; g.beginPath(); for (let k = -1; k < 3; k++) { const ax = x - 40 + k * 24 + ph; if (ax > x - 46 && ax < x + 36) { g.moveTo(ax, y - 136); g.lineTo(ax + 16, y - 120); g.lineTo(ax, y - 104); } } g.stroke();
-  }
-  // zonas de impulso (flechas animadas sobre la calzada)
-  g.save(); g.globalCompositeOperation = 'lighter';
-  for (const pd of T.pads) { if (pd.x1 < vx0 || pd.x0 > vx1) continue; for (let x = pd.x0; x < pd.x1; x += 34) { const y = srSurfY(x); if (y == null) continue; const a = ((x - pd.x0) / 34 - t * 6) % 3, al = .35 + .6 * Math.max(0, Math.sin(a * 2.1) * .5 + .5); g.strokeStyle = `rgba(127,227,255,${al.toFixed(2)})`; g.lineWidth = 6; g.beginPath(); g.moveTo(x, y - 14); g.lineTo(x + 16, y - 5); g.lineTo(x, y + 4); g.stroke(); } }
-  g.restore();
-}
-
-function srDrawItems(g) {
-  const T = SR.trk, cm = SR.cam, z = cm.z, w = SR.w, t = SR.anim;
-  const vx0 = cm.x - w / 2 / z - 200, vx1 = cm.x + w / 2 / z + 200;
-  // puntos de control: cortina de luz + mástil con bandera
-  for (let i = 0; i < T.cps.length; i++) {
-    const cp = T.cps[i], x = cp.x; if (x < vx0 || x > vx1) continue; const y = srSurfY(x); if (y == null) continue;
-    const on = cp.got, col = on ? '255,224,130' : '127,227,255';
-    g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, y - 230, 0, y); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(1, `rgba(${col},${on ? .4 : .3})`); g.fillStyle = gr; g.fillRect(x - 14, y - 230, 28, 230); g.restore();
-    g.fillStyle = '#e9eefc'; g.fillRect(x - 5, y - 200, 10, 200); g.fillStyle = on ? '#ffd56a' : '#7fe3ff';
-    g.beginPath(); g.moveTo(x + 5, y - 196); g.quadraticCurveTo(x + 40, y - 188 + Math.sin(t * 5 + i) * 6, x + 74, y - 176 + Math.sin(t * 5 + i + 1) * 8); g.lineTo(x + 5, y - 152); g.fill();
-    g.fillStyle = '#0b1a44'; g.font = '900 15px ' + SR.disp; g.textAlign = 'left'; g.fillText(String(i + 1), x + 18, y - 168);
-    g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${col},.8)`; g.beginPath(); g.arc(x, y - 206, 9 + Math.sin(t * 4) * 1.5, 0, TAU); g.fill(); g.restore();
-  }
-  // pórtico de salida
-  { const x = T.startX + 260, y = srSurfY(x); if (y != null && x > vx0 && x < vx1) {
-      g.fillStyle = '#e9eefc'; g.fillRect(x - 90, y - 210, 10, 210); g.fillRect(x + 80, y - 210, 10, 210);
-      const gr = g.createLinearGradient(0, y - 240, 0, y - 190); gr.addColorStop(0, '#2b6bd8'); gr.addColorStop(1, '#14307a'); g.fillStyle = gr; g.fillRect(x - 100, y - 240, 200, 48); g.strokeStyle = '#ffe08a'; g.lineWidth = 4; g.strokeRect(x - 100, y - 240, 200, 48);
-      g.fillStyle = '#fff6d8'; g.font = '900 italic 20px ' + SR.disp; g.textAlign = 'center'; g.fillText('SALIDA', x, y - 207);
-      g.fillStyle = 'rgba(255,255,255,.9)'; for (let k = 0; k < 8; k++) { g.fillRect(x - 60 + 0, y - 3 + (k % 2) * 0, 0, 0); }
-      g.fillStyle = '#fff'; g.fillRect(x - 6, y - 1, 12, 5); g.fillStyle = '#111'; g.fillRect(x - 6, y - 1, 6, 5 / 2); } }
-  // meta
-  { const x = T.finishX, y = srSurfY(x); if (y != null && x > vx0 && x < vx1) {
-      g.fillStyle = '#e9eefc'; g.fillRect(x - 70, y - 260, 12, 260); g.fillRect(x + 58, y - 260, 12, 260);
-      const sq = 16; for (let r = 0; r < 3; r++) for (let k = 0; k < 8; k++) { g.fillStyle = (r + k) % 2 ? '#101528' : '#fff'; g.fillRect(x - 64 + k * 16, y - 262 + r * sq, sq, sq); }
-      g.fillStyle = 'rgba(16,21,40,.88)'; g.fillRect(x - 64, y - 214, 128, 36); g.fillStyle = '#ffe08a'; g.font = '900 italic 24px ' + SR.disp; g.textAlign = 'center'; g.fillText('META', x, y - 188);
-      g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, y - 260, 0, y); gr.addColorStop(0, 'rgba(255,224,130,0)'); gr.addColorStop(1, 'rgba(255,224,130,.35)'); g.fillStyle = gr; g.fillRect(x - 58, y - 260, 116, 260); g.restore(); } }
-  // barreras de los extremos
-  for (const bx of [T.xmin - 14, T.xmax + 14]) { if (bx < vx0 || bx > vx1) continue; const y = srSurfY(Math.min(Math.max(bx, T.xmin), T.xmax)); if (y == null) continue; g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createLinearGradient(0, y - 180, 0, y); gr.addColorStop(0, 'rgba(127,227,255,0)'); gr.addColorStop(1, 'rgba(127,227,255,.55)'); g.fillStyle = gr; g.fillRect(bx - 5, y - 180, 10, 180); g.restore(); }
-  // aros de impulso
-  for (let i = 0; i < T.rings.length; i++) {
-    const rg = T.rings[i]; if (rg.x < vx0 || rg.x > vx1) continue;
-    const used = rg.used, pul = 1 + .05 * Math.sin(t * 5 + i), fx = rg.fx > 0 ? rg.fx : 0, rr = rg.r * pul * (1 + (.6 - fx) * (used ? .5 : 0)), al = used ? Math.max(0, fx / .6) * .8 : 1;
-    if (used && al <= 0) continue;
-    g.save(); g.translate(rg.x, rg.y); g.rotate(rg.a * .35);
-    g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(0, 0, rr * .3, 0, 0, rr * 1.5); gr.addColorStop(0, `rgba(255,224,130,${.0 * al})`); gr.addColorStop(.7, `rgba(255,200,90,${.35 * al})`); gr.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(0, 0, rr * 1.5, rr * 1.5, 0, 0, TAU); g.fill();
-    g.globalCompositeOperation = 'source-over'; g.globalAlpha = al; g.lineWidth = 12; g.strokeStyle = '#ffcf4a'; g.beginPath(); g.ellipse(0, 0, 20, rr, 0, 0, TAU); g.stroke();
-    g.lineWidth = 4; g.strokeStyle = '#fff6d8'; g.beginPath(); g.ellipse(0, 0, 20, rr, 0, 0, TAU); g.stroke();
-    g.fillStyle = '#7fe3ff'; for (let k = 0; k < 6; k++) { const a = t * 2 + k / 6 * TAU; g.beginPath(); g.arc(Math.cos(a) * 20, Math.sin(a) * rr, 4, 0, TAU); g.fill(); }
-    g.restore(); if (rg.fx > 0) rg.fx -= 1 / 60;
-  }
-}
-function srDrawCar(g) {
-  const c = SR.car, bc = CAR_BY_ID[save.sel] || CAR_BY_ID.volt, col = paintCol(bc.id, bc.col), alt = bc.alt || '#fff', H = SRC.H;
-  g.save(); g.translate(c.x, c.y); g.rotate(c.a);
-  const sq = c.land > 0 ? c.land * .12 : 0; g.scale(1 + sq, 1 - sq);
-  if (c.nitOn || c.boostT > 0) { g.save(); g.globalCompositeOperation = 'lighter'; const fl = (c.nitOn ? 1 : .55) * (.7 + Math.random() * .6), gr = g.createLinearGradient(-44, 0, -44 - 90 * fl, 0); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.3, 'rgba(255,170,60,.85)'); gr.addColorStop(1, 'rgba(60,180,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(-44, -2); g.lineTo(-44 - 90 * fl, 4); g.lineTo(-44, 10); g.fill(); g.restore(); }
-  // luz inferior
-  g.save(); g.globalCompositeOperation = 'lighter'; const ug = g.createRadialGradient(0, H - 6, 2, 0, H - 6, 60); ug.addColorStop(0, 'rgba(127,227,255,.35)'); ug.addColorStop(1, 'rgba(127,227,255,0)'); g.fillStyle = ug; g.fillRect(-60, H - 50, 120, 60); g.restore();
-  // carrocería
-  const body = () => { g.beginPath(); g.moveTo(-44, 8); g.lineTo(-44, -2); g.quadraticCurveTo(-43, -9, -33, -10); g.lineTo(-20, -11); g.quadraticCurveTo(-12, -25, 3, -25); g.lineTo(10, -25); g.quadraticCurveTo(21, -24, 29, -12); g.lineTo(40, -8); g.quadraticCurveTo(47, -5, 47, 3); g.lineTo(45, 9); g.closePath(); };
-  body(); const gr = g.createLinearGradient(0, -26, 0, 10); gr.addColorStop(0, '#ffffffcc'); gr.addColorStop(.25, col); gr.addColorStop(1, '#0b1224'); g.fillStyle = col; g.fill(); g.fillStyle = gr; g.globalAlpha = .55; g.fill(); g.globalAlpha = 1;
-  g.lineWidth = 2; g.strokeStyle = 'rgba(8,14,34,.85)'; g.stroke();
-  g.fillStyle = alt; g.globalAlpha = .9; g.fillRect(-42, -1, 86, 3); g.globalAlpha = 1;
-  // cristales
-  g.beginPath(); g.moveTo(-18, -11); g.quadraticCurveTo(-11, -22, 2, -22); g.lineTo(9, -22); g.quadraticCurveTo(18, -21, 24, -12); g.closePath(); const wg = g.createLinearGradient(0, -22, 0, -10); wg.addColorStop(0, '#d6f2ff'); wg.addColorStop(1, '#2a4a8a'); g.fillStyle = wg; g.fill(); g.strokeStyle = 'rgba(8,14,34,.7)'; g.lineWidth = 1.5; g.stroke();
-  g.fillStyle = '#fff3b0'; g.fillRect(42, -3, 6, 4); g.fillStyle = '#ff4d5e'; g.fillRect(-46, -4, 4, 5);
-  g.save(); g.globalCompositeOperation = 'lighter'; const hg = g.createRadialGradient(46, -1, 1, 46, -1, 26); hg.addColorStop(0, 'rgba(255,245,190,.7)'); hg.addColorStop(1, 'rgba(255,245,190,0)'); g.fillStyle = hg; g.fillRect(40, -24, 40, 46); g.restore();
-  // ruedas
-  for (const wx of [-27, 28]) { g.save(); g.translate(wx, 9); g.fillStyle = '#0b0f1e'; g.beginPath(); g.arc(0, 0, 13.5, 0, TAU); g.fill(); g.rotate(c.wheel); g.fillStyle = '#9db4e8'; g.beginPath(); g.arc(0, 0, 7.5, 0, TAU); g.fill(); g.strokeStyle = '#2b3b6a'; g.lineWidth = 2; for (let k = 0; k < 5; k++) { g.rotate(TAU / 5); g.beginPath(); g.moveTo(0, 0); g.lineTo(7, 0); g.stroke(); } g.restore(); }
-  g.restore();
-}
-function srDrawParts(g) {
-  const N = SRP.N; g.save();
-  for (let i = 0; i < N; i++) {
-    const l = SRP.l[i]; if (l <= 0) continue; const k = l / SRP.m[i], tp = SRP.t[i], s = SRP.s[i];
-    if (tp === 0) { g.fillStyle = `rgba(255,255,255,${(k * .45).toFixed(3)})`; g.beginPath(); g.arc(SRP.x[i], SRP.y[i], s * (1.6 - k * .6), 0, TAU); g.fill(); }
-    else { g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${SRCOL[SRP.c[i]]},${k.toFixed(3)})`; g.beginPath(); g.arc(SRP.x[i], SRP.y[i], s * (.5 + k * .6), 0, TAU); g.fill(); g.globalCompositeOperation = 'source-over'; }
-  }
-  g.restore();
-}
-function srDrawFront(g) {   // nubes en primer plano, líneas de viento y viñeta (espacio de pantalla)
-  const w = SR.w, h = SR.h, c = SR.car, t = SR.anim, cm = SR.cam, sp = Math.hypot(c.g ? c.v : c.vx, c.g ? 0 : c.vy), spf = clamp(sp / 900, 0, 1.2);
-  srLayer(g, SR.art.puff, 1.35, 1.5, 1500, -400, 500, .45, .32, 77, 430, 20);
-  if (spf > .25) { g.save(); g.lineCap = 'round'; const n = 22, a0 = clamp((spf - .25) * .9, 0, .75); for (let i = 0; i < n; i++) { const ph = (t * (1.5 + (i % 5) * .45) + i * .37) % 1, x = w - ph * (w + 400) + 100, y = ((i * 0.618034) % 1) * h, ln = 90 + (i % 7) * 40 * spf; g.strokeStyle = `rgba(255,255,255,${(.22 * a0 * (i % 2 ? 1 : .6)).toFixed(3)})`; g.lineWidth = 1.5 + (i % 3); g.beginPath(); g.moveTo(x, y); g.lineTo(x + ln, y); g.stroke(); } g.restore(); }
-  if (c.nitOn || c.boostT > 0) { const gr = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * .4, w / 2, h / 2, Math.hypot(w, h) * .62); gr.addColorStop(0, 'rgba(60,180,255,0)'); gr.addColorStop(1, 'rgba(60,180,255,.28)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); }
-}
-function srHUD(g) {
-  const w = SR.w, h = SR.h, c = SR.car, T = SR.trk, u = clamp(Math.min(w, h) / 720, .62, 1.3), dsp = SR.disp, touch = document.body.classList.contains('touch'), pad = 14 * u, saT = 0;
-  g.save(); g.textBaseline = 'alphabetic'; g.shadowColor = 'rgba(0,20,70,.85)'; g.shadowBlur = 6;
-  const txt = (s, x, y, size, col, al) => { g.font = `900 italic ${size * u}px ${dsp}`; g.textAlign = al || 'left'; g.fillStyle = col; g.fillText(s, x, y); };
-  // tiempo y checkpoint (arriba-izquierda)
-  txt(fmtTime(SR.time), pad, pad + 30 * u, 34, '#fff6d8');
-  txt('PUNTO ' + Math.max(0, SR.cp + 1) + '/' + T.cps.length + ' · CAÍDAS ' + SR.falls, pad, pad + 52 * u, 15, '#bfe8ff');
-  // barra de progreso (arriba-centro)
-  { const bw = Math.min(w * .34, 420 * u), bx = w / 2 - bw / 2, by = pad + 10 * u; g.shadowBlur = 0; g.fillStyle = 'rgba(8,20,70,.65)'; g.fillRect(bx, by, bw, 8 * u); g.fillStyle = '#7fe3ff'; const pr = clamp(c.x / T.finishX, 0, 1); g.fillRect(bx, by, bw * pr, 8 * u);
-    for (const cp of T.cps) { g.fillStyle = cp.got ? '#ffd56a' : '#e9eefc'; g.fillRect(bx + bw * cp.x / T.finishX - 1.5, by - 4 * u, 3, 16 * u); }
-    g.fillStyle = '#fff'; g.beginPath(); g.arc(bx + bw * pr, by + 4 * u, 7 * u, 0, TAU); g.fill(); g.fillStyle = '#ffd56a'; g.fillRect(bx + bw - 3, by - 6 * u, 6, 20 * u); g.shadowBlur = 6; }
-  // velocidad y nitro (arriba-derecha)
-  const kmh = Math.round(Math.abs(c.g ? c.v : Math.hypot(c.vx, c.vy)) * .36);
-  txt(String(kmh), w - pad - 62 * u, pad + 36 * u, 44, c.nitOn ? '#ffd56a' : '#fff', 'right'); txt('KM/H', w - pad, pad + 36 * u, 15, '#bfe8ff', 'right');
-  { const bw = 190 * u, bx = w - pad - bw, by = pad + 50 * u; g.shadowBlur = 0; g.fillStyle = 'rgba(8,20,70,.7)'; g.fillRect(bx, by, bw, 12 * u); const gr = g.createLinearGradient(bx, 0, bx + bw, 0); gr.addColorStop(0, '#ff9a2e'); gr.addColorStop(1, '#7fe3ff'); g.fillStyle = gr; g.fillRect(bx, by, bw * clamp(c.nit, 0, 1), 12 * u); g.strokeStyle = '#ffffff88'; g.lineWidth = 1.5; g.strokeRect(bx, by, bw, 12 * u); g.shadowBlur = 6; txt('NITRO', bx, by + 28 * u, 13, '#ffd9a0'); }
-  // altura sobre la pista cuando se vuela
-  if (!c.g && SR.state === 'run') { const ys = srSurfY(c.x), hh = ys == null ? null : Math.max(0, ys - (c.y + SRC.H)); txt(hh == null ? 'EN VUELO' : 'ALTURA ' + Math.round(hh / 10) + ' m', w - pad, pad + 98 * u, 15, '#bfe8ff', 'right'); }
-  g.shadowBlur = 8;
-  // mensajes
-  if (SR.msgT > 0 && SR.msg) { const a = clamp(SR.msgT / .4, 0, 1), s = 1 + (SR.msgT > (SR.msgDur || 1.5) - .15 ? .25 : 0); g.globalAlpha = a; txt(SR.msg, w / 2, h * .27, 36 * s, SR.msgCol, 'center'); g.globalAlpha = 1; }
-  // cuenta atrás
-  if (SR.state === 'count') { const n = Math.ceil(SR.cd - .0001), fr = SR.cd - Math.floor(SR.cd); if (n <= 3 && n >= 1) { g.globalAlpha = clamp(fr * 2 + .3, 0, 1); txt(String(n), w / 2, h * .42, 120 * (1 + (1 - fr) * .25), '#fff6d8', 'center'); g.globalAlpha = 1; } else txt('PREPÁRATE', w / 2, h * .4, 44, '#fff6d8', 'center'); }
-  // ayuda de controles (los primeros segundos, no en táctil)
-  if (!touch && SR.hint > 0) { g.globalAlpha = clamp(SR.hint / 1.2, 0, 1); txt('W acelerar · S frenar · A/D inclinar en el aire · ESPACIO nitro · R checkpoint · T inicio · P pausa', w / 2, h - 26 * u, 15, '#fff6d8', 'center'); g.globalAlpha = 1; }
-  g.restore();
-}
-function srDraw() {
-  const g = SR.g, w = SR.w, h = SR.h, k = SR.k, cm = SR.cam, z = cm.z;
-  g.setTransform(k, 0, 0, k, 0, 0); srDrawBack(g);
-  g.setTransform(k * z, 0, 0, k * z, k * (w / 2 - cm.x * z + cm.sx), k * (h / 2 - cm.y * z + cm.sy));
-  srDrawTrack(g); srDrawItems(g); srDrawCar(g); srDrawParts(g);
-  g.setTransform(k, 0, 0, k, 0, 0); srDrawFront(g); srHUD(g);
-  if (SR.flash > 0) { g.fillStyle = `rgba(255,248,220,${(SR.flash * .55).toFixed(3)})`; g.fillRect(0, 0, w, h); }
-  if (SR.fade > 0 || SR.state === 'fall') { const fa = SR.state === 'fall' ? clamp(SR.fallT / .55, 0, .85) : SR.fade; g.fillStyle = `rgba(6,12,40,${fa.toFixed(3)})`; g.fillRect(0, 0, w, h); }
-}
-
-/* ---------- entrada: teclado, táctil y mando (estado propio, nunca se mezcla con `keys` de la carrera) ---------- */
-function srPad() {
-  const g = save.pad && save.pad.on ? PAD.gp : null; if (!g) return null;
-  const dn = i => { const b = g.buttons[i]; return !!b && (b.pressed || b.value > .3); }, nin = padNin(g);
-  const A = nin ? dn(1) : dn(0), B = nin ? dn(0) : dn(1), X = nin ? dn(3) : dn(2);
-  const dz = save.pad.dz / 100, ax = g.axes[0] || 0; let str = Math.abs(ax) > dz ? Math.sign(ax) * (Math.abs(ax) - dz) / (1 - dz) : 0;
-  str = clamp(str * save.pad.sens / 100, -1, 1); if (dn(14) && !dn(15)) str = -1; else if (dn(15) && !dn(14)) str = 1;
-  return { thr: dn(7) || A, brk: dn(6) || B, nit: X || dn(5), str, start: dn(9), a: A, b: B };
-}
-function srReadInput(p) {
-  const k = SR.keys, I = SR.in;
-  if (SR.paused || !SR.run) { I.thr = I.brk = I.str = I.nit = 0; return; }
-  I.thr = (k.KeyW || k.ArrowUp || (p && p.thr)) ? 1 : 0; I.brk = (k.KeyS || k.ArrowDown || (p && p.brk)) ? 1 : 0;
-  let str = (k.KeyD || k.ArrowRight ? 1 : 0) - (k.KeyA || k.ArrowLeft ? 1 : 0); if (p && Math.abs(p.str) > Math.abs(str)) str = p.str;
-  I.str = str; I.nit = (k.Space || (p && p.nit)) ? 1 : 0;
-}
-function srOverlayShown() { return SR.paused ? 'pause' : SR.state === 'fall' && SR.fallT > .55 ? 'fall' : SR.state === 'finish' && SR.finT > 1.7 ? 'fin' : ''; }
-function srPause(on) {
-  if (!SR.run || on === SR.paused) return; if (on && (SR.state === 'fall' || SR.state === 'finish')) return;
-  SR.paused = on; SR.keys = {}; SR.in.thr = SR.in.brk = SR.in.str = SR.in.nit = 0; if (on) Snd.silence(); else SR.last = performance.now();
-  document.querySelectorAll('#srTouch button').forEach(b => b.classList.remove('down'));
-}
-function srKeyDown(e) {
-  if (!SR.run) return;
-  e.stopImmediatePropagation();                         // el juego principal no debe ver ninguna tecla mientras dura el circuito
-  if (!e.isTrusted) { e.preventDefault(); return; }     // pulsaciones sintéticas del mando: se leen directamente con srPad()
-  const k = e.code; if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(k)) e.preventDefault();
-  Snd.init(); if (e.repeat) return;
-  if (k === 'KeyM') { toggleSound(); return; }
-  const ov = srOverlayShown();
-  if (ov === 'pause') { if (k === 'Escape' || k === 'KeyP' || k === 'Enter') srPause(false); else if (k === 'KeyR') srRespawn(false); else if (k === 'KeyT') srRespawn(true); return; }
-  if (ov === 'fall') { if (k === 'Enter' || k === 'Space' || k === 'KeyR') srRespawn(false); else if (k === 'KeyT') srRespawn(true); else if (k === 'Escape') srExit(); return; }
-  if (ov === 'fin') { if (k === 'Enter' || k === 'Space' || k === 'KeyR' || k === 'KeyT') srRespawn(true); else if (k === 'Escape') srExit(); return; }
-  SR.keys[k] = true;
-  if (k === 'Escape' || k === 'KeyP') srPause(true);
-  else if (k === 'KeyR' && SR.state === 'run') srRespawn(false);
-  else if (k === 'KeyT' && (SR.state === 'run' || SR.state === 'count' || SR.state === 'finish')) srRespawn(true);
-}
-function srKeyUp(e) { if (!SR.run) return; SR.keys[e.code] = false; if (e.code === 'Space' || e.code === 'Enter') e.preventDefault(); }
-function srBlur() { if (!SR.run) return; SR.keys = {}; SR.in.thr = SR.in.brk = SR.in.str = SR.in.nit = 0; srPause(true); }
-function srVis() { if (document.hidden) srBlur(); }
-function srResize() {
-  if (!SR.cv) return; const k = Math.min(window.devicePixelRatio || 1, 1.75), w = SR.cv.clientWidth || innerWidth, h = SR.cv.clientHeight || innerHeight;
-  SR.w = w; SR.h = h; SR.k = k; SR.cv.width = Math.round(w * k); SR.cv.height = Math.round(h * k); SR.skyG = null; if (SR.car && SR.trk) srCamSnap();
-}
-function srAddListeners() {
-  if (SR.listeners) return; SR.listeners = true;
-  addEventListener('keydown', srKeyDown, true); addEventListener('keyup', srKeyUp, true); addEventListener('blur', srBlur);
-  document.addEventListener('visibilitychange', srVis); addEventListener('resize', srResize); addEventListener('orientationchange', srResize);
-}
-function srRemoveListeners() {
-  if (!SR.listeners) return; SR.listeners = false;
-  removeEventListener('keydown', srKeyDown, true); removeEventListener('keyup', srKeyUp, true); removeEventListener('blur', srBlur);
-  document.removeEventListener('visibilitychange', srVis); removeEventListener('resize', srResize); removeEventListener('orientationchange', srResize);
-}
-
-/* ---------- sonido: reutiliza Snd (motor, viento, silbidos, barridos); los eventos los genera la física ---------- */
-function srSound(now) {
-  const c = SR.car; while (SR.evs.length) {
-    const e = SR.evs.shift();
-    if (e === 'count') Snd.beep(440, .18, .1, 'square');
-    else if (e === 'go') Snd.go();
-    else if (e === 'launch') { Snd.boost('medium'); Snd.whoosh(.7, .25, 300, 3000); }
-    else if (e === 'pad') Snd.boost('small');
-    else if (e === 'ring') { Snd.beep(880, .16, .1, 'triangle'); Snd.beep(1320, .3, .07, 'sine'); Snd.whoosh(.35, .16, 600, 3400); }
-    else if (e === 'cp') { Snd.beep(660, .2, .09, 'triangle'); Snd.beep(990, .4, .08, 'sine'); }
-    else if (e === 'land') Snd.crash(.22);
-    else if (e === 'landhard') { Snd.crash(.75); Snd.sweep(160, 60, .3, .08, 'square'); }
-    else if (e === 'bounce') { Snd.sweep(180, 1000, .5, .1, 'sine'); Snd.beep(520, .25, .08, 'triangle'); Snd.crash(.3); }
-    else if (e === 'fall') { Snd.sweep(900, 50, 1.1, .12, 'sawtooth'); Snd.whoosh(1.2, .2, 2400, 300); }
-    else if (e === 'finish') { [523, 659, 784, 1047].forEach((f, i) => { Snd.beep(f, 1.4 - i * .1, .07, 'triangle'); Snd.beep(f / 2, 1.4, .04, 'sine'); }); Snd.whoosh(1.2, .2, 400, 3600); }
-  }
-  if (now - SR.snd < 30) return; SR.snd = now;
-  if (SR.paused || SR.state === 'fall') { Snd.silence(); return; }
-  const air = !c.g, sp = air ? Math.hypot(c.vx, c.vy) : Math.abs(c.v), spf = clamp(sp / SRC.VMAX, 0, 1.4), thr = SR.state === 'count' ? (SR.in.thr ? .6 : .1) : SR.in.thr ? 1 : .25;
-  Snd.engine(air ? spf * .75 : spf, thr, c.nitOn);
-  if (Snd.ctx && Snd.wind && save.sound) {   // viento más fuerte y más agudo durante el vuelo
-    const vol = (air ? .05 + .1 * spf : .01 + .035 * spf) + (c.nitOn ? .03 : 0), t = Snd.ctx.currentTime;
-    Snd.wind.g.gain.setTargetAtTime(vol, t, .1); Snd.wind.f.frequency.setTargetAtTime(500 + spf * 1900 + (air ? 700 : 0), t, .1);
-  }
-}
-
-/* ---------- pantallas superpuestas (pausa / caída / meta) ---------- */
-function srOverlay() {
-  const ov = srOverlayShown();
-  if (ov === SR.ov) return; SR.ov = ov;
-  for (const [id, n] of [['srPause', 'pause'], ['srFall', 'fall'], ['srFin', 'fin']]) $(id).classList.toggle('on', ov === n);
-  if (ov === 'fall') { const cr = SR.fallWhy === 'crash'; $('srFallT').textContent = cr ? '¡VOLCASTE!' : '¡CAÍSTE AL VACÍO!'; $('srFallP').textContent = (cr ? 'Aterrizaste demasiado torcido. ' : '') + (SR.cp >= 0 ? 'Puedes volver a intentarlo desde el último punto de control (' + (SR.cp + 1) + '/' + SR.trk.cps.length + ') o desde el principio.' : 'Aún no has pasado ningún punto de control: reintentarás desde la salida.'); $('srFaCp').textContent = SR.cp >= 0 ? 'DESDE EL CHECKPOINT' : 'REINTENTAR'; $('srFaCp').focus({ preventScroll: true }); }
-  if (ov === 'fin') { $('srFiT').textContent = fmtTime(SR.time); $('srFiB').textContent = fmtTime(SR.best); $('srFiF').textContent = SR.falls; $('srFiR').textContent = SR.ringN + '/' + SR.trk.rings.length; $('srFiAgain').focus({ preventScroll: true }); }
-  if (ov === 'pause') $('srPzGo').focus({ preventScroll: true });
-}
-let srPadPrev = { a: false, b: false, s: false };
-function srPadNav(p) {   // mando en las pantallas superpuestas: A = principal, B = secundaria, Start = pausa
-  const a = !!(p && p.a), b = !!(p && p.b), s = !!(p && p.start), ov = srOverlayShown();
-  if (a && !srPadPrev.a) { if (ov === 'pause') srPause(false); else if (ov === 'fall') srRespawn(false); else if (ov === 'fin') srRespawn(true); }
-  if (b && !srPadPrev.b) { if (ov === 'pause') srRespawn(false); else if (ov === 'fall') srRespawn(true); else if (ov === 'fin') srExit(); }
-  if (s && !srPadPrev.s) { if (ov === 'pause') srPause(false); else if (!ov) srPause(true); }
-  srPadPrev = { a, b, s };
-}
-
-/* ---------- bucle propio ---------- */
-function srFrame(now) {
-  if (!SR.run) return;
-  SR.raf = requestAnimationFrame(srFrame);
-  let dt = (now - SR.last) / 1000; SR.last = now; if (document.hidden) return; dt = Math.min(dt, .05);
-  try {
-    const p = srPad(); srPadNav(p); SR.frames++;
-    if (!SR.paused) {
-      srReadInput(p);
-      const n = Math.max(1, Math.ceil(dt / .0085)), h = dt / n; for (let i = 0; i < n; i++) srStep(h);
-      srPartsStep(dt); srCamUpdate(dt);
-      if (SR.msgT > 0) SR.msgT -= dt; if (SR.state !== 'fall') SR.fade = Math.max(0, SR.fade - dt * 2.2); if (SR.flash > 0) SR.flash = Math.max(0, SR.flash - dt * 1.3); if (SR.state === 'run' && SR.hint > 0) SR.hint -= dt;
-    }
-    srOverlay(); srSound(now); srDraw();
-  } catch (err) { console.error(err); }
-}
-function srStart() {
-  if (SR.run || mode !== 'skycrown' || !skyOpen()) return;
-  if (!SR.cv) { SR.cv = $('srCv'); SR.g = SR.cv.getContext('2d'); }
-  if (!SR.trk) { SR.trk = srBuildTrack(); srPartsInit(); SR.car = srNewCar(); }
-  if (!SR.art) SR.art = srMakeArt();
-  SR.disp = (getComputedStyle(document.documentElement).getPropertyValue('--disp') || '').trim() || '"Segoe UI",Roboto,sans-serif';
-  mode = 'skyrace'; frozen = false; toggleCtl(false);
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on', 'out')); $('topbar').classList.remove('on');
-  document.documentElement.classList.add('sky-race-active'); $('skyRace').className = 'on';
-  SR.run = true; SR.keys = {}; SR.paused = false; SR.ov = ''; SR.anim = 0; SR.hint = 7; SR.snd = 0; SR.evs.length = 0; SR.lastN = 99; SR.frames = 0; srPadPrev = { a: true, b: true, s: true };
-  srAddListeners(); srResize(); Snd.init(); Snd.silence();
-  srRespawn(true); SR.last = performance.now(); cancelAnimationFrame(SR.raf); SR.raf = requestAnimationFrame(srFrame);
-}
-function srExit() {
-  if (!SR.run) return;
-  SR.run = false; cancelAnimationFrame(SR.raf); srRemoveListeners();
-  SR.keys = {}; SR.paused = false; SR.state = 'idle'; SR.ov = ''; SR.evs.length = 0; SR.in.thr = SR.in.brk = SR.in.str = SR.in.nit = 0;
-  for (const k in keys) keys[k] = false;                                    // ninguna tecla de la carrera queda «pulsada»
-  document.querySelectorAll('#srTouch button').forEach(b => b.classList.remove('down'));
-  for (const id of ['srPause', 'srFall', 'srFin']) $(id).classList.remove('on');
-  $('skyRace').className = ''; document.documentElement.classList.remove('sky-race-active');
-  Snd.silence(); Snd.squeal(0); if (SR.g) SR.g.clearRect(0, 0, SR.cv.width, SR.cv.height);
-  go('skycrown');                                                            // vuelve a la pantalla de la Corona de los Cielos
-}
-/* botones de las pantallas superpuestas y controles táctiles (los manejadores sólo actúan si SR.run) */
-{ const on = (id, fn) => $(id).addEventListener('click', e => { e.currentTarget.blur(); if (SR.run) fn(); });
-  on('srPzGo', () => srPause(false)); on('srPzCp', () => srRespawn(false)); on('srPzSt', () => srRespawn(true)); on('srPzQuit', srExit);
-  on('srFaCp', () => srRespawn(false)); on('srFaSt', () => srRespawn(true)); on('srFaQuit', srExit);
-  on('srFiAgain', () => srRespawn(true)); on('srFiBack', srExit);
-  $('srTcPause').addEventListener('click', () => { if (SR.run) srPause(true); });
-  document.querySelectorAll('#srTouch [data-k]').forEach(b => {
-    const code = b.dataset.k, dn = e => { e.preventDefault(); if (!SR.run || SR.paused) return; SR.keys[code] = true; b.classList.add('down'); try { b.setPointerCapture(e.pointerId); } catch (x) { /* */ } }, up = () => { SR.keys[code] = false; b.classList.remove('down'); };
-    b.addEventListener('pointerdown', dn); b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up); b.addEventListener('contextmenu', e => e.preventDefault());
-  });
-}
-$('skGo').onclick = srStart;
+/* «EMPEZAR»: abre la corona de los cielos dentro de Supervivencia (misma pantalla y flujo que las demás coronas) */
+$('skGo').onclick = () => { if (!skyOpen()) return; CW.sel = SKY_CI; CW.ask = false; go('survival'); setTimeout(() => { const d = $('cwDet'); if (d && d.scrollIntoView) d.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 120); };
 
 go(save.name ? 'menu' : 'welcome');
 requestAnimationFrame(frame);
@@ -7641,7 +7208,8 @@ requestAnimationFrame(frame);
     save.xp = Math.max(save.xp, xpAt(60)); save.coins = Math.max(save.coins, 1000000);
     for (const c of CARS) { const u = upgOf(c.id); for (const { k } of UPG) u[k] = UPG_MAX; paintData(c.id).own = LIVERIES.map(l => l.id); }
     save.pfx.own = PFX.map(p => p.id); crownsOn(true);
-    done('Cuenta al máximo: nivel 60, coches mejorados, pinturas, estelas de nitro, circuitos y coronas');
+    { const st = stOf(SKYCR.id); st.runs = Math.max(st.runs, 1); st.wins = Math.max(st.wins, 1); st.best = st.best ? Math.min(st.best, 1) : 1; st.bp = 1; delete save.champ.cur[SKYCR.id]; save.sky.on = true; }   // Corona de los Cielos también al máximo («seen» no se toca)
+    done('Cuenta al máximo: nivel 60, coches mejorados, pinturas, estelas de nitro, circuitos y coronas (incluida la Corona de los Cielos)');
   }
   function cine() {
     if (SKY.run) return;
