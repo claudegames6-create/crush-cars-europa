@@ -4372,14 +4372,18 @@ function renderEv() {
   for (const [id, h] of [['evRow', 'evHint'], ['svEv', 'svEvHint']]) {
     const row = $(id); if (!row) continue;
     row.querySelectorAll('[data-ev]').forEach(b => b.classList.toggle('on', b.dataset.ev === save.ev));
-    $(h).innerHTML = '<b>' + { off: 'SIN EVENTOS', one: 'UNO A LA VEZ', chaos: 'CAOS' }[save.ev] + '</b> · ' + EV_INFO[save.ev] + ' (sólo en solitario)';
+    $(h).innerHTML = '<b>' + { off: 'SIN EVENTOS', one: 'UNO A LA VEZ', chaos: 'CAOS' }[save.ev] + '</b> · ' + EV_INFO[save.ev] + (NET.room ? '' : ' (sólo en solitario)');
   }
 }
 for (const id of ['evRow']) $(id).addEventListener('click', e => {
   const b = e.target.closest('[data-ev]'); if (!b) return;
   save.ev = b.dataset.ev; persist(); renderEv();
 });
-$('btnStart').addEventListener('click', () => startRace(MAPS.find(m => m.id === save.map) || MAPS[0], save.rev, save.cc));
+$('btnStart').addEventListener('click', () => {
+  const m = MAPS.find(x => x.id === save.map) || MAPS[0];
+  if (NET.room) { netPartyStart({ mapId: m.id, rev: !!save.rev, cc: save.cc, ev: save.ev, laps: m.laps }); return; }   // en grupo: la misma pantalla, pero arranca la carrera para todos
+  startRace(m, save.rev, save.cc);
+});
 
 /* ---------- garaje ---------- */
 const gv = { idx: 0, car: CARS[0] };
@@ -5130,13 +5134,13 @@ function crownSvg(c, i) {
 let CW = { sel: -1, ask: false };
 function renderCrowns() {
   const ch = save.champ, se = $('skyEntry');
-  se.hidden = !skyOpen(); se.innerHTML = skyOpen() ? '<button type="button" class="btn" id="skyOpen">✦ CORONA SECRETA ✦</button>' : '';   // sólo con las 8 coronas ganadas y el secreto desbloqueado
+  se.hidden = !skyOpen() || !!NET.room; se.innerHTML = skyOpen() && !NET.room ? '<button type="button" class="btn" id="skyOpen">✦ CORONA SECRETA ✦</button>' : '';   // sólo con las 8 coronas ganadas y el secreto desbloqueado
   $('cwList').innerHTML = CROWNS.map((c, i) => {
-    const cur = ch.cur[c.id], st = ch.st[c.id], done = cur ? cur.r : (st && st.wins ? CH_N : 0);
+    const cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], done = cur ? cur.r : (st && st.wins ? CH_N : 0);
     return `<button type="button" class="cr-b ${i === CW.sel ? 'sel' : ''} ${st && st.wins ? 'won' : ''}" data-ci="${i}" style="--c:${c.col}"><span class="cr-em">${c.emoji}</span>${st && st.wins ? `<span class="cr-trophy" title="¡Corona conseguida!">${crownSvg(c, i)}</span>` : ''}<b>${c.name}</b><small>${cur ? 'EN CURSO · RONDA ' + (cur.r + 1) + '/4' : st && st.wins ? '🏆 ×' + st.wins + ' · MEJOR ' + st.bp + '.º' : st && st.runs ? 'JUGADA · MEJOR ' + (st.bp || '—') + '.º' : '12 → 9 → 6 → 3 → 1'}</small><span class="cw-dots">${[0, 1, 2, 3].map(k => `<i class="${k < done ? 'on' : ''}"></i>`).join('')}</span></button>`;
   }).join('');
   if (CW.sel < 0 || CW.sel >= CROWNS.length) { $('cwDet').innerHTML = ''; MINI.list = []; MINI.cache = {}; navApply(); return; }
-  const ci = CW.sel, c = CROWNS[ci], cur = ch.cur[c.id], st = ch.st[c.id], cc = cur ? cur.cc : save.cc;
+  const ci = CW.sel, c = CROWNS[ci], cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], cc = cur ? cur.cc : save.cc;
   const pl = Array.from({ length: 12 }, (_, i) => ({ i, out: cur && i > 0 && (i - 1) in cur.out ? cur.out[i - 1] : -1 })).sort((x, y) => (x.out >= 0) - (y.out >= 0) || (y.out - x.out) || x.i - y.i);   // los que siguen en carrera primero; luego los eliminados, los últimos en caer arriba
   $('cwDet').style.setProperty('--c', c.col);
   $('cwDet').innerHTML = `
@@ -5175,7 +5179,7 @@ $('survival').addEventListener('click', e => {
   const ev = e.target.closest('#svEv [data-ev]'); if (ev) { save.ev = ev.dataset.ev; persist(); renderEv(); return; }
   const k = e.target.closest('[data-cwcc]'); if (k && !k.disabled) { save.cc = +k.dataset.cwcc; persist(); renderCrowns(); return; }
   if (e.target.closest('#cwReset')) { if (!CW.ask) { CW.ask = true; renderCrowns(); } else { delete save.champ.cur[CROWNS[CW.sel].id]; CW.ask = false; persist(); renderCrowns(); toast('Campeonato reiniciado'); } return; }
-  if (e.target.closest('#cwGo')) { const c = CROWNS[CW.sel]; if (save.champ.cur[c.id]) champRace(CW.sel); else champStart(CW.sel); }
+  if (e.target.closest('#cwGo')) { const c = CROWNS[CW.sel]; if (NET.room) { netPartyStart({ crown: c.id, cc: save.cc, ev: save.ev }); return; } if (save.champ.cur[c.id]) champRace(CW.sel); else champStart(CW.sel); }
 });
 
 function survShowResults(R) {
@@ -5947,11 +5951,21 @@ function netGiveUp() {
   if (race && race.net) { race = null; $('pause').classList.remove('on'); go('mpmenu'); } else if (mode === 'mplobby' || mode === 'results') go('mpmenu');
 }
 /* la sala manda: 'party' = elegir coche · 'menu' = el grupo elige modo · 'lobby' = configuración de la partida */
+function netTarget() {
+  const r = NET.room, ph = r.phase || 'lobby', host = r.host === NET.pid;
+  if (ph === 'menu') return 'modes'; if (ph === 'party') return 'mplobby';
+  return host ? (r.kind === 'surv' ? 'survival' : 'maps') : 'mplobby';   // el anfitrión elige en las pantallas de siempre; el resto espera en la sala
+}
 function netRoute() {
   const r = NET.room; if (!r) return;
-  const tgt = (r.phase || 'lobby') === 'menu' ? 'modes' : 'mplobby';
-  if (mode === 'mpmenu' || ((mode === 'mplobby' || mode === 'modes') && mode !== tgt)) go(tgt);
+  const tgt = netTarget();
+  if (mode === 'mpmenu' || (['mplobby', 'modes', 'maps', 'survival'].includes(mode) && mode !== tgt)) { NET.routing = true; try { go(tgt); } finally { NET.routing = false; } }
   else if (mode === 'mplobby') lbSchedule(); else if (mode === 'modes') renderPartyBar();
+}
+/* anfitrión: manda la configuración elegida en las pantallas individuales y arranca para todo el grupo */
+function netPartyStart(cfg) {
+  const r = NET.room; if (!r || r.host !== NET.pid) return;
+  netSend({ t: 'prof', prof: mpProf() }); netSend({ t: 'cfg', cfg }); netSend({ t: 'start', go: true });
 }
 function renderPartyBar() {
   const bar = $('ptyBar'), note = $('ptyNote'), md = $('modes'), r = NET.room;
@@ -6137,7 +6151,7 @@ function renderLobby() {
   const total = r.players.length + cfg.bots; let why = '';
   if (disc) why = 'Hay jugadores desconectados.'; else if (blocked) why = 'Algún jugador no cumple los requisitos (nivel o coche).'; else if (total < 2 && r.kind !== 'surv') why = 'Activa bots o espera a un amigo (mínimo 2 participantes).'; else if (!others.every(p => p.ready)) why = 'Faltan jugadores por marcar "LISTO".';
   $('lbReady').style.display = host ? 'none' : ''; lbSet('lbReady', me && me.ready ? 'NO PREPARADO' : 'LISTO'); $('lbReady').classList.toggle('pri', !(me && me.ready)); $('lbReady').disabled = !!(me && me.block);
-  lbSet('lbStart', r.kind === 'surv' ? 'INICIAR TORNEO' : 'INICIAR CARRERA'); $('lbStart').style.display = host ? '' : 'none'; $('lbStart').disabled = !!why; lbSet('lbHint', host ? (why || '¡Todo listo! Pulsa ' + $('lbStart').textContent + '.') : (me && me.ready ? 'Esperando a que el anfitrión inicie…' : 'Marca LISTO cuando quieras correr.'));
+  lbSet('lbStart', r.kind === 'surv' ? 'INICIAR TORNEO' : 'INICIAR CARRERA'); $('lbStart').style.display = host ? '' : 'none'; $('lbStart').disabled = !!why; lbSet('lbHint', host ? (why || '¡Todo listo! Pulsa ' + $('lbStart').textContent + '.') : (me && me.ready ? 'Esperando a que el anfitrión inicie…' : 'El anfitrión está eligiendo la partida…'));
   if (phase === 'party') {
     const okc = r.players.length >= 2 && !disc;
     $('lbCont').style.display = host ? '' : 'none'; $('lbCont').disabled = !okc;
@@ -6297,7 +6311,7 @@ function netShowResults(R) {
   mode = 'results'; document.querySelectorAll('.screen').forEach(sc => sc.classList.toggle('on', sc.id === 'results')); document.body.classList.remove('inrace');
   if (mine && g) { countUp($('rsCoins'), mine.coins, 1300, '+', true); countUp($('rsXp'), mine.xp, 1100); } else { const c = $('rsCoins'); if (c) c.textContent = '+' + fmt(mine ? mine.coins : 0); const x = $('rsXp'); if (x) x.textContent = '+' + fmt(mine ? mine.xp : 0); }
   frozen = false; nav.i = 0; navApply(); Snd.silence(); Snd.beep(pos === 1 ? 880 : 520, .4, .12, 'triangle'); netBadge();
-  $('rsLobby').onclick = () => { race = null; if (NET.room) go('mplobby'); else go('mpmenu'); };
+  $('rsLobby').onclick = () => { race = null; if (NET.room) go(netTarget()); else go('mpmenu'); };
   $('rsExit').onclick = () => { race = null; netLeaveRoom(); go('mpmenu'); };
 }
 
@@ -6326,7 +6340,7 @@ function netShowSurvResults(m) {
       e.textContent = 'SIGUIENTE: ' + nextM.name + ' · ' + nx.n + ' pilotos · pasan ' + nx.k + (nx.k === 1 ? ' (sólo uno gana)' : '') + (ok ? ' · empieza en ' + s + ' s' : ' · ya no participas · empieza en ' + s + ' s'); };
     tick(); NET.svT = setInterval(tick, 250);
   }
-  const rl = $('rsLobby'); if (rl) rl.onclick = () => { race = null; if (NET.room) go('mplobby'); else go('mpmenu'); };
+  const rl = $('rsLobby'); if (rl) rl.onclick = () => { race = null; if (NET.room) go(netTarget()); else go('mpmenu'); };
   $('rsExit').onclick = () => { clearInterval(NET.svT); race = null; netLeaveRoom(); go('mpmenu'); };
 }
 
@@ -6337,7 +6351,12 @@ MAPS.forEach(m => { if (!MAP_META[m.id]) MAP_META[m.id] = { c: m.th.cA || '#18c8
 const _go = go;
 go = function (name) {
   const prev = mode;
-  if (NET.room && prev === 'modes' && name === 'menu') {   // atrás desde «Elige modo» dentro de una sala: el anfitrión vuelve a la sala, el resto espera
+  if (NET.room && !NET.routing && (prev === 'maps' || prev === 'survival') && name === 'modes') {   // atrás: el grupo vuelve a «Elige modo»
+    if (NET.room.host === NET.pid) netSend({ t: 'phase', v: 'menu' });
+    return;
+  }
+  if (NET.room && !NET.routing && prev === 'garage' && name === 'menu') name = netTarget();   // el garaje de una sala vuelve a la pantalla de elegir partida
+  if (NET.room && !NET.routing && prev === 'modes' && name === 'menu') {   // atrás desde «Elige modo» dentro de una sala: el anfitrión vuelve a la sala, el resto espera
     if (NET.room.host === NET.pid) netSend({ t: 'phase', v: 'party' }); else toast('Solo el anfitrión puede volver atrás');
     return;
   }
