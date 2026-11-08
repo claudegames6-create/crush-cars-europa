@@ -418,12 +418,12 @@ io.on('connection', sock => {
     if (t.sock) t.sock.emit('kick', { msg: 'El anfitrión te ha expulsado de la sala.' });
     leaveRoom(t);
   }));
-  on('start', need(() => {
+  on('start', need(m => {
     const r = P.room; if (!r || r.host !== P.pid || r.state !== 'lobby') return;
     if (r.phase !== 'lobby') return err('Primero elige el modo de juego.');
     if (r.players.some(p => !p.connected)) return err('Hay jugadores desconectados.');
     if (r.players.some(p => blockOf(r, p))) return err('Algún jugador no cumple los requisitos (nivel o coche).');
-    if (r.players.some(p => p.pid !== r.host && !p.ready)) return err('Faltan jugadores por marcar "LISTO".');
+    if (!m.go && r.players.some(p => p.pid !== r.host && !p.ready)) return err('Faltan jugadores por marcar "LISTO".');
     if (r.kind !== 'surv' && r.players.length + r.cfg.bots < 2) return err('Necesitas al menos 2 participantes (activa bots o espera a un amigo).');
     startRoom(r);
   }));
