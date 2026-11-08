@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>CRUSH CARS</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#06080f">
@@ -12,6 +12,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="CRUSH CARS">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style id="uiScale">/* ajuste de escala para móviles: las pantallas se diseñaron para ~700 px de alto */
+.screen,#topbar{zoom:var(--ui,1)}
+</style>
+<script>(function(){function f(){var s=Math.max(.5,Math.min(1,innerHeight/680,innerWidth/1000));document.documentElement.style.setProperty('--ui',s.toFixed(3))}f();addEventListener('resize',f);addEventListener('orientationchange',f)})();</script>
+
+<script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));</script>
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script id="ioFallback">window.io||document.write('<script src="https://crush-cars-europa.onrender.com/socket.io/socket.io.js"><\/script>');</script>
 <style>
