@@ -5391,11 +5391,11 @@ function renderCrowns() {
   const ch = save.champ, se = $('skyEntry');
   se.hidden = true; se.innerHTML = '';   // sin botón «CORONA SECRETA»: la corona de los cielos ya aparece como tarjeta en la lista   // sólo con las 8 coronas ganadas y el secreto desbloqueado
   $('cwList').innerHTML = (skyVisible() ? CROWNS_ALL : CROWNS).map((c, i) => {
-    const cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], done = cur ? cur.r : (st && st.wins ? CH_N : 0);
+    const cur = NET.room ? null : ch.cur[c.id], st = c.id === 'cielos' && !skyOpen() ? null : ch.st[c.id], done = cur ? cur.r : (st && st.wins ? CH_N : 0);
     return `<button type="button" class="cr-b ${c.id === 'cielos' ? 'skyc' : ''} ${i === CW.sel ? 'sel' : ''} ${st && st.wins ? 'won' : ''}" data-ci="${i}" style="--c:${c.col}"><span class="cr-em">${c.emoji}</span>${st && st.wins ? `<span class="cr-trophy" title="¡Corona conseguida!">${crownSvg(c, i)}</span>` : ''}<b>${c.name}</b><small>${cur ? 'EN CURSO · RONDA ' + (cur.r + 1) + '/4' : st && st.wins ? '🏆 ×' + st.wins + ' · MEJOR ' + st.bp + '.º' : st && st.runs ? 'JUGADA · MEJOR ' + (st.bp || '—') + '.º' : '12 → 9 → 6 → 3 → 1'}</small><span class="cw-dots">${[0, 1, 2, 3].map(k => `<i class="${k < done ? 'on' : ''}"></i>`).join('')}</span></button>`;
   }).join('');
   if (CW.sel < 0 || !crownOf(CW.sel) || (CW.sel === SKY_CI && !skyVisible())) { $('cwDet').innerHTML = ''; MINI.list = []; MINI.cache = {}; navApply(); return; }
-  const ci = CW.sel, c = crownOf(ci), cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], cc = cur ? cur.cc : save.cc;
+  const ci = CW.sel, c = crownOf(ci), cur = NET.room ? null : ch.cur[c.id], st = c.id === 'cielos' && !skyOpen() ? null : ch.st[c.id], cc = cur ? cur.cc : save.cc;
   const pl = Array.from({ length: 12 }, (_, i) => ({ i, out: cur && i > 0 && (i - 1) in cur.out ? cur.out[i - 1] : -1 })).sort((x, y) => (x.out >= 0) - (y.out >= 0) || (y.out - x.out) || x.i - y.i);   // los que siguen en carrera primero; luego los eliminados, los últimos en caer arriba
   $('cwDet').style.setProperty('--c', c.col);
   $('cwDet').innerHTML = `
