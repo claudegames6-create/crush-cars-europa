@@ -5901,7 +5901,7 @@ function netSocketWS(url) {
   const ws = {
     readyState: 0, onopen: null, onmessage: null, onclose: null, onerror: null,
     send(s) { let o; try { o = JSON.parse(s); } catch (e) { return; } sock.emit(o.t, o); },
-    sendObj(o) { sock.emit(o.t, o); },                      // sin pasar por JSON.stringify/parse (los snapshots llegan a 20 Hz y el estado se envía a 30 Hz)
+    sendObj(o) { if (o.t === 'st') sock.volatile.emit(o.t, o); else sock.emit(o.t, o); },   // el estado del coche es «volátil»: si la red va justa se descarta el viejo en vez de acumularse y retrasarlo todo                      // sin pasar por JSON.stringify/parse (los snapshots llegan a 20 Hz y el estado se envía a 30 Hz)
     close() { ws.readyState = 3; closed = true; sock.close(); },
   };
   const fireClose = () => { if (closed) return; closed = true; ws.readyState = 3; if (ws.onclose) ws.onclose(); };
@@ -6233,6 +6233,9 @@ function netBeginRace(m) {
 function netApplySnap(m) {
   const R = race; if (!R || !R.net || !R.net.buf) return; const N = R.net;
   if (m.q <= N.snapSeq) return; N.snapSeq = m.q;
+  { const ta = performance.now();   // retardo de interpolación adaptativo: más colchón cuando la red tiene jitter, mínimo cuando va fina
+    if (N.lastArr) { const iv = ta - N.lastArr, dev = Math.abs(iv - 40); N.jit = (N.jit === undefined ? dev : N.jit * 0.94 + dev * 0.06); N.dly = clamp(0.085 + N.jit * 0.0028, 0.1, 0.26); }
+    N.lastArr = ta; }
   let removed = false;
   for (const arr of m.c) {
     const d = mpDecode(arr), c = N.byCid[d.cid]; if (!c) continue;
@@ -6245,8 +6248,9 @@ function netApplySnap(m) {
   }
   if (removed) R.cars = R.cars.filter(c => !c.removed);
 }
+const N_DLY = N => N.dly === undefined ? MPC.DELAY : (N.dlyS = N.dlyS === undefined ? N.dly : N.dlyS + (N.dly - N.dlyS) * 0.02);
 function netInterpolate(R) {
-  const N = R.net, rt = R.t - MPC.DELAY;
+  const N = R.net, rt = R.t - (N_DLY(R.net));
   for (const c of R.cars) {
     if (!c.remote) continue;
     const b = N.buf[c.cid]; if (!b || !b.length) continue;
@@ -6300,7 +6304,7 @@ function netUpdateRace(R, dt) {
   for (const c of R.cars) if (!(c.pos > 0)) c.pos = 1;
   R.order = R.cars.slice().sort((a, b) => a.pos - b.pos);
   prerollFx(R, dt); if (R.ev) evUpdate(R, dt); spawnFx(R, dt); updateParticles(dt);
-  N.stAcc += dt; if (N.stAcc >= 1 / MPC.ST_HZ) { N.stAcc = 0; netSend({ t: 'st', s: mpEncode(p) }); }
+  N.stAcc += dt; if (N.stAcc >= 1 / MPC.ST_HZ - 0.003) { N.stAcc = Math.min(N.stAcc - 1 / MPC.ST_HZ, 0.02); netSend({ t: 'st', s: mpEncode(p) }); }   // 30 Hz reales (antes, a 60 fps, caía a 20 Hz por redondeo)
 }
 function netQuitRace() { netLeaveRoom(); race = null; $('pause').classList.remove('on'); go('mpmenu'); toast('Has abandonado la carrera'); }
 
