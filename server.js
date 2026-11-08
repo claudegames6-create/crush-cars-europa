@@ -43,7 +43,7 @@ function loadCore(html) {
   if (!m) throw new Error('No encuentro el <script> principal en ' + GAME_FILE);
   let code = m[1].replace("go(save.name ? 'menu' : 'welcome');", '');
   code += `
-;globalThis.__G = { CARS, CAR_BY_ID, MAPS, SURV_MAPS, SURV_ROUNDS, SURV_NAMES, CC, CC_LIST, MPC, PFX_BY_ID,
+;globalThis.__G = { CARS, CAR_BY_ID, MAPS, SURV_MAPS, CROWNS, CROWN_MAPS, SURV_ROUNDS, SURV_NAMES, CC, CC_LIST, MPC, PFX_BY_ID,
   mpHash, mpCreateRace, mpCollide, mpEncode, mpDecode, mpApplyFlags, mpReward, mpCleanUpg,
   aiInput, stepCar, progress, collide, locate, pointAt, setEmitOff: v => { EMIT_OFF = v; } };`;
   const stub = mkStub();
@@ -139,6 +139,11 @@ function lobbyBots(count, diff) {
   }
   return out;
 }
+/* pista de la ronda de supervivencia: las 4 pistas de la corona elegida (si no hay corona válida, las 4 clásicas) */
+function survMap(cfg, round) {
+  const cr = G.CROWNS.find(c => c.id === cfg.crown);
+  return cr ? cr.tracks[round] : G.SURV_MAPS[round];
+}
 function survBots(count) {
   const names = shuffle(G.SURV_NAMES.slice()), q = shuffle(names.map((_, i) => i / (names.length - 1))), out = [];
   for (let i = 0; i < count; i++) {
@@ -158,7 +163,7 @@ function startRoom(room) {
 }
 function launch(room, field, round) {
   const surv = room.kind === 'surv', cfg = room.cfg;
-  const mapDef = surv ? G.SURV_MAPS[round] : G.MAPS.find(m => m.id === cfg.mapId) || G.MAPS[0];
+  const mapDef = surv ? survMap(cfg, round) : G.MAPS.find(m => m.id === cfg.mapId) || G.MAPS[0];
   const raceId = uid(6), seed = Math.floor(Math.random() * 0x7fffffff);
   const rcfg = { mapId: mapDef.id, rev: surv ? false : !!cfg.rev, cc: cfg.cc, laps: surv ? mapDef.laps : cfg.laps, seed, raceId, ev: cfg.ev || 'chaos' };
   const slots = shuffle(field.map((_, i) => i)), fieldBy = {};
@@ -288,7 +293,7 @@ function finalize(room, rc) {
     last = rc.round === G.SURV_ROUNDS.length - 1;
     const q = ord.slice(0, k), humansLeft = q.some(c => !c.bot && room.players.some(p => p.pid === c.pid && p.connected));
     over = last || !humansLeft;
-    if (!over) next = { mapId: G.SURV_MAPS[rc.round + 1].id, n: k, k: G.SURV_ROUNDS[rc.round + 1].k, at: Date.now() + 12000 };
+    if (!over) next = { mapId: survMap(room.cfg, rc.round + 1).id, n: k, k: G.SURV_ROUNDS[rc.round + 1].k, at: Date.now() + 12000 };
   }
   const base = { raceId: rc.raceId, order, cfg: { mapId: rc.cfg.mapId, rev: rc.cfg.rev, cc: rc.cfg.cc, laps: rc.cfg.laps }, n, test, surv: surv ? { round: rc.round, k, n: si.n, last, over, next } : undefined };
   for (const p of room.players) {
@@ -358,7 +363,7 @@ io.on('connection', sock => {
     const kind = m.kind === 'surv' ? 'surv' : 'race', mode = m.mode === 'party' ? 'party' : 'duel', mapId = pickMap(m.cfg && m.cfg.mapId), map = G.MAPS.find(x => x.id === mapId);
     const code = newCode();
     const room = { code, kind, mode, host: P.pid, state: 'lobby', players: [P], race: null, tour: null, timer: null,
-      cfg: { mapId, rev: !!(m.cfg && m.cfg.rev), cc: m.cfg && G.CC_LIST.includes(+m.cfg.cc) ? +m.cfg.cc : 150, laps: map.laps, bots: mode === 'party' && kind === 'race' ? 3 : 0, diff: 1, unlockAll: false, ev: 'chaos' } };
+      cfg: { mapId, rev: !!(m.cfg && m.cfg.rev), cc: m.cfg && G.CC_LIST.includes(+m.cfg.cc) ? +m.cfg.cc : 150, laps: map.laps, bots: mode === 'party' && kind === 'race' ? 3 : 0, diff: 1, unlockAll: false, ev: 'chaos', crown: G.CROWNS[0].id } };
     fixBots(room); rooms.set(code, room); P.room = room; P.ready = false; sock.join(code); broadcast(room);
   }));
   on('join', need(m => {
@@ -378,6 +383,7 @@ io.on('connection', sock => {
     const r = P.room; if (!r || r.host !== P.pid || r.state !== 'lobby' || !m.cfg) return;
     const c = r.cfg, k = m.cfg;
     if ('mapId' in k && G.MAPS.some(x => x.id === k.mapId)) c.mapId = k.mapId;
+    if ('crown' in k && r.kind === 'surv' && G.CROWNS.some(x => x.id === k.crown)) c.crown = k.crown;
     if ('mode' in k && r.kind === 'race' && (k.mode === 'duel' || k.mode === 'party') && !(k.mode === 'duel' && r.players.length > 2)) r.mode = k.mode;
     if ('laps' in k) c.laps = clampI(k.laps, 1, G.MPC.LAPS_MAX, c.laps);
     if ('rev' in k) c.rev = !!k.rev;
