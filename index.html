@@ -713,7 +713,7 @@ body.inrace #netBadge{top:6px}
 .lb-st{margin-top:4px;display:grid;gap:1px}.lb-st .mini{transform:scale(.92);transform-origin:left}
 .lb-ps{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
 .pill{font-size:10.5px;font-weight:900;letter-spacing:.06em;padding:4px 9px;border-radius:20px;background:#1a2748;color:var(--dim);border:1px solid var(--line)}.pill.ok{background:#37e08a22;color:#37e08a;border-color:#37e08a77}.pill.bad{background:#ff3b5c22;color:#ff3b5c;border-color:#ff3b5c77}
-@media(max-width:700px){.lb-p{grid-template-columns:auto minmax(0,1fr) auto;gap:6px 10px}.lb-p canvas{display:none}.lb-pc{grid-column:1/-1;display:flex;gap:10px;align-items:baseline}.lb-st{display:none}.lb-ps{grid-column:3;grid-row:1}.lb-p.bots{grid-template-columns:auto 1fr}.lb-code{font-size:36px}}
+@media(max-width:700px){.lb-p{grid-template-columns:auto minmax(0,1fr) auto;gap:6px 10px}.lb-p canvas{display:none}.lb-pc{grid-column:1/-1;display:flex;gap:10px;align-items:baseline}.lb-st{display:none}.lb-ps{grid-column:3;grid-row:1}.lb-p.bots{grid-template-columns:auto 1fr auto}.bot-step{display:flex;gap:6px}.lb-code{font-size:36px}}
 @media(max-height:800px){.lb-st{display:none}.lb-p canvas{width:110px;height:66px}.lb-p{grid-template-columns:auto minmax(90px,1fr) 110px minmax(90px,1fr) auto}}
 .lb-cars{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
 .lb-car{flex:none;width:118px;background:linear-gradient(160deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:12px;padding:6px;text-align:center}
@@ -5005,9 +5005,13 @@ const SKYCR = {
   ],
 };
 const crownOf = ci => ci === SKY_CI ? SKYCR : CROWNS[ci];
+const CROWNS_ALL = CROWNS.concat([SKYCR]);
+/* ¿se ve la tarjeta de los cielos? solo con ella desbloqueada; en sala: el anfitrión si la tiene, y los invitados cuando el anfitrión la elige */
+const skyVisible = () => NET.room ? (NET.room.host === NET.pid ? skyOpen() : NET.room.cfg.crown === 'cielos') : skyOpen();
 SKYCR.tracks.forEach((t, k) => {   // cada pista = «mapa» completo, igual que las de CROWNS (pero fuera de CROWN_MAPS: no es una corona de sala online)
   const q = SKY_CI * CH_N + k, S = SKY_SHAPES[k], lo = +(0.86 + q * 0.0036).toFixed(3);
   Object.assign(t, { lvl: 1, laps: k === 3 ? 3 : 2, mult: 1, xpm: 1, scale: S.sc, w: t.w, ai: [lo, Math.min(1.08, +(lo + 0.09).toFixed(3))], pool: [0, 1, 2], shape: S.sh, seed: (q + 1) * 65537, crown: SKY_CI, idx: k });
+  CROWN_MAPS.push(t);   // también online: la corona de los cielos es la novena corona de las salas (el servidor ejecuta este mismo script)
   MAP_META[t.id] = { c: SKYCR.col, tag: 'CIELOS' };
   const th = t.th; AMB[t.id] = { e: hx2rgb(th.bg), ea: th.night ? .5 : .34, l: [[th.gl, .1, .08, th.night ? .1 : .08], [hx2rgb(th.cA), .9, .92, .06]] };
 });
@@ -5104,21 +5108,21 @@ function swOver(g, T, th) {
 
 /* ---------- vuelo: sólo cambia lo que se ve (elevación + alas) y un pequeño empuje al pisar la plataforma de lanzamiento ---------- */
 const swOf = R => R.skyc || (R.T && R.T.th && R.T.th.sky ? (R.skyc = { geo: swGeo(R.T) }) : null);
-function swLaunch(c, R, p) {
+function swLaunch(c, R, p, np) {
   const T = R.T, ca = Math.cos(c.a), sa = Math.sin(c.a), vf = c.vx * ca + c.vy * sa;
-  if (vf < c.st.vmax * 1.25) { c.vx += ca * 120; c.vy += sa * 120; }
+  if (!np && vf < c.st.vmax * 1.25) { c.vx += ca * 120; c.vy += sa * 120; }   // np: coche remoto (solo efecto visual)
   const left = evWrap(p.gEnd - c.s, T.L), v = Math.max(420, Math.hypot(c.vx, c.vy));
   c.fly = clamp((left + 90) / v, .7, 1.9); c.skCd = c.fly + .6;
   if (c.human) { R.shake = Math.max(R.shake, .25); if (Snd.gate('skf', 200)) { Snd.whoosh(.5, .2, 400, 2800); Snd.sweep(260, 1300, .4, .08, 'triangle'); } }
   for (let i = 0; i < 8; i++) emit(0, c.x + (Math.random() - .5) * 30, c.y + (Math.random() - .5) * 30, (Math.random() - .5) * 120, (Math.random() - .5) * 120, .6, 8 + Math.random() * 8, 'rgba(255,255,255,');
 }
-function swCarPre(c, R, h) {
+function swCarPre(c, R, h, np) {
   const T = R.T, geo = R.skyc.geo;
   c.flyPh = (c.flyPh || 0) + h * (c.fly > 0 ? 17 : 8);
   if (c.skCd > 0) c.skCd -= h;
   if (c.fly > 0) c.fly -= h;
   if (!c.finished) {
-    if (!(c.skCd > 0)) for (const p of geo.pads) { const d = evWrap(c.s - p.s, T.L); if (d > -p.len * .5 && d < p.len * .5 && Math.abs(c.off) < T.hw) { swLaunch(c, R, p); break; } }
+    if (!(c.skCd > 0)) for (const p of geo.pads) { const d = evWrap(c.s - p.s, T.L); if (d > -p.len * .5 && d < p.len * .5 && Math.abs(c.off) < T.hw) { swLaunch(c, R, p, np); break; } }
     if (!(c.fly > .22)) for (const gp of geo.gaps) { const d = evWrap(c.s - gp.s0, T.L); if (d > -30 && d < gp.len + 30) { c.fly = .22; break; } }   // cruzar un hueco siempre es volando
   }
   const up = c.fly > 0, f0 = c.flyH || 0; c.flyH = f0 + ((up ? 1 : 0) - f0) * (1 - Math.exp(-h * (up ? 9 : 5)));
@@ -5386,11 +5390,11 @@ let CW = { sel: -1, ask: false };
 function renderCrowns() {
   const ch = save.champ, se = $('skyEntry');
   se.hidden = true; se.innerHTML = '';   // sin botón «CORONA SECRETA»: la corona de los cielos ya aparece como tarjeta en la lista   // sólo con las 8 coronas ganadas y el secreto desbloqueado
-  $('cwList').innerHTML = (skyOpen() && !NET.room ? CROWNS.concat([SKYCR]) : CROWNS).map((c, i) => {
+  $('cwList').innerHTML = (skyVisible() ? CROWNS_ALL : CROWNS).map((c, i) => {
     const cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], done = cur ? cur.r : (st && st.wins ? CH_N : 0);
     return `<button type="button" class="cr-b ${c.id === 'cielos' ? 'skyc' : ''} ${i === CW.sel ? 'sel' : ''} ${st && st.wins ? 'won' : ''}" data-ci="${i}" style="--c:${c.col}"><span class="cr-em">${c.emoji}</span>${st && st.wins ? `<span class="cr-trophy" title="¡Corona conseguida!">${crownSvg(c, i)}</span>` : ''}<b>${c.name}</b><small>${cur ? 'EN CURSO · RONDA ' + (cur.r + 1) + '/4' : st && st.wins ? '🏆 ×' + st.wins + ' · MEJOR ' + st.bp + '.º' : st && st.runs ? 'JUGADA · MEJOR ' + (st.bp || '—') + '.º' : '12 → 9 → 6 → 3 → 1'}</small><span class="cw-dots">${[0, 1, 2, 3].map(k => `<i class="${k < done ? 'on' : ''}"></i>`).join('')}</span></button>`;
   }).join('');
-  if (CW.sel < 0 || !crownOf(CW.sel) || (CW.sel === SKY_CI && (!skyOpen() || NET.room))) { $('cwDet').innerHTML = ''; MINI.list = []; MINI.cache = {}; navApply(); return; }
+  if (CW.sel < 0 || !crownOf(CW.sel) || (CW.sel === SKY_CI && !skyVisible())) { $('cwDet').innerHTML = ''; MINI.list = []; MINI.cache = {}; navApply(); return; }
   const ci = CW.sel, c = crownOf(ci), cur = NET.room ? null : ch.cur[c.id], st = ch.st[c.id], cc = cur ? cur.cc : save.cc;
   const pl = Array.from({ length: 12 }, (_, i) => ({ i, out: cur && i > 0 && (i - 1) in cur.out ? cur.out[i - 1] : -1 })).sort((x, y) => (x.out >= 0) - (y.out >= 0) || (y.out - x.out) || x.i - y.i);   // los que siguen en carrera primero; luego los eliminados, los últimos en caer arriba
   $('cwDet').style.setProperty('--c', c.col);
@@ -6251,7 +6255,7 @@ function partyView() {
   try {
     if (CC_LIST.includes(+c.cc)) save.cc = +c.cc; if (['off', 'one', 'chaos'].includes(c.ev)) save.ev = c.ev;
     if (mode === 'maps') { if (MAPS.some(m => m.id === c.mapId)) save.map = c.mapId; save.rev = !!c.rev; renderMaps(); }
-    else { CW.sel = Math.max(0, CROWNS.findIndex(x => x.id === c.crown)); renderCrowns(); }
+    else { CW.sel = Math.max(0, CROWNS_ALL.findIndex(x => x.id === c.crown)); renderCrowns(); }
   } finally { save.map = bk.map; save.rev = bk.rev; save.cc = bk.cc; save.ev = bk.ev; if (mode === 'survival') CW.sel = sel; }
   const b2 = mode === 'maps' ? $('btnStart') : $('cwGo'); if (b2) { b2.disabled = true; b2.textContent = 'ESPERANDO AL ANFITRIÓN…'; }
 }
@@ -6260,7 +6264,7 @@ function netPartySync() { clearTimeout(NET.syT); NET.syT = setTimeout(netPartySy
 function netPartySyncNow() {
   const r = NET.room; if (!r || r.host !== NET.pid) return;
   if (mode === 'maps') { const m = MAPS.find(x => x.id === save.map) || MAPS[0]; netSend({ t: 'cfg', cfg: { mapId: m.id, rev: !!save.rev, cc: save.cc, ev: save.ev, laps: m.laps } }); }
-  else if (mode === 'survival' && CROWNS[CW.sel]) netSend({ t: 'cfg', cfg: { crown: CROWNS[CW.sel].id, cc: save.cc, ev: save.ev } });
+  else if (mode === 'survival' && CROWNS_ALL[CW.sel]) netSend({ t: 'cfg', cfg: { crown: CROWNS_ALL[CW.sel].id, cc: save.cc, ev: save.ev } });
 }
 /* anfitrión: manda la configuración elegida en las pantallas individuales y arranca para todo el grupo */
 function netPartyStart(cfg) {
@@ -6414,7 +6418,7 @@ function renderLobby() {
       <div class="lb-pc"><b style="color:${car.col}">${esc(car.name)}</b><small>${car.ab ? esc(car.ab.name) : ''}</small><div class="lb-st">${ratingRows(car.id, p.upg)}</div></div>
       <div class="lb-ps">${b && phase !== 'party' ? `<span class="pill bad">${b.startsWith('nivel') ? 'NIVEL ' + b.slice(6) : 'COCHE BLOQUEADO'}</span>` : p.host ? '<span class="pill ok">ANFITRIÓN</span>' : phase === 'party' ? '' : p.ready ? '<span class="pill ok">PREPARADO</span>' : '<span class="pill">NO PREPARADO</span>'}
       <span class="mp-dot" data-s="${p.connected ? 'g' : 'x'}" title="${p.connected ? 'Conectado' : 'Desconectado'}"></span>${host && p.pid !== NET.pid ? `<button class="btn sm danger" data-kick="${p.pid}" aria-label="Expulsar">✕</button>` : ''}</div></div>`;
-  }).join('') + (cfg.bots ? `<div class="lb-p bots"><div class="tav">🤖</div><div class="lb-pn"><b>+${cfg.bots} BOTS</b><small>${r.kind === 'surv' ? 'Completan los 12 pilotos del torneo' : MPC.DIFFS[cfg.diff].lbl + ' · usan todos los coches y habilidades'}</small></div></div>` : '');
+  }).join('') + ((cfg.bots || (phase === 'party' && host)) ? `<div class="lb-p bots"><div class="tav">🤖</div><div class="lb-pn"><b>+${cfg.bots} BOTS</b><small>${r.kind === 'surv' ? 'Completan los 12 pilotos del torneo' : MPC.DIFFS[cfg.diff].lbl + ' · para el modo Carrera'}</small></div>${host && r.kind !== 'surv' ? `<div class="bot-step"><button class="btn sm" data-bots="-1" ${cfg.bots <= 0 ? 'disabled' : ''} aria-label="Menos bots">−</button><button class="btn sm" data-bots="1" ${r.players.length + cfg.bots >= 8 ? 'disabled' : ''} aria-label="Más bots">+</button></div>` : ''}</div>` : '');
   $('lbPlayers').querySelectorAll('canvas[data-car]').forEach(c => lbPrevDraw(c, CAR_BY_ID[c.dataset.car], -0.45, 1.05));
   }
   // coches propios
@@ -6433,8 +6437,8 @@ function renderLobby() {
   const cfSig = JSON.stringify([r.kind, r.mode, cfg, r.players.length, hostP.lvl, host, !!NET.evIgnored]);
   if (lbS.cfg !== cfSig) { lbS.cfg = cfSig; rebuilt = true;
   $('lbCfg').innerHTML = r.kind === 'surv' ? `<div class="rwd">${SURV_ROUNDS.map((x, i) => `<span class="chip2 ${i === 3 ? 'rv' : ''}">${i === 3 ? '🏆 FINAL · ' + x.n + ' → 1' : 'RONDA ' + (i + 1) + ' · ' + x.n + ' → ' + x.k}</span>`).join('')}</div><p class="lb-note">Cuatro pistas exclusivas, una por ronda. El servidor decide quién pasa; los eliminados ven los resultados hasta el final.</p>` +
-    seg('crown', 'CORONA', CROWNS.map(c => [c.id, c.emoji + ' ' + c.name.replace('CORONA ', '')]), (CROWNS.find(c => c.id === cfg.crown) || CROWNS[0]).id).replace('class="cf-r"', 'class="cf-r crw"') +
-    `<p class="lb-note">${(CROWNS.find(c => c.id === cfg.crown) || CROWNS[0]).tracks.map((t, i) => (i === 3 ? '🏆 ' : (i + 1) + '. ') + esc(t.name)).join(' → ')}</p>` +
+    seg('crown', 'CORONA', (cfg.crown === 'cielos' || skyOpen() ? CROWNS_ALL : CROWNS).map(c => [c.id, c.emoji + ' ' + c.name.replace('CORONA ', '')]), (CROWNS_ALL.find(c => c.id === cfg.crown) || CROWNS[0]).id).replace('class="cf-r"', 'class="cf-r crw"') +
+    `<p class="lb-note">${(CROWNS_ALL.find(c => c.id === cfg.crown) || CROWNS[0]).tracks.map((t, i) => (i === 3 ? '🏆 ' : (i + 1) + '. ') + esc(t.name)).join(' → ')}</p>` +
     seg('cc', 'CILINDRADA', CC_LIST.map(c => [c, c + 'cc']), cfg.cc) + seg('ev', 'EVENTOS', [['off', 'SIN EVENTOS'], ['one', 'UNO A LA VEZ'], ['chaos', 'CAOS']], cfg.ev || 'chaos') :
     `<div class="lb-maps">${MAPS.map(m => { const lock = !cfg.unlockAll && hostP.lvl < m.lvl; return `<div class="lb-map ${m.id === cfg.mapId ? 'sel' : ''} ${lock ? 'locked' : ''}" data-k="mapId" data-v="${m.id}"><canvas width="220" height="134"></canvas><b>${esc(m.name)}</b><small>${lock ? '🔒 NIVEL ' + m.lvl : 'NIVEL ' + m.lvl}</small></div>`; }).join('')}</div>` +
     seg('mode', 'MODO', [['duel', 'DUELO 1v1'], ['party', 'AMIGOS + BOTS']], r.mode) +
@@ -6474,7 +6478,7 @@ $('lbCfg').addEventListener('click', e => {
   }
 });
 $('lbCars').addEventListener('click', e => { const b = e.target.closest('[data-pick]'); if (b && !b.disabled) netSend({ t: 'prof', prof: mpProf(b.dataset.pick) }); });
-$('lbPlayers').addEventListener('click', e => { const b = e.target.closest('[data-kick]'); if (b) netSend({ t: 'kick', pid: b.dataset.kick }); });
+$('lbPlayers').addEventListener('click', e => { const b = e.target.closest('[data-kick]'); if (b) netSend({ t: 'kick', pid: b.dataset.kick }); const q = e.target.closest('[data-bots]'); if (q && NET.room) netSend({ t: 'cfg', cfg: { bots: Math.max(0, NET.room.cfg.bots + (+q.dataset.bots)) } }); });
 $('lbReady').onclick = () => { const me = NET.room && NET.room.players.find(p => p.pid === NET.pid); if (me) netSend({ t: 'ready', v: !me.ready }); };
 $('lbStart').onclick = () => netSend({ t: 'start' });
 $('lbLeave').onclick = () => go('mpmenu');
@@ -6549,7 +6553,7 @@ function netInterpolate(R) {
   }
 }
 function netUpdateRace(R, dt) {
-  const N = R.net, p = R.player;
+  const N = R.net, p = R.player; swOf(R);
   R.clock += dt; R.shake = Math.max(0, R.shake - dt * 2.2); R.flash = Math.max(0, R.flash - dt); R.msgT = Math.max(0, R.msgT - dt);
   for (const c of R.cars) { if (c.hitFlash > 0) c.hitFlash -= dt; if (c.abTag > 0) c.abTag -= dt; }
   const want = (serverNow() - N.startAt) / 1000;
@@ -6565,10 +6569,12 @@ function netUpdateRace(R, dt) {
       if (!p.finished) { if (N.paused) { p.inp.thr = p.inp.brk = p.inp.str = 0; p.inp.nit = p.inp.ab = false; } else readPlayerInput(p); }
       else { p.ai.pace = Math.max(0.35, p.ai.pace - h * 0.15); aiInput(p, R, h); p.ai.auto = true; }
       if (R.launch && !p.finished) launchInput(p, R, h);
+      if (R.skyc) swCarPre(p, R, h);   // cielo: lanzamiento, elevación y alas de MI coche
       if (!(R.ev && evCarPre(p, R, h))) stepCar(p, p.inp, h, R);
       progress(p, R, h);
       for (const o of R.cars) if (o.remote) mpCollide(p, o, R);
     }
+    if (R.skyc) for (const o of R.cars) if (o !== p) swCarPre(o, R, dt, true);   // rivales: solo la parte visual (alas)
     netInterpolate(R);
     const v = p.vx * Math.cos(p.ta) + p.vy * Math.sin(p.ta); p.wrongT = (v < -90 && !p.finished) ? p.wrongT + dt : 0;
     if (p.finished && R.state !== 'finish') R.state = 'finish';
