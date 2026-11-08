@@ -269,10 +269,10 @@ function stepRace(room, rc) {
     }
   } else R.state = R.t < 0 ? 'count' : R.state;
   const ord = ranking(R); ord.forEach((c, i) => { c.pos = i + 1; });
-  if (now - rc.lastSnap >= 50) {
-    rc.lastSnap = now;
+  if (now >= (rc.nextSnap || 0)) {   // 25 Hz con reloj propio: un tick tardío ya no deja huecos de 75 ms entre snapshots
+    rc.nextSnap = Math.max((rc.nextSnap || now) + 40, now - 40); rc.lastSnap = now;
     const msg = { q: ++rc.q, rt: R.t, c: R.cars.map(G.mpEncode) };
-    for (const p of room.players) if (p.connected && rc.byPid[p.pid]) p.sock.emit('snap', msg);
+    for (const p of room.players) if (p.connected && rc.byPid[p.pid]) p.sock.volatile.emit('snap', msg);   // volátil: si el cliente va justo de red se salta el viejo en vez de encolarlo
   }
   if (rc.ended || R.t < 0) { if (rc.ended && now >= rc.endAt) finalize(room, rc); return; }
   const active = rc.humans.filter(c => !c.finished && !c.dnf);
@@ -320,7 +320,7 @@ setInterval(() => {
       broadcast(room);
     }
   }
-}, 25);
+}, 20);
 
 /* ---------------------------------------------------------------------
    6. HTTP + SOCKET.IO
@@ -334,7 +334,7 @@ const server = http.createServer((req, res) => {
   if (u === '/' || u === '/index.html') { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' }); return res.end(HTML); }
   res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('404');
 });
-const io = new Server(server, { cors: { origin: '*' }, transports: ['websocket', 'polling'], pingInterval: 10000, pingTimeout: 25000 });
+const io = new Server(server, { cors: { origin: '*' }, transports: ['websocket', 'polling'], pingInterval: 10000, pingTimeout: 25000, perMessageDeflate: false, httpCompression: false });
 
 io.on('connection', sock => {
   let P = null;
