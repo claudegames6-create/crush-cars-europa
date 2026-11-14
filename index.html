@@ -8957,6 +8957,7 @@ function i18nObserve(on) {
 }
 /* ---- canvas + diálogos nativos (sólo activos fuera del español) ---- */
 (function () {
+  if (typeof CanvasRenderingContext2D === 'undefined') return;   // sin navegador (p. ej. el servidor carga este script en node:vm): no hay canvas que traducir
   const P = CanvasRenderingContext2D.prototype, f0 = P.fillText, s0 = P.strokeText, m0 = P.measureText;
   P.fillText = function (t, x, y, w) { return f0.call(this, LG === 'es' || typeof t !== 'string' ? t : trRaw(t), x, y, w); };
   P.strokeText = function (t, x, y, w) { return s0.call(this, LG === 'es' || typeof t !== 'string' ? t : trRaw(t), x, y, w); };
