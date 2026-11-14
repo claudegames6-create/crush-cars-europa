@@ -732,6 +732,7 @@ body.inrace #netBadge{top:6px}
 @media(max-width:700px){.lb-p{grid-template-columns:auto minmax(0,1fr) auto;gap:6px 10px}.lb-p canvas{display:none}.lb-pc{grid-column:1/-1;display:flex;gap:10px;align-items:baseline}.lb-st{display:none}.lb-ps{grid-column:3;grid-row:1}.lb-p.bots{grid-template-columns:auto 1fr auto}.bot-step{display:flex;gap:6px}.lb-code{font-size:36px}}
 @media(max-height:800px){.lb-st{display:none}.lb-p canvas{width:110px;height:66px}.lb-p{grid-template-columns:auto minmax(90px,1fr) 110px minmax(90px,1fr) auto}}
 .lb-cars{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.lb-car.secret:not(.locked){box-shadow:0 0 14px color-mix(in srgb,var(--c) 55%,transparent)}.lb-car.secret b::after{content:' ★';color:#ffd25a}
 .lb-car{flex:none;width:118px;background:linear-gradient(160deg,var(--panel2),var(--panel));border:2px solid var(--line);border-radius:12px;padding:6px;text-align:center}
 .lb-car.sel{border-color:var(--c);box-shadow:0 0 16px color-mix(in srgb,var(--c) 50%,transparent)}.lb-car.locked{opacity:.45}.lb-car canvas{width:100%;height:auto;border-radius:6px;background:#060a14}.lb-car b{display:block;font-size:13px;font-style:italic}.lb-car small{display:block;font-size:10px;color:var(--dim)}
 .lb-maps{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;margin-bottom:6px}
@@ -7773,9 +7774,9 @@ function renderLobby() {
   // coches propios
   const mine = me ? me.carId : save.sel, carSig = mine + '|' + (cfg.unlockAll ? 1 : 0) + '|' + save.owned.join(',');
   if (lbS.cars !== carSig) { lbS.cars = carSig; rebuilt = true;
-  $('lbCars').innerHTML = garageCars().map(c => {
+  $('lbCars').innerHTML = CAR_ORDER.concat(SECRET_CARS).map(c => {   // también los coches secretos: se pueden elegir si los tienes desbloqueados (o en MODO PRUEBA)
     const have = cfg.unlockAll || save.owned.includes(c.id);
-    return `<button type="button" class="lb-car ${c.id === mine ? 'sel' : ''} ${have ? '' : 'locked'}" data-pick="${c.id}" ${have ? '' : 'disabled'} style="--c:${c.col}"><canvas width="110" height="66" data-car="${c.id}"></canvas><b>${esc(c.name)}</b><small>${have ? esc(c.ab ? c.ab.name : c.tag) : '🔒 NIVEL ' + c.lvl}</small></button>`;
+    return `<button type="button" class="lb-car ${c.id === mine ? 'sel' : ''} ${have ? '' : 'locked'} ${c.secret ? 'secret' : ''}" data-pick="${c.id}" ${have ? '' : 'disabled'} style="--c:${c.col}"><canvas width="110" height="66" data-car="${c.id}"></canvas><b>${esc(c.name)}</b><small>${have ? esc(c.ab ? c.ab.name : c.tag) : c.secret ? '🔒 SECRETO' : '🔒 NIVEL ' + c.lvl}</small></button>`;
   }).join('');
   $('lbCars').querySelectorAll('canvas[data-car]').forEach(c => lbPrevDraw(c, CAR_BY_ID[c.dataset.car], -0.45, 0.8));
   }
