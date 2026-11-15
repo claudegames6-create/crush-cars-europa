@@ -8506,11 +8506,16 @@ function skyAudio(t) {
     Snd.engine(f, clamp(f * 1.2, 0, 1), t > 6 && t < 17);
   } else if (t >= 19 && !ev.sil) { ev.sil = 1; Snd.silence(); }
 }
+function skySync(dt) {   // la música va por el reloj de audio: si un fotograma se retrasa, la animación la alcanza poco a poco (y no al revés) para que sigan clavadas
+  const x = Snd.ctx; if (!EP.on || !x || x.state !== 'running') return;
+  const err = (x.currentTime - (x.outputLatency || 0) - EP.t0) - SKY.t;
+  if (err > 0.02) SKY.t += err > 0.3 ? err : err * 0.4; else if (err < -0.02) SKY.t -= Math.min(dt * 0.5, -err * 0.1);
+}
 function skyFrame(now) {
   if (!SKY.run) return;
   SKY.raf = requestAnimationFrame(skyFrame);
   const raw = now - SKY.last, dt = Math.min(.05, raw / 1000); SKY.last = now; if (document.hidden) return;
-  SKY.t += dt; const t = SKY.t;
+  SKY.t += dt; skySync(dt); const t = SKY.t;
   if (raw < 250) SKY.ema = (SKY.ema || 16) * .92 + raw * .08;   // calidad adaptable: con pocos fps se apagan bloom, grano y texturas
   if (!SKY.fixQ && t > 1.2 && SKY.ema > 42) SKY.lite = true;
   try { skyAudio(t); skyDraw(t, dt); } catch (e) { console.error(e); }
@@ -9843,25 +9848,51 @@ const EP_INT = [0.3, 0.42, 0.55, 0.65, 0.75, 0.85, 0.95, 1, 1.3, 1.15, 1, 0.7];
 const EP_MEL = [null, [[1, 62, 1], [2, 69, 2]], [[0, 74, 2], [2, 77, 1], [3, 74, 1]], [[0, 72, 2], [2, 69, 1], [3, 72, 1]], [[0, 76, 2], [2, 79, 1], [3, 76, 1]], [[0, 74, 3], [3, 69, 1]],
   [[0, 74, 2], [2, 77, 1], [3, 79, 1]], [[0, 81, 2], [2, 79, 0.5], [2.5, 77, 0.5], [3, 76, 1]], [[0, 86, 3], [3, 81, 1]], [[0, 83, 2], [2, 81, 1], [3, 79, 1]], [[0, 86, 4.4]]];
 const epHz = m => 440 * Math.pow(2, (m - 69) / 12);
-function epNoiseBuf(x) { const n = Math.floor(x.sampleRate * 3), b = x.createBuffer(1, n, x.sampleRate), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; return b; }
-function epReverb(x) { const n = Math.floor(x.sampleRate * 2.8), b = x.createBuffer(2, n, x.sampleRate); for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3.4); } const cv = x.createConvolver(); cv.buffer = b; return cv; }
+/* generador de ruido rápido (xorshift) y envolvente por tramos: ≈15× más barato que Math.random() + Math.pow() por muestra (antes bloqueaba ~250 ms al arrancar) */
+function epRand(seed) { let s = seed | 0 || 1; return () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; return (s >>> 0) / 2147483648 - 1; }; }
+function epNoiseBuf(x) { const n = Math.floor(x.sampleRate * 3), b = x.createBuffer(1, n, x.sampleRate), d = b.getChannelData(0), r = epRand(1234567); for (let i = 0; i < n; i++) d[i] = r(); return b; }
+const EP_IR = { x: null, buf: null };
+function epReverb(x) {   // sala sintética: misma caída que antes ((1 - t/2,8 s)^3,4) cortada a 2,2 s con un fundido final (el resto estaba a -45 dB): 21 % menos de convolución
+  if (EP_IR.x !== x) {
+    const sr = x.sampleRate, n = Math.floor(sr * 2.2), full = sr * 2.8, fade = Math.floor(sr * 0.2), b = x.createBuffer(2, n, sr), STEP = 32;
+    for (let c = 0; c < 2; c++) {
+      const d = b.getChannelData(c), r = epRand(7919 + c * 104729); let e0 = 1, e1 = 1;
+      for (let i = 0; i < n; i++) {
+        if (i % STEP === 0) { e0 = Math.pow(Math.max(0, 1 - i / full), 3.4); e1 = Math.pow(Math.max(0, 1 - (i + STEP) / full), 3.4); }
+        const env = e0 + (e1 - e0) * ((i % STEP) / STEP), tail = i > n - fade ? (n - i) / fade : 1; d[i] = r() * env * tail;
+      }
+    }
+    EP_IR.x = x; EP_IR.buf = b;
+  }
+  if (EP_IR.spare && EP_IR.spare.x === x) { const cv = EP_IR.spare.cv; EP_IR.spare = null; return cv; }   // convolvedor ya preparado en segundo plano
+  const cv = x.createConvolver(); cv.buffer = EP_IR.buf; return cv;
+}
+/* asignar la respuesta al convolvedor cuesta ~50 ms en el hilo principal: se deja preparada una unidad de reserva unos segundos después del primer toque, para que la animación no se atasque al arrancar */
+function epPrewarm() {
+  const x = Snd.ctx; if (!x || x.state === 'closed' || (EP_IR.spare && EP_IR.spare.x === x)) return;
+  try { epNoiseBuf(x); const cv = epReverb(x); EP_IR.spare = { x, cv }; } catch (e) { }
+}
+addEventListener('pointerdown', () => setTimeout(() => { if (window.requestIdleCallback) requestIdleCallback(epPrewarm, { timeout: 4000 }); else epPrewarm(); }, 4000), { once: true });
 function epEnv(g, t, vol, atk, dur, rel) { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + atk); g.gain.setValueAtTime(vol, t + Math.max(atk, dur)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur + rel); }
 function epPad(x, out, f, t, dur, vol, lp0, lp1, atk, rel, type) {   // cuerdas / colchón: 3 osciladores desafinados con filtro que se abre
   const g = x.createGain(), fl = x.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(lp0, t); fl.frequency.linearRampToValueAtTime(lp1, t + dur);
-  for (const d of [-9, 0, 9]) { const o = x.createOscillator(); o.type = type || 'sawtooth'; o.frequency.value = f; o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + rel + 0.05); }
-  epEnv(g, t, vol / 3, atk, dur, rel); fl.connect(g); g.connect(out);
+  const dts = type === 'sine' ? [0] : [-7, 7];   // 2 voces desafinadas (antes 3; un seno puro no necesita coro)
+  for (const d of dts) { const o = x.createOscillator(); o.type = type || 'sawtooth'; o.frequency.value = f; o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + rel + 0.05); }
+  epEnv(g, t, vol / (type === 'sine' ? 1.4 : 2), atk, dur, rel); fl.connect(g); g.connect(out);
 }
 function epBrass(x, out, f, t, dur, vol) {
   const g = x.createGain(), fl = x.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(500, t); fl.frequency.linearRampToValueAtTime(3400, t + 0.09); fl.frequency.exponentialRampToValueAtTime(1700, t + Math.max(0.3, dur));
+  let vib = null; if (dur > 0.9) { const l = x.createOscillator(); vib = x.createGain(); l.frequency.value = 5.3; vib.gain.setValueAtTime(0, t); vib.gain.linearRampToValueAtTime(9, t + 0.7); l.connect(vib); l.start(t); l.stop(t + dur + 0.3); }   // un único vibrato para las 3 voces
   for (const [ty, d, v] of [['sawtooth', -7, 1], ['sawtooth', 7, 1], ['square', 0, 0.45]]) {
     const o = x.createOscillator(), og = x.createGain(); o.type = ty; o.frequency.value = f; o.detune.value = d; og.gain.value = v; o.connect(og); og.connect(fl); o.start(t); o.stop(t + dur + 0.3);
-    if (dur > 0.9) { const l = x.createOscillator(), lg = x.createGain(); l.frequency.value = 5.3; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(9, t + 0.7); l.connect(lg); lg.connect(o.detune); l.start(t); l.stop(t + dur + 0.3); }
+    if (vib) vib.connect(o.detune);
   }
   epEnv(g, t, vol / 2.4, 0.05, dur, 0.18); fl.connect(g); g.connect(out);
 }
-function epChoir(x, out, f, t, dur, vol) {   // «aaah»: diente de sierra pasado por formantes de vocal
-  const g = x.createGain(); for (const [fq, q, v] of [[800, 4, 1], [1150, 5, 0.7], [2800, 6, 0.25]]) { const b = x.createBiquadFilter(), bg = x.createGain(); b.type = 'bandpass'; b.frequency.value = fq; b.Q.value = q; bg.gain.value = v; b.connect(bg); bg.connect(g);
-    for (const d of [-6, 6]) { const o = x.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = d; o.connect(b); o.start(t); o.stop(t + dur + 1); } }
+function epChoir(x, out, f, t, dur, vol) {   // «aaah»: 2 dientes de sierra compartidos por tres filtros de vocal en paralelo (mismo sonido con 3× menos osciladores)
+  const g = x.createGain(), src = x.createGain();
+  for (const [fq, q, v] of [[800, 4, 1], [1150, 5, 0.7], [2800, 6, 0.25]]) { const b = x.createBiquadFilter(), bg = x.createGain(); b.type = 'bandpass'; b.frequency.value = fq; b.Q.value = q; bg.gain.value = v; src.connect(b); b.connect(bg); bg.connect(g); }
+  for (const d of [-6, 6]) { const o = x.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = d; o.connect(src); o.start(t); o.stop(t + dur + 1); }
   epEnv(g, t, vol, 0.55, dur, 0.7); g.connect(out);
 }
 function epBell(x, out, f, t, vol) {
@@ -9884,18 +9915,21 @@ function epRiser(x, out, buf, t, dur, vol) {   // ruido que sube + diente de sie
   og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(vol * 0.35, t + dur); og.gain.linearRampToValueAtTime(0, t + dur + 0.08); o.connect(lp); lp.connect(og); og.connect(out); o.start(t); o.stop(t + dur + 0.1);
 }
 /* programa el compás b (que empieza en el instante T del reloj de audio) */
-function epBar(x, out, nz, T, b) {
+function* epBarGen(x, out, nz, T, b) {   // programa el compás por capas: cada «yield» deja respirar al hilo principal (el dibujo de la animación no se atasca)
   const nm = EP_PROG[Math.min(b, EP_PROG.length - 1)], [r, th, fi] = EP_CH[nm], I = EP_INT[Math.min(b, EP_INT.length - 1)] * (b > 11 ? Math.max(0.55, 1 - (b - 11) * 0.06) : 1);
   const tn = k => [r + 12 * k, r + 12 * k + th, r + 12 * k + fi], q = EP_BEAT, e8 = q / 2, e16 = q / 4, S = EP_BAR;
   // colchón de cuerdas
   if (b === 0) { epPad(x, out, epHz(r), T, S + 0.4, 0.16, 250, 700, 1.4, 0.6, 'sawtooth'); epPad(x, out, epHz(r + 7), T + 0.5, S - 0.1, 0.09, 250, 600, 1.2, 0.6, 'sawtooth'); }
   else { for (const n of tn(1)) epPad(x, out, epHz(n), T, S + 0.5, 0.075 * I, 500, 900 + 1800 * I, b < 2 ? 1 : 0.5, 0.7); if (I > 0.6) for (const n of tn(2)) epPad(x, out, epHz(n), T, S + 0.5, 0.06 * I, 700, 1400 + 2600 * I, 0.5, 0.7); }
+  yield;
   // bajo: nota larga + pulso de corcheas
   epPad(x, out, epHz(r), T, S + 0.2, 0.24 * Math.min(1, I + 0.2), 220, 260, 0.04, 0.5, 'sine');
   if (b >= 1 && b <= 9) for (let s = 0; s < 8; s++) epPad(x, out, epHz(r + (s % 2 ? 12 : 0)), T + s * e8, e8 * 0.9, 0.17 * I * (s % 2 ? 0.55 : 1), 420, 560, 0.004, 0.04);
+  yield;
   // ostinato de cuerdas (corcheas → semicorcheas)
   if (b >= 1 && b <= 9) { const fast = b >= 4, sq = [0, 1, 2, 1], n2 = tn(2), n3 = tn(3), st = fast ? e16 : e8, cnt = fast ? 16 : 8;
     for (let s = 0; s < cnt; s++) { const m = (s % 8 < 4 ? n2 : n3)[sq[s % 4]]; epPad(x, out, epHz(m), T + s * st, st * 1.3, 0.1 * I, 2600, 2800, 0.004, 0.06); } }
+  yield;
   // percusión
   const grv = [1, 0, 0.5, 0, 0.85, 0.35, 0.5, 0.6];
   if (b === 0) { epRiser(x, out, nz, T + 0.4, 1.8, 0.16); [[5, 0.22], [6, 0.32], [7, 0.5]].forEach(([s, v]) => epTimp(x, out, T + s * e8 * 0.78 + 0.1, v)); }
@@ -9906,33 +9940,46 @@ function epBar(x, out, nz, T, b) {
   else if (b === 9) { epNoise(x, out, nz, T, 1.8, 0.22, 'highpass', 5500, 0.5); for (let s = 0; s < 8; s++) if (grv[s]) epTimp(x, out, T + s * e8, 0.85 * grv[s]); }
   else if (b === 10) { epBoom(x, out, T, 0.8); epTimp(x, out, T, 1); epNoise(x, out, nz, T, 2.6, 0.35, 'highpass', 5500, 0.5); }
   else if (b === 11) epTimp(x, out, T, 0.28);
+  yield;
   // trompas: melodía (y octava grave en el clímax)
   const mel = b <= 10 ? EP_MEL[b] : null;
-  if (mel) for (const [bt, m, ln] of mel) { const d = ln * q * 0.97; epBrass(x, out, epHz(m), T + bt * q, d, b >= 8 ? 0.16 : 0.13); if (b >= 8) { epBrass(x, out, epHz(m - 12), T + bt * q, d, 0.1); epBrass(x, out, epHz(m + 12), T + bt * q, d, 0.045); } }
+  if (mel) for (const [bt, m, ln] of mel) { const d = ln * q * 0.97; epBrass(x, out, epHz(m), T + bt * q, d, b >= 8 ? 0.16 : 0.13); if (b >= 8) { epBrass(x, out, epHz(m - 12), T + bt * q, d, 0.1); } }
   if (b === 8) for (const n of tn(2)) epBrass(x, out, epHz(n), T, S * 0.95, 0.1);   // acorde de fanfarria
+  yield;
   // coro
   if (b >= 2) { const cv = b >= 8 ? 0.13 : 0.06 * I; for (const n of tn(2)) epChoir(x, out, epHz(n), T, S + 0.3, cv); if (b >= 8) for (const n of tn(3)) epChoir(x, out, epHz(n), T, S + 0.3, cv * 0.7); }
+  yield;
   // campanillas / destellos
   if (b === 2) tn(4).concat([tn(4)[0] + 12]).forEach((m, i) => epBell(x, out, epHz(m), T + 0.3 + i * 0.13, 0.05));
   if (b >= 8) { const n4 = tn(4).concat(tn(4).map(m => m + 12)), step = b >= 11 ? q : e8, cnt = b >= 11 ? 4 : 8, v = b >= 11 ? 0.03 : 0.045 * (b === 8 ? 1.2 : 1); for (let s = 0; s < cnt; s++) epBell(x, out, epHz(n4[(s * 2 + (b % 2)) % n4.length]), T + s * step, v); }
 }
+function epBar(x, out, nz, T, b) { for (const _ of epBarGen(x, out, nz, T, b)); }   // compás completo de una vez (pruebas)
 /* cadena de salida: voces → (seco + reverb de sala) → compresor → destino */
 function epChain(x, dest, vol) {
   const inp = x.createGain(), bus = x.createGain(), dry = x.createGain(), wet = x.createGain(), rev = epReverb(x), c = x.createDynamicsCompressor();
   dry.gain.value = 0.82; wet.gain.value = 0.5; inp.connect(dry); dry.connect(bus); inp.connect(rev); rev.connect(wet); wet.connect(bus); bus.gain.value = vol; bus.connect(c); c.connect(dest);
   return { inp, bus };
 }
-const EP = { on: false, ch: null, nz: null, t0: 0, next: 0, timer: 0 };
+const EP = { on: false, ch: null, nz: null, t0: 0, next: 0, timer: 0, gen: null }, EP_AHEAD = 2.8;
 function epicStart() {
   epicStop(0.05); const x = Snd.ctx;
   if (!x || save.sound === false || save.lobbyMusic === false || !volOf('volMusic')) return;
   EP.nz = EP.nz && EP.nzCtx === x ? EP.nz : (EP.nzCtx = x, epNoiseBuf(x));
-  EP.ch = epChain(x, Snd.realDest || x.destination, 0.5 * volOf('volMusic')); EP.t0 = x.currentTime + 0.15; EP.next = 0; EP.on = true;
-  const pump = () => { if (!EP.on) return; if (mode !== 'skycine') { epicStop(0.6); return; } while (EP.t0 + EP.next * EP_BAR < x.currentTime + 1.4) { try { epBar(x, EP.ch.inp, EP.nz, EP.t0 + EP.next * EP_BAR, EP.next); } catch (e) { EP.err = e; } EP.next++; } };
-  pump(); EP.timer = setInterval(pump, 200);
+  EP.ch = epChain(x, Snd.realDest || x.destination, 0.5 * volOf('volMusic')); EP.t0 = x.currentTime + 0.15; EP.next = 0; EP.gen = null; EP.on = true;
+  const pump = () => {
+    if (!EP.on) return; if (mode !== 'skycine') { epicStop(0.6); return; }
+    const t0 = performance.now();   // presupuesto de ~4 ms por llamada: nunca se programa un compás entero de golpe
+    for (;;) {
+      if (!EP.gen) { if (EP.t0 + EP.next * EP_BAR >= x.currentTime + EP_AHEAD) break; EP.gen = epBarGen(x, EP.ch.inp, EP.nz, EP.t0 + EP.next * EP_BAR, EP.next); EP.next++; }
+      let r; try { r = EP.gen.next(); } catch (e) { EP.err = e; r = { done: true }; }
+      if (r.done) EP.gen = null;
+      if (performance.now() - t0 > 4) break;
+    }
+  };
+  pump(); EP.timer = setInterval(pump, 40);
 }
 function epicStop(fade) {
-  if (!EP.on) return; EP.on = false; clearInterval(EP.timer); const x = Snd.ctx, ch = EP.ch; EP.ch = null; if (!x || !ch) return;
+  if (!EP.on) return; EP.on = false; EP.gen = null; clearInterval(EP.timer); const x = Snd.ctx, ch = EP.ch; EP.ch = null; if (!x || !ch) return;
   ch.bus.gain.cancelScheduledValues(x.currentTime); ch.bus.gain.setValueAtTime(ch.bus.gain.value, x.currentTime); ch.bus.gain.linearRampToValueAtTime(0, x.currentTime + (fade || 1.4));
   setTimeout(() => { try { ch.bus.disconnect(); } catch (e) { } }, ((fade || 1.4) + 0.3) * 1000);
 }
