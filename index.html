@@ -1648,7 +1648,7 @@ html.sky-cinematic-active body>:not(#skyCine){visibility:hidden!important}
 <div id="devpanel" role="dialog" aria-modal="true" aria-label="Panel de administrador">
   <div class="dv-box" tabindex="-1">
     <div class="dv-head">
-      <div><h2>CRUSH CARS — PANEL DE ADMINISTRADOR</h2><div class="dv-warn">⚠ MODO DE PRUEBAS TEMPORAL · Ctrl+Shift+1+Q</div></div>
+      <div><h2>CRUSH CARS — PANEL DE ADMINISTRADOR</h2><div class="dv-warn">⚠ MODO DE PRUEBAS TEMPORAL · Ctrl+Shift+1+Q · o 5 toques seguidos en las monedas</div></div>
       <button class="btn sm" type="button" data-dv="close">CERRAR ✕</button>
     </div>
     <div class="dv-state" id="dvState"></div>
@@ -8314,47 +8314,81 @@ function skyCheck() {   // se llama al ganar una corona (final en 1.º puesto) y
 const skyMix = (a, b, k) => { k = clamp(k, 0, 1); return `rgb(${Math.round(a[0] + (b[0] - a[0]) * k)},${Math.round(a[1] + (b[1] - a[1]) * k)},${Math.round(a[2] + (b[2] - a[2]) * k)})`; };
 const skyMixA = (a, b, k) => { k = clamp(k, 0, 1); return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k]; };
 const skySm = (a, b, t) => { const k = clamp((t - a) / (b - a), 0, 1); return k * k * (3 - 2 * k); };
+function skyGlow(rgb) {   // sprite de resplandor suave (se cachea por color)
+  const C = SKY.glow || (SKY.glow = {}); if (C[rgb]) return C[rgb];
+  const s = document.createElement('canvas'); s.width = s.height = 64; const g = s.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, `rgba(${rgb},1)`); gr.addColorStop(.22, `rgba(${rgb},.6)`); gr.addColorStop(.55, `rgba(${rgb},.16)`); gr.addColorStop(1, `rgba(${rgb},0)`);
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return C[rgb] = s;
+}
+function skyMakeCloud(seed) {   // nube con volumen: cúmulo con base plana, cima iluminada por el sol y vientre sombreado
+  const r = rng(seed), W = 320, H = 190, s = document.createElement('canvas'); s.width = W; s.height = H; const g = s.getContext('2d');
+  for (let pass = 0; pass < 2; pass++) for (let i = 0; i < 30; i++) {
+    const u0 = r(), mound = Math.sin(Math.PI * (.08 + .84 * u0)), rad = (16 + r() * 26) * (pass ? .6 : 1) + mound * 24 * (pass ? .5 : 1);
+    const x = W * (.23 + .54 * u0), y = H * .7 - mound * H * (.12 + .22 * r()) * (pass ? 1.15 : .8) - r() * 6;
+    const gr = g.createRadialGradient(x - rad * .2, y - rad * .28, rad * .08, x, y, rad);
+    gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.5, 'rgba(248,251,255,.72)'); gr.addColorStop(1, 'rgba(244,249,255,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, TAU); g.fill();
+  }
+  g.globalCompositeOperation = 'source-atop';
+  let sh = g.createLinearGradient(0, H * .3, 0, H * .78); sh.addColorStop(0, 'rgba(120,150,200,0)'); sh.addColorStop(1, 'rgba(96,122,176,.62)'); g.fillStyle = sh; g.fillRect(0, 0, W, H);   // vientre en sombra
+  const hl = g.createRadialGradient(W * .38, H * .16, 6, W * .38, H * .16, W * .5); hl.addColorStop(0, 'rgba(255,247,222,.55)'); hl.addColorStop(1, 'rgba(255,247,222,0)'); g.fillStyle = hl; g.fillRect(0, 0, W, H);   // cima cálida
+  g.globalCompositeOperation = 'destination-out'; const base = g.createLinearGradient(0, H * .66, 0, H * .86); base.addColorStop(0, 'rgba(0,0,0,0)'); base.addColorStop(1, 'rgba(0,0,0,1)'); g.fillStyle = base; g.fillRect(0, 0, W, H);   // base plana y difusa
+  return s;
+}
+function skyTile(n, fn) { const s = document.createElement('canvas'); s.width = s.height = n; fn(s.getContext('2d'), n); return s; }
 function skyBuild() {
   const r = rng(77);
-  SKY.stars = Array.from({ length: 90 }, () => ({ x: r(), y: r() * .55, s: .5 + r() * 1.6, p: r() * 6 }));
-  SKY.clouds = Array.from({ length: 34 }, () => ({ x: r() * 1.4 - .2, y: r() * 2, z: .25 + r() * 1.2, s: 160 + r() * 260, a: .35 + r() * .5 }));
-  const s = SKY.puff = document.createElement('canvas'); s.width = s.height = 128; const g = s.getContext('2d');
-  for (let i = 0; i < 7; i++) {
-    const x = 64 + (r() - .5) * 52, y = 64 + (r() - .5) * 22, rad = 26 + r() * 20, gr = g.createRadialGradient(x, y, 2, x, y, rad);
-    gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.55, 'rgba(235,245,255,.45)'); gr.addColorStop(1, 'rgba(235,245,255,0)');
-    g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
-  }
+  SKY.stars = [];
+  SKY.clouds = Array.from({ length: 34 }, () => ({ x: r() * 1.4 - .2, y: r() * 2, z: .25 + r() * 1.2, s: 160 + r() * 260, a: .4 + r() * .5, v: Math.floor(r() * 4) }));
+  SKY.cloudImg = [11, 23, 37, 51].map(skyMakeCloud);
+  SKY.puff = SKY.cloudImg[0];
+  const rr = rng(909);
+  SKY.grassT = skyTile(256, (g, n) => { for (let i = 0; i < 2600; i++) { const x = rr() * n, y = rr() * n, l = 3 + rr() * 6, a = -Math.PI / 2 + (rr() - .5) * .9; g.strokeStyle = rr() < .5 ? `rgba(14,70,8,${.18 + rr() * .22})` : `rgba(200,255,130,${.14 + rr() * .2})`; g.lineWidth = .8 + rr() * .7; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke(); }
+    for (let i = 0; i < 40; i++) { const x = rr() * n, y = rr() * n, q = 18 + rr() * 34, gr = g.createRadialGradient(x, y, 0, x, y, q); gr.addColorStop(0, rr() < .5 ? 'rgba(10,60,5,.10)' : 'rgba(210,255,140,.07)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(x - q, y - q, q * 2, q * 2); } });
+  SKY.asphT = skyTile(256, (g, n) => { for (let i = 0; i < 5200; i++) { g.fillStyle = rr() < .5 ? `rgba(0,0,0,${.1 + rr() * .2})` : `rgba(255,255,255,${.05 + rr() * .14})`; const z = rr() < .12 ? 2 : 1; g.fillRect(rr() * n, rr() * n, z, z); }
+    for (let i = 0; i < 24; i++) { g.strokeStyle = 'rgba(0,0,0,.14)'; g.lineWidth = .8; g.beginPath(); let x = rr() * n, y = rr() * n; g.moveTo(x, y); for (let j = 0; j < 5; j++) { x += (rr() - .5) * 18; y += (rr() - .5) * 18; g.lineTo(x, y); } g.stroke(); } });
+  SKY.grainT = skyTile(160, (g, n) => { const im = g.createImageData(n, n), d = im.data; for (let i = 0; i < d.length; i += 4) { const v = 96 + Math.random() * 64; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255; } g.putImageData(im, 0, 0); });
+  SKY.smoke = skyTile(96, (g, n) => { for (let i = 0; i < 6; i++) { const x = n / 2 + (rr() - .5) * 26, y = n / 2 + (rr() - .5) * 26, q = 22 + rr() * 14, gr = g.createRadialGradient(x, y, 0, x, y, q); gr.addColorStop(0, 'rgba(236,236,232,.5)'); gr.addColorStop(.6, 'rgba(210,212,214,.22)'); gr.addColorStop(1, 'rgba(200,204,208,0)'); g.fillStyle = gr; g.fillRect(0, 0, n, n); } });
+  SKY.dust = [];
 }
 
-/* ---------- escena inicial: pista de carreras en perspectiva (cielo azul, césped, asfalto con curva, bordillos, gradas y torres de focos) ---------- */
+/* ---------- escena inicial: pista de carreras en perspectiva (césped y asfalto con textura, bordillos, gradas y torres de focos) ---------- */
 function skyMakeStadium() {   // franja del horizonte (colinas + gradas + torres de focos): se dibuja una vez y se recoloca con el horizonte
   const w = SKY.w, h = SKY.h, k = SKY.k, u = Math.min(w, h) / 800, hs = Math.round(h * .36);
   const cv = document.createElement('canvas'); cv.width = Math.round(w * k); cv.height = Math.round(hs * k);
   const g = cv.getContext('2d'); g.scale(k, k); const r = rng(321);
-  g.fillStyle = 'rgba(132,178,222,.6)'; g.beginPath(); g.moveTo(0, hs);   // colinas lejanas
-  for (let x = 0; x <= w; x += 16) g.lineTo(x, hs - (34 + 20 * Math.sin(x * .0042 + 1) + 12 * Math.sin(x * .012 + 2)) * u); g.lineTo(w, hs); g.fill();
-  g.fillStyle = 'rgba(96,160,120,.65)'; g.beginPath(); g.moveTo(0, hs);
-  for (let x = 0; x <= w; x += 16) g.lineTo(x, hs - (12 + 9 * Math.sin(x * .007 + 4) + 6 * Math.sin(x * .02)) * u); g.lineTo(w, hs); g.fill();
-  const crowd = ['#ff5a4a', '#ffd23f', '#4ac8ff', '#ffffff', '#7be05a', '#ff9a2e', '#c07bff'];
+  g.fillStyle = 'rgba(150,188,226,.55)'; g.beginPath(); g.moveTo(0, hs);   // colinas lejanas (aire de por medio)
+  for (let x = 0; x <= w; x += 16) g.lineTo(x, hs - (40 + 24 * Math.sin(x * .0042 + 1) + 12 * Math.sin(x * .012 + 2) + 5 * Math.sin(x * .031)) * u); g.lineTo(w, hs); g.fill();
+  g.fillStyle = 'rgba(112,162,150,.6)'; g.beginPath(); g.moveTo(0, hs);
+  for (let x = 0; x <= w; x += 16) g.lineTo(x, hs - (20 + 12 * Math.sin(x * .0065 + 3) + 7 * Math.sin(x * .017)) * u); g.lineTo(w, hs); g.fill();
+  g.fillStyle = 'rgba(70,128,86,.75)'; g.beginPath(); g.moveTo(0, hs);   // línea de árboles
+  for (let x = 0; x <= w; x += 7 * u) g.lineTo(x, hs - (7 + 5 * r() + 3 * Math.sin(x * .02)) * u); g.lineTo(w, hs); g.fill();
+  const crowd = ['#d9564a', '#e8c24a', '#58b4dc', '#e8e8e8', '#76c25a', '#e08e3a', '#a678d6'];
   const stand = (x0, x1, hh) => {
     const bw = x1 - x0, tiers = 3, th = hh / (tiers + 1);
-    g.fillStyle = '#3d4258'; g.fillRect(x0, hs - hh, bw, hh);                         // muro de fondo
+    let gr = g.createLinearGradient(0, hs - hh, 0, hs); gr.addColorStop(0, '#454b62'); gr.addColorStop(1, '#2c3044'); g.fillStyle = gr; g.fillRect(x0, hs - hh, bw, hh);
     for (let i = 0; i < tiers; i++) {
-      const y = hs - hh + th * (i + 1.05); g.fillStyle = i % 2 ? '#6f768f' : '#7d849e'; g.fillRect(x0, y, bw, th * .96);
-      for (let x = x0 + 3 * u; x < x1 - 3 * u; x += 5 * u) { g.fillStyle = crowd[Math.floor(r() * crowd.length)]; g.fillRect(x, y + th * (.12 + r() * .25), 3.4 * u, 4.4 * u); }   // público
+      const y = hs - hh + th * (i + 1.05); g.fillStyle = i % 2 ? '#6a718a' : '#79809a'; g.fillRect(x0, y, bw, th * .96);
+      g.fillStyle = 'rgba(0,0,0,.22)'; g.fillRect(x0, y + th * .78, bw, th * .18);                                                        // sombra de cada grada
+      for (let x = x0 + 3 * u; x < x1 - 3 * u; x += 4.2 * u) { g.fillStyle = crowd[Math.floor(r() * crowd.length)]; g.globalAlpha = .75 + r() * .25; g.fillRect(x, y + th * (.1 + r() * .28), 2.8 * u, 4 * u); g.fillStyle = 'rgba(240,210,180,.85)'; g.fillRect(x + .6 * u, y + th * (.1 + r() * .28) - 1.6 * u, 1.6 * u, 1.6 * u); }
+      g.globalAlpha = 1;
     }
-    g.fillStyle = '#272b3d'; g.fillRect(x0 - 5 * u, hs - hh - 7 * u, bw + 10 * u, 9 * u);                 // techo
-    g.fillStyle = '#1a2142'; g.fillRect(x0 + bw * .12, hs - hh * .42, bw * .76, th * .66);               // cartel
+    g.fillStyle = '#23273a'; g.fillRect(x0 - 5 * u, hs - hh - 7 * u, bw + 10 * u, 9 * u);
+    g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(x0 - 5 * u, hs - hh - 7 * u, bw + 10 * u, 1.6 * u);                                    // brillo del borde del techo
+    g.fillStyle = '#1a2142'; g.fillRect(x0 + bw * .12, hs - hh * .42, bw * .76, th * .66);
     g.fillStyle = '#ff9a2e'; g.font = `900 italic ${Math.max(9, th * .5)}px sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('CRUSH CARS', x0 + bw / 2, hs - hh * .42 + th * .33);
   };
   const tower = (x, hh) => {
-    g.fillStyle = '#9aa0b8'; g.fillRect(x - 2.5 * u, hs - hh, 5 * u, hh);
-    const pw = 46 * u, ph = 27 * u, py = hs - hh - ph * .6; g.fillStyle = '#2b3048'; g.fillRect(x - pw / 2, py, pw, ph);
+    g.fillStyle = '#8c92aa'; g.fillRect(x - 2.5 * u, hs - hh, 5 * u, hh); g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(x - 2.5 * u, hs - hh, 1.5 * u, hh);
+    const pw = 46 * u, ph = 27 * u, py = hs - hh - ph * .6; g.fillStyle = '#272c42'; g.fillRect(x - pw / 2, py, pw, ph);
     for (let a = 0; a < 3; a++) for (let b = 0; b < 2; b++) { const lx = x - pw / 2 + pw * (.2 + a * .3), ly = py + ph * (.3 + b * .4);
-      const gr = g.createRadialGradient(lx, ly, 1, lx, ly, 8 * u); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(lx - 9 * u, ly - 9 * u, 18 * u, 18 * u); }
+      const gr = g.createRadialGradient(lx, ly, 1, lx, ly, 11 * u); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.35, 'rgba(255,250,225,.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(lx - 12 * u, ly - 12 * u, 24 * u, 24 * u); }
   };
   stand(w * .01, w * .33, 74 * u); stand(w * .66, w * .99, 74 * u); stand(w * .36, w * .52, 38 * u);
   tower(w * .075, 126 * u); tower(w * .93, 126 * u); tower(w * .57, 92 * u);
+  const fade = g.createLinearGradient(0, 0, 0, hs); fade.addColorStop(0, 'rgba(196,222,246,.38)'); fade.addColorStop(.7, 'rgba(196,222,246,.1)'); fade.addColorStop(1, 'rgba(196,222,246,0)');   // perspectiva aérea
+  g.globalCompositeOperation = 'source-atop'; g.fillStyle = fade; g.fillRect(0, 0, w, hs);
+  if ('filter' in g) { const c2 = document.createElement('canvas'); c2.width = cv.width; c2.height = cv.height; const g2 = c2.getContext('2d'); g2.filter = `blur(${(.9 * k).toFixed(2)}px)`; g2.drawImage(cv, 0, 0); return c2; }   // desenfoque de profundidad de campo
   return cv;
 }
 function skyTrackScene(g, w, h, hor, u, dist, pc, alpha, t) {
@@ -8362,42 +8396,67 @@ function skyTrackScene(g, w, h, hor, u, dist, pc, alpha, t) {
   g.save(); g.globalAlpha = alpha;
   if (!SKY.std || SKY.stdW !== w || SKY.stdH !== h) { SKY.std = skyMakeStadium(); SKY.stdW = w; SKY.stdH = h; }
   g.drawImage(SKY.std, 0, hor - SKY.std.height / SKY.k, w, SKY.std.height / SKY.k);
-  // césped base + bandas de corte
-  const gr = g.createLinearGradient(0, hor, 0, h); gr.addColorStop(0, '#6fcb3c'); gr.addColorStop(1, '#4aa72b'); g.fillStyle = gr; g.fillRect(0, hor, w, H);
-  const bend = -.62 + .3 * Math.sin(dist / 2600), rw = u * 340;
+  // césped base
+  const gr = g.createLinearGradient(0, hor, 0, h); gr.addColorStop(0, '#78c24a'); gr.addColorStop(.25, '#5aa832'); gr.addColorStop(1, '#3a8421'); g.fillStyle = gr; g.fillRect(0, hor, w, H);
+  const bend = -.62 + .3 * Math.sin(dist / 2600), rw = u * 340, roadAt = p => ({ half: rw * p, xc: w / 2 + bend * w * 1.5 * Math.pow(Math.max(0, pc - p), 1.7) });
+  // textura del césped: la misma baldosa a escala de perspectiva, desplazándose con el suelo
+  const grass = SKY.gP && SKY.gPg === g ? SKY.gP : (SKY.gPg = g, SKY.gP = g.createPattern(SKY.grassT, 'repeat')), asph = SKY.aP && SKY.aPg === g ? SKY.aP : (SKY.aPg = g, SKY.aP = g.createPattern(SKY.asphT, 'repeat'));
+  const BH = 5, bandTex = (y0, y1, pat, poly) => {
+    const p = clamp((y0 + y1) / 2 - hor, 1, H) / H, s = clamp(.2 + p * 1.9, .2, 2.2), off = (dist * .6 * s) % (256 * s);
+    g.save(); if (poly) { g.beginPath(); g.moveTo(poly[0], y0); g.lineTo(poly[1], y0); g.lineTo(poly[3], y1); g.lineTo(poly[2], y1); g.closePath(); } else { g.beginPath(); g.rect(0, y0, w, y1 - y0); }
+    g.clip(); g.translate(0, y0 - off); g.scale(s, s); g.fillStyle = pat; g.fillRect(0, 0, w / s, (y1 - y0 + off) / s + 2); g.restore();
+  };
+  const tex = !SKY.lite; if (tex) { g.globalAlpha = alpha * .65; for (let y = hor + 2; y < h; y += BH) bandTex(y, Math.min(h, y + BH), grass, null); g.globalAlpha = alpha; }
   for (let y = hor; y < h; y += 2) {
     const p = (y - hor) / H; if (p < .006) continue;
-    const z = 1 / p, band = Math.floor(z * 5 - dist / 140) & 1, half = rw * p, xc = w / 2 + bend * w * 1.5 * Math.pow(Math.max(0, pc - p), 1.7);
-    if (band) { g.fillStyle = 'rgba(30,110,20,.16)'; g.fillRect(0, y, w, 2.2); }                         // bandas de césped segado
+    const z = 1 / p, band = Math.floor(z * 5 - dist / 140) & 1, { half, xc } = roadAt(p);
+    g.fillStyle = band ? 'rgba(16,86,12,.2)' : 'rgba(214,255,150,.07)'; g.fillRect(0, y, w, 2.2);                    // bandas de césped segado (luz y sombra)
     const cb = half * .085, bar = half * .05, x0 = xc - half, x1 = xc + half;
-    g.fillStyle = band ? '#2f6fe0' : '#f4f4f4'; g.fillRect(x0 - cb - bar * 1.6, y, bar, 2.2);              // valla azul y blanca
-    g.fillStyle = band ? '#e8362a' : '#f6f6f6'; g.fillRect(x1 + cb * .2, y, cb * 1.1, 2.2);               // bordillo rojo y blanco (derecha)
-    g.fillStyle = band ? '#111' : '#f2f2f2'; g.fillRect(x0 - cb, y, cb * .8, 2.2);                        // línea de cuadros (izquierda)
-    g.fillStyle = '#ff9a2e'; g.fillRect(x0 - cb * .18, y, cb * .18, 2.2);
-    g.fillStyle = band ? '#434853' : '#4a505c'; g.fillRect(x0, y, x1 - x0, 2.2);                           // asfalto
-    if (band) { g.fillStyle = 'rgba(255,255,255,.75)'; g.fillRect(xc - half * .012, y, half * .024, 2.2); }   // línea central discontinua
+    g.fillStyle = band ? '#2a63c6' : '#e4e6ea'; g.fillRect(x0 - cb - bar * 1.6, y, bar, 2.2);                    // valla azul y blanca
+    g.fillStyle = band ? '#cf3328' : '#e6e6e6'; g.fillRect(x1 + cb * .2, y, cb * 1.1, 2.2);                      // bordillo rojo y blanco
+    g.fillStyle = band ? '#15161a' : '#e0e0e0'; g.fillRect(x0 - cb, y, cb * .8, 2.2);                            // bordillo de cuadros
+    g.fillStyle = '#e48a28'; g.fillRect(x0 - cb * .18, y, cb * .18, 2.2);
+    g.fillStyle = 'rgba(0,0,0,.26)'; g.fillRect(x1 + cb * 1.3, y, cb * .9, 2.2); g.fillRect(x0 - cb * 1.9 - bar, y, cb * .5, 2.2);   // sombra de bordillos sobre el césped
+    g.fillStyle = band ? '#3c4049' : '#42464f'; g.fillRect(x0, y, x1 - x0, 2.2);                                   // asfalto
+    g.fillStyle = 'rgba(0,0,0,.13)'; g.fillRect(xc - half * .56, y, half * .3, 2.2); g.fillRect(xc + half * .26, y, half * .3, 2.2);   // roderas con goma
+    g.fillStyle = 'rgba(236,236,236,.8)'; g.fillRect(x0 + half * .03, y, half * .018, 2.2); g.fillRect(x1 - half * .05, y, half * .018, 2.2);   // líneas laterales
+    if (band) { g.fillStyle = 'rgba(255,255,255,.72)'; g.fillRect(xc - half * .012, y, half * .024, 2.2); }
+    const sh = .3 * (1 - p) * (1 - p) * (1 - p); g.fillStyle = `rgba(190,218,250,${sh.toFixed(3)})`; g.fillRect(x0, y, x1 - x0, 2.2);   // reflejo del cielo sobre el asfalto
   }
-  const hz = g.createLinearGradient(0, hor - 6, 0, hor + H * .16); hz.addColorStop(0, 'rgba(205,232,255,.85)'); hz.addColorStop(1, 'rgba(205,232,255,0)'); g.fillStyle = hz; g.fillRect(0, hor - 6, w, H * .16 + 6);   // bruma del horizonte
+  g.globalAlpha = alpha * .75;
+  if (tex) for (let y = hor + 2; y < h; y += BH) { const y1 = Math.min(h, y + BH), a = roadAt((y - hor) / H), b = roadAt((y1 - hor) / H); bandTex(y, y1, asph, [a.xc - a.half, a.xc + a.half, b.xc - b.half, b.xc + b.half]); }
+  g.globalAlpha = alpha;
+  const hz = g.createLinearGradient(0, hor - 8, 0, hor + H * .22); hz.addColorStop(0, 'rgba(214,234,255,.6)'); hz.addColorStop(.45, 'rgba(206,230,255,.26)'); hz.addColorStop(1, 'rgba(205,232,255,0)'); g.fillStyle = hz; g.fillRect(0, hor - 8, w, H * .22 + 8);   // bruma del horizonte
   g.restore();
 }
-/* alas: se despliegan (open 0→1) y baten (flap). Se dibujan en el espacio local del coche: +x = morro, ±y = costados */
+/* alas: se despliegan (open 0→1) y baten (flap). Se dibujan en el espacio local del coche: +x = morro, ±y = costados.
+   Tres capas de plumas (primarias, secundarias, coberteras) con barbas, sombreado en la raíz y borde translúcido */
 function skyWings(g, car, open, flap) {
   if (open < .01) return;
-  const L = car.len, Wd = car.wid, n = 8;
-  g.save(); g.lineJoin = 'round';
+  const L = car.len, Wd = car.wid;
+  const layers = [{ n: 11, lf: 1, wf: .62, js: 1, c0: '#d9e6fa', c1: '#ffffff', c2: '#a9c9f2', ed: 'rgba(110,150,214,.7)' },
+                  { n: 10, lf: .64, wf: .74, js: 2, c0: '#cfdff6', c1: '#f6faff', c2: '#c4dcfa', ed: 'rgba(120,160,220,.6)' },
+                  { n: 9, lf: .36, wf: .8, js: 3, c0: '#e8f0fc', c1: '#ffffff', c2: '#fff0c6', ed: 'rgba(150,180,230,.5)' }];
+  g.save(); g.lineJoin = 'round'; g.lineCap = 'round';
   for (const sd of [-1, 1]) {
     g.save(); g.translate(-L * .03, sd * Wd * .36);
     const span = (Wd * .6 + L * 1.55) * open * (.9 + .1 * Math.cos(flap)), fl = Math.sin(flap);
-    g.globalCompositeOperation = 'lighter'; { const gl = g.createRadialGradient(0, sd * span * .45, 2, 0, sd * span * .45, span * .8); gl.addColorStop(0, `rgba(255,246,210,${(.16 * open).toFixed(3)})`); gl.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gl; g.beginPath(); g.ellipse(0, sd * span * .45, span * .8, span * .5, 0, 0, TAU); g.fill(); }
+    g.globalCompositeOperation = 'lighter';
+    { const gl = g.createRadialGradient(0, sd * span * .45, 2, 0, sd * span * .45, span * .85); gl.addColorStop(0, `rgba(255,246,214,${(.12 * open).toFixed(3)})`); gl.addColorStop(.6, `rgba(255,236,176,${(.06 * open).toFixed(3)})`); gl.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gl; g.beginPath(); g.ellipse(0, sd * span * .45, span * .85, span * .52, 0, 0, TAU); g.fill(); }
     g.globalCompositeOperation = 'source-over';
-    for (let i = n - 1; i >= 0; i--) {
-      const f = i / (n - 1), beta = (.42 - .32 * open) + f * .62 + fl * .3 * (1 - f * .35), len = span * (1 - .5 * f), wf = Wd * (.62 - .16 * f) * Math.max(open, .15);
-      const dx = -Math.sin(beta), dy = sd * Math.cos(beta), bx = -f * L * .26, by = 0, tx = bx + dx * len, ty = by + dy * len, px = -dy, py = dx;
-      const gr = g.createLinearGradient(bx, by, tx, ty); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.7, f < .45 ? '#e6f1ff' : '#cfe4ff'); gr.addColorStop(1, f < .5 ? '#ffe08a' : '#a9cdf5');
-      g.fillStyle = gr; g.strokeStyle = 'rgba(120,165,225,.75)'; g.lineWidth = .9;
-      g.beginPath(); g.moveTo(bx + px * wf * .5, by + py * wf * .5); g.quadraticCurveTo((bx + tx) / 2 + px * wf * .75, (by + ty) / 2 + py * wf * .75, tx, ty);
-      g.quadraticCurveTo((bx + tx) / 2 - px * wf * .6, (by + ty) / 2 - py * wf * .6, bx - px * wf * .5, by - py * wf * .5); g.closePath(); g.fill(); g.stroke();
-      g.strokeStyle = 'rgba(150,185,235,.55)'; g.beginPath(); g.moveTo(bx, by); g.lineTo(bx + dx * len * .86, by + dy * len * .86); g.stroke();   // raquis
+    for (const ly of layers) for (let i = ly.n - 1; i >= 0; i--) {
+      const f = i / (ly.n - 1), jit = Math.sin(i * 12.9898 * ly.js) * .035, beta = (.42 - .32 * open) + f * .62 + fl * .3 * (1 - f * .35) * (1 + .12 * ly.js * Math.sin(i + flap * .5)) + jit;
+      const len = span * (1 - .5 * f) * ly.lf, wf = Wd * (.62 - .16 * f) * Math.max(open, .15) * ly.wf;
+      const dx = -Math.sin(beta), dy = sd * Math.cos(beta), bx = -f * L * .26 * (ly.lf < 1 ? .8 : 1) + (ly.lf < 1 ? -L * .02 * ly.js : 0), by = 0, tx = bx + dx * len, ty = by + dy * len, px = -dy, py = dx;
+      const gr = g.createLinearGradient(bx, by, tx, ty); gr.addColorStop(0, ly.c0); gr.addColorStop(.35, ly.c1); gr.addColorStop(.8, ly.c1); gr.addColorStop(1, ly.c2);
+      g.fillStyle = gr; g.strokeStyle = ly.ed; g.lineWidth = .8;
+      g.beginPath(); g.moveTo(bx + px * wf * .45, by + py * wf * .45); g.bezierCurveTo(bx + dx * len * .35 + px * wf * .8, by + dy * len * .35 + py * wf * .8, bx + dx * len * .82 + px * wf * .55, by + dy * len * .82 + py * wf * .55, tx, ty);
+      g.bezierCurveTo(bx + dx * len * .8 - px * wf * .5, by + dy * len * .8 - py * wf * .5, bx + dx * len * .32 - px * wf * .72, by + dy * len * .32 - py * wf * .72, bx - px * wf * .45, by - py * wf * .45); g.closePath(); g.fill(); g.stroke();
+      // barbas + raquis
+      g.beginPath(); for (let m = 1; m <= 7; m++) { const q = m / 8, ox = bx + dx * len * q, oy = by + dy * len * q, ww = wf * .46 * Math.sin(Math.PI * Math.min(1, q * .9 + .1)) * (1 - q * .45), ex = dx * len * .13, ey = dy * len * .13;
+        g.moveTo(ox, oy); g.lineTo(ox + px * ww + ex, oy + py * ww + ey); g.moveTo(ox, oy); g.lineTo(ox - px * ww + ex, oy - py * ww + ey); }
+      g.strokeStyle = 'rgba(130,168,224,.38)'; g.lineWidth = .6; g.stroke();
+      g.beginPath(); g.moveTo(bx, by); g.lineTo(bx + dx * len * .94, by + dy * len * .94); g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = .9; g.stroke();
     }
     g.restore();
   }
@@ -8409,7 +8468,7 @@ function skyEmit(x, y, vx, vy, life, col, sz) {
 }
 function skyPlay(admin) {   // admin = true: reproducción desde el panel de administrador (no toca el progreso ni la marca «vista»)
   const ov = $('skyCine'); if (!ov) return;
-  SKY.admin = admin === true; SKY.run = true; SKY.done = false; SKY.t = 0; SKY.parts = []; SKY.ev = {}; SKY.shake = 0;
+  SKY.admin = admin === true; SKY.run = true; SKY.done = false; SKY.t = 0; SKY.lite = false; SKY.ema = 16; SKY.parts = []; SKY.dust = []; SKY.ev = {}; SKY.shake = 0;
   document.documentElement.classList.add('sky-cinematic-active');
   document.body.style.background = '#000';
   mode = 'skycine'; frozen = false; toggleCtl(false);
@@ -8418,27 +8477,27 @@ function skyPlay(admin) {   // admin = true: reproducción desde el panel de adm
   SKY.car = paintedCar(CAR_BY_ID[save.sel] || CAR_BY_ID.volt);
   SKY.cv = $('skyCv'); SKY.g = SKY.cv.getContext('2d'); skyResize();
   ov.className = 'on'; $('skyBtn').blur();
-  Snd.init(); Snd.silence();
+  Snd.init(); Snd.silence(); epicStart();
   SKY.last = performance.now(); cancelAnimationFrame(SKY.raf); SKY.raf = requestAnimationFrame(skyFrame);
 }
 function skyResize() {
   const k = Math.min(devicePixelRatio || 1, 2); SKY.w = innerWidth; SKY.h = innerHeight;
   SKY.cv.width = Math.round(SKY.w * k); SKY.cv.height = Math.round(SKY.h * k); SKY.k = k;
+  const mk = (d) => { const c = document.createElement('canvas'); c.width = Math.max(8, Math.ceil(SKY.w / d)); c.height = Math.max(8, Math.ceil(SKY.h / d)); return c; }; SKY.b1 = mk(5); SKY.b3 = mk(5); SKY.b2 = mk(22); SKY.gPg = SKY.aPg = SKY.grPg = SKY.wgG = null;
 }
 addEventListener('resize', () => { if (SKY.run && SKY.cv) skyResize(); });
 function skyAudio(t) {
   const ev = SKY.ev, once = (k, at, fn) => { if (t >= at && !ev[k]) { ev[k] = 1; fn(); } };
-  once('amb', .3, () => { Snd.sweep(70, 140, 3.2, .05, 'sine'); Snd.beep(196, 4, .03, 'sine'); });
+  once('amb', .3, () => { Snd.whoosh(2.2, .05, 80, 220); });
   once('ig', 2.2, () => { Snd.sweep(60, 180, .7, .09, 'sawtooth'); Snd.crash(.25); });
   once('rv1', 3.2, () => Snd.sweep(90, 340, .9, .07, 'sawtooth'));
-  once('wg', 4.7, () => { Snd.sweep(500, 1900, .9, .07, 'sine'); Snd.beep(1047, 1.4, .04, 'triangle'); Snd.beep(1568, 1.8, .025, 'sine'); });
+  once('wg', 4.7, () => { Snd.sweep(500, 1900, .9, .07, 'sine'); });
   once('rv2', 4.4, () => Snd.sweep(110, 520, 1.0, .08, 'sawtooth'));
-  once('to', 5.5, () => { Snd.whoosh(2.6, .35, 300, 3200); Snd.sweep(180, 900, 2.2, .1, 'sawtooth'); Snd.beep(392, 1.6, .05, 'triangle'); });
-  once('w2', 9, () => { Snd.whoosh(3, .4, 500, 4200); Snd.beep(523, 2, .04, 'triangle'); });
+  once('to', 5.5, () => { Snd.whoosh(2.6, .35, 300, 3200); Snd.sweep(180, 900, 2.2, .1, 'sawtooth'); });
+  once('w2', 9, () => { Snd.whoosh(3, .4, 500, 4200); });
   once('w3', 12.4, () => { Snd.whoosh(3.5, .45, 700, 5200); Snd.sweep(300, 1600, 3, .08, 'sawtooth'); });
-  once('fl', 17.6, () => { Snd.sweep(400, 2400, 1.6, .1, 'sine'); Snd.beep(1568, 2.2, .05, 'sine'); Snd.beep(2093, 2.6, .03, 'sine'); });
-  once('ch', 19.4, () => { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => { Snd.beep(f, 3, .07, 'sine'); Snd.beep(f / 2, 3, .035, 'triangle'); }, i * 220)); });
-  once('btn', 23.6, () => Snd.beep(1320, .5, .05, 'triangle'));
+  once('fl', 17.6, () => { Snd.sweep(400, 2400, 1.6, .1, 'sine'); });
+  once('btn', 23.6, () => epBell(Snd.ctx, EP.ch ? EP.ch.inp : Snd.ctx.destination, 1174.7, Snd.ctx.currentTime, .06));
   // motor: ralentí → rugido → crescendo; el viento lo aporta el propio Snd.engine
   if (t - (SKY.snd || 0) > .05 && t >= 2 && t < 19) {
     SKY.snd = t;
@@ -8450,29 +8509,41 @@ function skyAudio(t) {
 function skyFrame(now) {
   if (!SKY.run) return;
   SKY.raf = requestAnimationFrame(skyFrame);
-  const dt = Math.min(.05, (now - SKY.last) / 1000); SKY.last = now; if (document.hidden) return;
+  const raw = now - SKY.last, dt = Math.min(.05, raw / 1000); SKY.last = now; if (document.hidden) return;
   SKY.t += dt; const t = SKY.t;
+  if (raw < 250) SKY.ema = (SKY.ema || 16) * .92 + raw * .08;   // calidad adaptable: con pocos fps se apagan bloom, grano y texturas
+  if (!SKY.fixQ && t > 1.2 && SKY.ema > 42) SKY.lite = true;
   try { skyAudio(t); skyDraw(t, dt); } catch (e) { console.error(e); }
   if (t > 19.2 && !$('skyCine').classList.contains('msg')) $('skyCine').classList.add('msg');
   if (t > 21.6) $('skyCine').classList.add('sub');
   if (t > 23.6 && !SKY.done) { SKY.done = true; if (!SKY.admin) { save.sky.seen = true; persist(); }   // «vista» se guarda al TERMINAR la animación: si se cierra a medias, volverá a verse
      $('skyCine').classList.add('btn'); $('skyBtn').focus(); }
 }
+/* bloom: copia reducida y desenfocada de las zonas más brillantes, sumada encima (da la sensación de lente real) */
+function skyBloom(g, amt) {
+  const b1 = SKY.b1, b2 = SKY.b2, b3 = SKY.b3; if (!b1 || amt <= .01) return;
+  const x1 = b1.getContext('2d'), x2 = b2.getContext('2d'), x3 = b3.getContext('2d');
+  x1.imageSmoothingQuality = x2.imageSmoothingQuality = 'high';
+  x1.globalCompositeOperation = 'copy'; x1.drawImage(SKY.cv, 0, 0, b1.width, b1.height);
+  x3.globalCompositeOperation = 'copy'; x3.drawImage(b1, 0, 0);
+  x1.globalCompositeOperation = 'multiply'; x1.drawImage(b3, 0, 0); x3.globalCompositeOperation = 'copy'; x3.drawImage(b1, 0, 0); x1.drawImage(b3, 0, 0);   // umbral: sólo pasan los brillos
+  x2.globalCompositeOperation = 'copy'; x2.drawImage(b1, 0, 0, b2.width, b2.height);
+  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = amt; g.drawImage(b2, 0, 0, SKY.w, SKY.h); g.globalAlpha = amt * .7; g.drawImage(b1, 0, 0, SKY.w, SKY.h); g.restore();
+}
 function skyDraw(t, dt) {
   const g = SKY.g, w = SKY.w, h = SKY.h, k = SKY.k, car = SKY.car;
-  g.setTransform(k, 0, 0, k, 0, 0);
+  g.setTransform(k, 0, 0, k, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
   const u = Math.min(w, h) / 800;                         // unidad de escala
   const lift = skySm(5.2, 8.5, t), asc = skySm(5.5, 11, t), top = skySm(11.5, 17.6, t), flash = skySm(16.8, 18.6, t), fade = skySm(19, 21, t);
   const speed = skySm(5.0, 9.5, t) * 900 + skySm(9.5, 16, t) * 900;   // velocidad de desplazamiento del mundo (px/s)
-  // ---- cielo: crepúsculo → azul celestial → luz dorada ----
-  const dusk0 = [52, 128, 232], dusk1 = [192, 228, 255], sky0 = [58, 140, 236], sky1 = [186, 228, 255], gold0 = [255, 240, 196], gold1 = [255, 255, 255];
-  const c0 = skyMixA(skyMixA(dusk0, sky0, asc), gold0, top), c1 = skyMixA(skyMixA(dusk1, sky1, asc), gold1, top);
-  let gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, skyMix(c0, c0, 0)); gr.addColorStop(1, skyMix(c1, c1, 0));
+  const sunX = w * .56, sunY = h * (.17 - .09 * top);
+  // ---- cielo: azul profundo arriba → turquesa → horizonte pálido, y se vuelve dorado en la ascensión ----
+  const z0 = [30, 98, 214], m0 = [74, 154, 238], h0 = [200, 228, 252], z1 = [40, 112, 226], m1 = [96, 170, 244], h1 = [212, 234, 255], gold0 = [255, 236, 190], gold1 = [255, 252, 238];
+  const cz = skyMixA(skyMixA(z0, z1, asc), gold0, top), cm = skyMixA(skyMixA(m0, m1, asc), gold0, top * .9), ch = skyMixA(skyMixA(h0, h1, asc), gold1, top);
+  let gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, skyMix(cz, cz, 0)); gr.addColorStop(.5, skyMix(cm, cm, 0)); gr.addColorStop(1, skyMix(ch, ch, 0));
   g.fillStyle = gr; g.fillRect(0, 0, w, h);
-  // estrellas (sólo al principio)
-  const sa = 0;   // ya no hay estrellas: empieza a plena luz del día
-  if (sa > 0) for (const s of SKY.stars) { g.fillStyle = `rgba(255,255,255,${(sa * (.4 + .6 * Math.abs(Math.sin(t * 1.5 + s.p)))).toFixed(3)})`; g.fillRect(s.x * w, s.y * h, s.s, s.s); }
-  // ---- escenario del suelo (escenas 1-2): suelo en perspectiva, rejilla y plataforma ----
+  { const sa = .5 + .5 * skySm(0, 9, t); g.save(); g.globalCompositeOperation = 'lighter'; gr = g.createRadialGradient(sunX, sunY, 0, sunX, sunY, h * .75); gr.addColorStop(0, `rgba(255,246,222,${.34 * sa})`); gr.addColorStop(.12, `rgba(255,236,190,${.14 * sa})`); gr.addColorStop(1, 'rgba(255,230,170,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.restore(); }   // sol y halo atmosférico
+  // ---- escenario del suelo (escenas 1-2) ----
   const tilt = 0.58 + .42 * skySm(6, 11.5, t), ground = 1 - skySm(8.5, 12.5, t);
   const cam = skySm(0, 5.5, t);                           // empuje de cámara de la escena 1
   const drive = skySm(2.0, 4.8, t);                       // el coche arranca y recorre la pista antes de abrir las alas
@@ -8482,107 +8553,136 @@ function skyDraw(t, dt) {
   if (ground > 0.01) skyTrackScene(g, w, h, hor, u, SKY.road, pcar, ground, t);
   // ---- posición del coche ----
   const base = u * 2.5;
-  const gx = w * (.5 + .12 * (1 - cam) * 0), gy0 = h * (.66 - .06 * cam);
+  const gx = w * .5, gy0 = h * (.66 - .06 * cam);
   const cx = gx + Math.sin(t * 1.7) * 6 * u * asc, cy0 = gy0 - lift * h * .2 - asc * h * .1 - top * h * .12;
   const cy = cy0 + Math.sin(t * 3) * 3 * u * lift;
   const sc = base * (1 + .25 * lift - .62 * top) * (1 - .25 * flash);
-  const th = -Math.PI / 2;                                 // el coche mira hacia el horizonte desde el principio
-  const th2 = th * 1;                                      // 0 → nariz hacia arriba
-  // plataforma luminosa + sombra (se separa del suelo al despegar)
-  const pa = 0;                                           // (sin plataforma: ahora hay una pista)
-  if (pa > .01) {
-    g.save(); g.globalAlpha = pa; const rx = 170 * u * 1.6, ry = rx * .26 * tilt * 1.4;
-    gr = g.createRadialGradient(gx, gy0 + 20 * u, 4, gx, gy0 + 20 * u, rx); gr.addColorStop(0, 'rgba(70,110,200,.9)'); gr.addColorStop(1, 'rgba(8,12,30,.9)');
-    g.fillStyle = gr; g.beginPath(); g.ellipse(gx, gy0 + 20 * u, rx, ry, 0, 0, TAU); g.fill();
-    g.lineWidth = 3; g.strokeStyle = `rgba(255,200,90,${.6 + .3 * Math.sin(t * 4)})`; g.beginPath(); g.ellipse(gx, gy0 + 20 * u, rx, ry, 0, 0, TAU); g.stroke();
-    g.strokeStyle = 'rgba(80,200,255,.7)'; g.lineWidth = 2; g.setLineDash([16, 12]); g.lineDashOffset = -t * 50; g.beginPath(); g.ellipse(gx, gy0 + 20 * u, rx * .8, ry * .8, 0, 0, TAU); g.stroke(); g.setLineDash([]);
-    g.restore();
-  }
+  const th2 = -Math.PI / 2;                                // el coche mira hacia el horizonte
+  // sombra suave (penumbra + oclusión de contacto): se aleja, se agranda y se difumina al despegar
   const sh = clamp(1 - lift * .8, 0, 1) * (1 - skySm(8.5, 10.5, t));
-  if (sh > .02) {   // sombra: se aleja y se encoge → las ruedas ya no tocan el suelo
-    g.save(); g.globalAlpha = .38 * sh; g.fillStyle = '#000'; const so = lift * 70 * u;
-    g.translate(cx + so * .4, gy0 + 26 * u + so * .5); g.scale(1 - lift * .4, tilt * .5 * (1 - lift * .4)); g.beginPath(); g.ellipse(0, 0, car.len * base * .55, car.wid * base * .5, 0, 0, TAU); g.fill(); g.restore();
+  if (sh > .02) {
+    const so = lift * 70 * u, rx = car.len * base * .62 * (1 + lift * .5), ry = car.wid * base * .78 * (1 + lift * .5) * tilt;
+    g.save(); g.translate(cx + so * .4 + 5 * u * (1 - lift), gy0 + 26 * u + so * .5); g.scale(1, ry / rx);
+    gr = g.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, `rgba(0,0,0,${(.62 * sh * (1 - lift * .5)).toFixed(3)})`); gr.addColorStop(.55, `rgba(0,0,0,${(.3 * sh * (1 - lift * .5)).toFixed(3)})`); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, rx, 0, TAU); g.fill(); g.restore();
   }
-  // ---- luz celestial: rayos giratorios ----
+  // ---- luz celestial: rayos crepusculares suaves (cada rayo = 3 capas de distinta anchura → bordes difusos) ----
   const rayA = skySm(6, 10, t) * (1 - fade * .3);
   if (rayA > .01) {
-    g.save(); g.globalCompositeOperation = 'lighter'; g.translate(w / 2, h * (.15 - .1 * top)); g.rotate(t * .12);
-    const R = Math.hypot(w, h);
-    for (let i = 0; i < 14; i++) { const a = i / 14 * TAU, wd = .09 + .04 * Math.sin(i * 3.1 + t); gr = g.createLinearGradient(0, 0, Math.cos(a) * R, Math.sin(a) * R); gr.addColorStop(0, `rgba(255,236,170,${.34 * rayA})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.lineTo(Math.cos(a - wd) * R, Math.sin(a - wd) * R); g.lineTo(Math.cos(a + wd) * R, Math.sin(a + wd) * R); g.closePath(); g.fill(); }
+    const R = Math.hypot(w, h); g.save(); g.globalCompositeOperation = 'lighter'; g.translate(sunX, sunY); g.rotate(t * .1);
+    gr = g.createLinearGradient(0, 0, R, 0); gr.addColorStop(0, `rgba(255,238,178,${.2 * rayA})`); gr.addColorStop(.5, `rgba(255,236,176,${.08 * rayA})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr;
+    for (let i = 0; i < 20; i++) { const a = i / 20 * TAU + Math.sin(i * 2.3) * .08, wd = (.04 + .035 * (.5 + .5 * Math.sin(i * 3.1 + t * .8))) * (.7 + .6 * ((i * 7) % 5) / 4);
+      for (const m of [1, .62, .3]) { g.save(); g.rotate(a); g.globalAlpha = .4; g.beginPath(); g.moveTo(0, 0); g.lineTo(R, -Math.tan(wd * m) * R); g.lineTo(R, Math.tan(wd * m) * R); g.closePath(); g.fill(); g.restore(); } }
     g.restore();
   }
-  // ---- nubes de fondo (z<1) ----
+  // ---- nubes (z<1: lejanas) ----
   const cl = Math.max(asc, .85), drawClouds = fg => {
-    if (cl <= 0) return;
-    g.save(); g.globalAlpha = 1;
+    g.save(); const stretch = 1 + clamp(speed / 1700, 0, 1) * .5;
     for (const c of SKY.clouds) {
       if ((c.z >= 1) !== fg) continue;
       if (ground > .04 && c.y * h + c.s * c.z * .3 > hor - 8 * u) continue;   // sobre la pista sólo hay nubes en el cielo
       c.y += speed * dt * c.z * .0011; if (c.y > 1.15) { c.y -= 2.3; c.x = Math.random() * 1.4 - .2; }
-      const a = c.a * cl * (c.z >= 1 ? .8 : 1) * (1 - fade * .6), sz = c.s * c.z * (1 + top * .5);
-      g.globalAlpha = clamp(a, 0, 1); g.drawImage(SKY.puff, c.x * w - sz / 2, c.y * h - sz * .3, sz, sz * .6);
+      const a = c.a * cl * (c.z >= 1 ? .85 : 1) * (1 - fade * .6), sz = c.s * c.z * (1 + top * .5), hh = sz * .594 * (c.z >= 1 ? stretch : 1 + (stretch - 1) * .4);
+      g.globalAlpha = clamp(a, 0, 1); g.drawImage(SKY.cloudImg[c.v], c.x * w - sz / 2, c.y * h - hh * .5, sz, hh);
     }
     g.restore();
   };
   drawClouds(false);
-  // ---- estela azul y dorada + viento ----
+  // ---- polvo de las ruedas al arrancar ----
+  if (t > 2.3 && t < 7.5) {
+    const rate = (1 - lift) * skySm(2.3, 3.2, t) * (t < 5 ? 1 : .6);
+    for (let i = 0; i < 2; i++) if (Math.random() < .55 * rate) SKY.dust.push({ x: cx + (Math.random() < .5 ? -1 : 1) * car.wid * sc * .42 + (Math.random() - .5) * 6 * u, y: gy0 + car.len * sc * .3, vx: (Math.random() - .5) * 40 * u, vy: (40 + Math.random() * 60) * u, l: 1.1 + Math.random() * .9, L: 2, s: (14 + Math.random() * 14) * u, r: Math.random() * 6 });
+  }
+  if (SKY.dust.length) {
+    g.save();
+    for (let i = SKY.dust.length - 1; i >= 0; i--) { const p = SKY.dust[i]; p.l -= dt; if (p.l <= 0) { SKY.dust.splice(i, 1); continue; }
+      const a = p.l / p.L; p.x += p.vx * dt; p.y += (p.vy + speed * .35) * dt; const rr = p.s * (2.4 - a * 1.2); g.globalAlpha = clamp(a * .62, 0, .5) * (1 - lift);
+      g.save(); g.translate(p.x, p.y); g.rotate(p.r + (1 - a) * .8); g.drawImage(SKY.smoke, -rr, -rr * .7, rr * 2, rr * 1.4); g.restore(); }
+    g.restore();
+  }
+  // ---- estela de propulsión: chorro continuo de plasma azul y dorado + chispas ----
+  const vis = 1 - skySm(17.2, 18.4, t);
+  if (t > 3 && vis > .01) {
+    const jl = (40 + 330 * skySm(5.2, 12, t) + 40 * skySm(2.5, 5, t)) * u * (1 - top * .35) * (.92 + .08 * Math.random()), jw = car.wid * sc * (.95 + .5 * lift), jy = cy + car.len * sc * .3;
+    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = vis * (.36 + .34 * skySm(3, 6, t)) * (1 - .35 * top);
+    g.drawImage(skyGlow('70,170,255'), cx - jw * 1.1, jy - jl * .12, jw * 2.2, jl * 1.35); g.globalAlpha *= .9; g.drawImage(skyGlow('255,206,110'), cx - jw * .55, jy - jl * .06, jw * 1.1, jl * .72); g.restore();
+  }
   if (t > 5.4 && t < 18.6) {
-    const n = Math.round(2 + 5 * skySm(5.4, 9, t)), ang = Math.PI / 2;
+    const n = Math.round(2 + 5 * skySm(5.4, 9, t));
     for (let i = 0; i < n; i++) {
       const gold = Math.random() < .5, off = (Math.random() - .5) * car.wid * sc * .8;
-      skyEmit(cx + off, cy + car.len * sc * .38, (Math.random() - .5) * 40 * u, (160 + Math.random() * 260) * u, .5 + Math.random() * .6, gold ? '255,200,70' : '60,190,255', (3 + Math.random() * 5) * u * (1 - top * .5));
+      skyEmit(cx + off, cy + car.len * sc * .38, (Math.random() - .5) * 40 * u, (160 + Math.random() * 260) * u, .5 + Math.random() * .6, gold ? '255,200,70' : '60,190,255', (2.4 + Math.random() * 4) * u * (1 - top * .5));
     }
     SKY.shake = (SKY.shake * .9) + (t < 12 ? 2.6 : 1.4) * u * Math.random() * .1 + 0;
   }
   g.save(); g.globalCompositeOperation = 'lighter';
   for (let i = SKY.parts.length - 1; i >= 0; i--) {
     const p = SKY.parts[i]; p.l -= dt; if (p.l <= 0) { SKY.parts.splice(i, 1); continue; }
-    p.x += p.vx * dt; p.y += (p.vy + speed * .3) * dt; const a = p.l / p.L; const r = p.s * (.6 + a);
-    g.globalAlpha = a * .9; g.fillStyle = `rgba(${p.c},${a})`; g.beginPath(); g.arc(p.x, p.y, r, 0, TAU); g.fill();
+    p.x += p.vx * dt; p.y += (p.vy + speed * .3) * dt; const a = p.l / p.L; const r = p.s * (.6 + a) * 1.9;
+    g.globalAlpha = a * .85; g.drawImage(skyGlow(p.c), p.x - r, p.y - r, r * 2, r * 2);
   }
   g.restore();
-  // líneas de viento
+  // líneas de velocidad: trazos finos que se desvanecen en los extremos
   if (speed > 50) {
-    g.save(); g.lineCap = 'round'; const wa = clamp(speed / 1500, 0, 1);
-    for (let i = 0; i < 26; i++) { const ph = ((t * (1.2 + (i % 5) * .35) + i * .37) % 1), x = ((i * 0.6180339) % 1) * w, y = ph * (h + 300) - 150, ln = 90 + (i % 7) * 40 * wa * 2; g.strokeStyle = `rgba(255,255,255,${.28 * wa * (i % 2 ? 1 : .6)})`; g.lineWidth = 1.4 + (i % 3); g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + ln); g.stroke(); }
+    const wa = clamp(speed / 1500, 0, 1); g.save();
+    if (!SKY.wg || SKY.wgG !== g) { SKY.wgG = g; SKY.wg = g.createLinearGradient(0, 0, 0, 1); SKY.wg.addColorStop(0, 'rgba(255,255,255,0)'); SKY.wg.addColorStop(.35, 'rgba(255,255,255,.9)'); SKY.wg.addColorStop(1, 'rgba(255,255,255,0)'); }
+    for (let i = 0; i < 26; i++) { const ph = ((t * (1.2 + (i % 5) * .35) + i * .37) % 1), x = ((i * 0.6180339) % 1) * w, y = ph * (h + 300) - 150, ln = 110 + (i % 7) * 46 * wa * 2;
+      g.save(); g.translate(x, y); g.scale(1 + (i % 3) * .7, ln); g.globalAlpha = .3 * wa * (i % 2 ? 1 : .6); g.fillStyle = SKY.wg; g.fillRect(-.5, 0, 1, 1); g.restore(); }
     g.restore();
   }
-  // ---- el coche (sprite del propio juego, con el color/pintura equipado) ----
-  const vis = 1 - skySm(17.2, 18.4, t);
+  // ---- el coche (sprite del propio juego) iluminado: sol arriba-izquierda, sombra abajo-derecha y reflejo que barre la carrocería ----
   if (vis > .01) {
+    const S = Math.ceil(car.len * sc * 1.5 + 28);
+    if (!SKY.cc) SKY.cc = document.createElement('canvas'); const cc = SKY.cc, cg = cc.getContext('2d'), P = Math.round(S * k);
+    if (cc.width !== P) { cc.width = cc.height = P; }
+    cg.setTransform(1, 0, 0, 1, 0, 0); cg.globalCompositeOperation = 'source-over'; cg.clearRect(0, 0, P, P);
+    cg.setTransform(k, 0, 0, k, 0, 0); cg.translate(S / 2, S / 2); cg.scale(1, tilt); cg.rotate(th2 + Math.sin(t * 2.2) * .03 * lift); cg.scale(sc, sc);
+    drawCarSprite(cg, car, t, {});
+    cg.setTransform(k, 0, 0, k, 0, 0); cg.globalCompositeOperation = 'source-atop';
+    let lg = cg.createLinearGradient(0, 0, S, S); lg.addColorStop(0, 'rgba(255,248,230,.34)'); lg.addColorStop(.5, 'rgba(255,248,230,0)'); lg.addColorStop(1, 'rgba(8,18,50,.34)'); cg.fillStyle = lg; cg.fillRect(0, 0, S, S);
+    const sw = (t * .45) % 3.2 - .6; if (t > 1.2) { lg = cg.createLinearGradient(S * (sw - .25), 0, S * (sw + .25), S * .5); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(.5, `rgba(255,255,255,${(.38 * (1 - top)).toFixed(3)})`); lg.addColorStop(1, 'rgba(255,255,255,0)'); cg.fillStyle = lg; cg.fillRect(0, 0, S, S); }
+    if (lift > .02) { lg = cg.createRadialGradient(S / 2, S * .3, 2, S / 2, S * .3, S * .6); lg.addColorStop(0, `rgba(255,226,150,${(.3 * lift).toFixed(3)})`); lg.addColorStop(1, 'rgba(255,226,150,0)'); cg.fillStyle = lg; cg.fillRect(0, 0, S, S); }   // luz dorada del cielo sobre el techo
     g.save(); g.translate(cx + (Math.random() - .5) * SKY.shake, cy + (Math.random() - .5) * SKY.shake);
-    // halo celestial
-    if (lift > .02) { g.globalCompositeOperation = 'lighter'; gr = g.createRadialGradient(0, 0, 4, 0, 0, car.len * sc); gr.addColorStop(0, `rgba(255,230,150,${.55 * lift * vis})`); gr.addColorStop(1, 'rgba(60,180,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, car.len * sc, 0, TAU); g.fill(); g.globalCompositeOperation = 'source-over'; }
-    g.globalAlpha = vis; g.scale(1, tilt); g.rotate(th2 + Math.sin(t * 2.2) * .03 * lift); g.scale(sc, sc);
-    // llamas de los escapes al acelerar
-    if (t > 3) { const fl = clamp((t - 3) / 2.5, 0, 1) * (.5 + .5 * Math.random()) * (1 + lift * 1.2); g.globalCompositeOperation = 'lighter'; for (const sgn of [-.28, .28]) { const fx = -car.len * .5; gr = g.createLinearGradient(fx, 0, fx - 46 * fl, 0); gr.addColorStop(0, 'rgba(255,230,140,.95)'); gr.addColorStop(.5, 'rgba(60,190,255,.7)'); gr.addColorStop(1, 'rgba(60,190,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(fx, car.wid * sgn - 5); g.lineTo(fx - 46 * fl, car.wid * sgn); g.lineTo(fx, car.wid * sgn + 5); g.fill(); } g.globalCompositeOperation = 'source-over'; }
+    if (lift > .02) { g.globalCompositeOperation = 'lighter'; gr = g.createRadialGradient(0, 0, 4, 0, 0, car.len * sc * 1.1); gr.addColorStop(0, `rgba(255,232,160,${.4 * lift * vis})`); gr.addColorStop(.5, `rgba(255,214,130,${.1 * lift * vis})`); gr.addColorStop(1, 'rgba(60,180,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, car.len * sc * 1.1, 0, TAU); g.fill(); g.globalCompositeOperation = 'source-over'; }
+    g.globalAlpha = vis; g.save(); g.scale(1, tilt); g.rotate(th2 + Math.sin(t * 2.2) * .03 * lift); g.scale(sc, sc);
+    if (t > 3) { const fl = clamp((t - 3) / 2.5, 0, 1) * (.5 + .5 * Math.random()) * (1 + lift * 1.2); g.globalCompositeOperation = 'lighter'; for (const sgn of [-.28, .28]) { const fx = -car.len * .5; gr = g.createLinearGradient(fx, 0, fx - 46 * fl, 0); gr.addColorStop(0, 'rgba(255,236,160,.95)'); gr.addColorStop(.4, 'rgba(255,170,70,.6)'); gr.addColorStop(.7, 'rgba(60,190,255,.45)'); gr.addColorStop(1, 'rgba(60,190,255,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(fx, car.wid * sgn - 5); g.lineTo(fx - 46 * fl, car.wid * sgn); g.lineTo(fx, car.wid * sgn + 5); g.fill(); } g.globalCompositeOperation = 'source-over'; }
     { const open = skySm(4.7, 6.5, t), flap = t * (6 + 5 * lift) + Math.sin(t * 2) * .3, amp = clamp(skySm(5.2, 7, t), 0, 1);
       skyWings(g, car, open, flap * (.35 + .65 * amp)); }
-    drawCarSprite(g, car, t, {});
+    g.restore();
+    const mb = clamp(speed / 1500, 0, 1); if (mb > .05) for (let j = 3; j >= 1; j--) { g.globalAlpha = vis * .1 * mb * (4 - j) / 3; g.drawImage(cc, -S / 2, -S / 2 + j * 9 * u * mb, S, S); }   // estela de movimiento
+    g.globalAlpha = vis; g.drawImage(cc, -S / 2, -S / 2, S, S);
     g.restore();
     if (t > 4.6 && t < 6.6) for (const sd of [-1, 1]) if (Math.random() < .8) skyEmit(cx + sd * car.wid * sc * .45, cy, sd * (30 + Math.random() * 90) * u, -(20 + Math.random() * 90) * u, .5 + Math.random() * .5, Math.random() < .6 ? '255,226,140' : '255,255,255', (2 + Math.random() * 4) * u);
   }
   drawClouds(true);
-  // ---- luz final ----
+  // ---- luz final: núcleo, destello anamórfico y reflejos de lente ----
   if (flash > .01) {
     g.save(); g.globalCompositeOperation = 'lighter'; const R = Math.hypot(w, h) * (.2 + .9 * flash);
-    gr = g.createRadialGradient(w / 2, h * .38, 4, w / 2, h * .38, R); gr.addColorStop(0, `rgba(255,255,255,${flash})`); gr.addColorStop(.35, `rgba(255,240,190,${.8 * flash})`); gr.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.restore();
+    gr = g.createRadialGradient(sunX, h * .38, 4, sunX, h * .38, R); gr.addColorStop(0, `rgba(255,255,255,${flash})`); gr.addColorStop(.35, `rgba(255,240,190,${.8 * flash})`); gr.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    const fa = Math.sin(Math.PI * clamp((t - 16.8) / 3.2, 0, 1)); gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, 'rgba(120,180,255,0)'); gr.addColorStop(.5, `rgba(200,230,255,${(.8 * fa).toFixed(3)})`); gr.addColorStop(1, 'rgba(120,180,255,0)');
+    g.fillStyle = gr; g.fillRect(0, h * .38 - 2 * u, w, 4 * u); g.fillRect(w * .2, h * .38 - .8 * u, w * .6, 1.6 * u);
+    const vx = w / 2 - sunX, vy = h / 2 - h * .38; [[.5, 26, '255,200,120'], [1.1, 40, '120,200,255'], [1.7, 18, '255,160,200'], [2.3, 56, '180,220,255']].forEach(([m, r0, c]) => { const gx2 = sunX + vx * m, gy2 = h * .38 + vy * m, r2 = r0 * u * (1 + flash); g.globalAlpha = .5 * fa; g.drawImage(skyGlow(c), gx2 - r2, gy2 - r2, r2 * 2, r2 * 2); g.globalAlpha = .22 * fa; g.strokeStyle = `rgba(${c},1)`; g.lineWidth = 1.6 * u; g.beginPath(); g.arc(gx2, gy2, r2 * .85, 0, TAU); g.stroke(); });
+    g.restore();
   }
+  // ---- postproceso de lente: bloom, viñeta y grano de película ----
+  if (!SKY.lite) skyBloom(g, .14 + .08 * skySm(8, 14, t) * (1 - flash) + .2 * flash);
+  { const vg = g.createRadialGradient(w / 2, h * .5, Math.min(w, h) * .45, w / 2, h * .5, Math.hypot(w, h) * .62); vg.addColorStop(0, 'rgba(8,18,46,0)'); vg.addColorStop(1, `rgba(8,18,46,${(.5 * (1 - flash * .8)).toFixed(3)})`); g.fillStyle = vg; g.fillRect(0, 0, w, h); }
   // tras la luz queda un cielo dorado profundo para el mensaje
   if (fade > 0) {
     gr = g.createRadialGradient(w / 2, h * .45, 10, w / 2, h * .45, Math.hypot(w, h) * .65);
     gr.addColorStop(0, `rgba(255,248,225,${.55 * (1 - fade) + .12})`); gr.addColorStop(.5, `rgba(40,70,150,${.55 * fade})`); gr.addColorStop(1, `rgba(6,12,40,${.92 * fade})`);
     g.fillStyle = gr; g.fillRect(0, 0, w, h);
   }
-  // barras cinematográficas + viñeta
-  const bar = h * .08 * (1 - skySm(19, 21, t) * .0) * skySm(0, 1.2, t);
+  if (SKY.grainT && !SKY.lite) { g.save(); g.globalCompositeOperation = 'overlay'; g.globalAlpha = .13; const gp = SKY.grP && SKY.grPg === g ? SKY.grP : (SKY.grPg = g, SKY.grP = g.createPattern(SKY.grainT, 'repeat')); g.translate(Math.floor(Math.random() * 160), Math.floor(Math.random() * 160)); g.fillStyle = gp; g.fillRect(-160, -160, w + 320, h + 320); g.restore(); }
+  // barras cinematográficas
+  const bar = h * .08 * skySm(0, 1.2, t);
   g.fillStyle = '#000'; g.fillRect(0, 0, w, bar); g.fillRect(0, h - bar, w, bar);
   const fi = 1 - skySm(0, 1.6, t); if (fi > 0) { g.fillStyle = `rgba(0,0,0,${fi})`; g.fillRect(0, 0, w, h); }
   g.globalAlpha = 1;
 }
 function skyEnd() {
   if (!SKY.run || !SKY.done) return;
-  SKY.run = false; cancelAnimationFrame(SKY.raf); Snd.silence();
+  SKY.run = false; cancelAnimationFrame(SKY.raf); Snd.silence(); epicStop(1.4);
   const ov = $('skyCine'); ov.className = ''; SKY.parts = [];
   document.documentElement.classList.remove('sky-cinematic-active');
   document.body.style.background = '';
@@ -9725,6 +9825,118 @@ addEventListener('keydown', e => {
   setInterval(() => { if (Snd.sfxG && Snd.ctx) Snd.sfxG.gain.setTargetAtTime(save.sound === false ? 0 : volOf('volSfx'), Snd.ctx.currentTime, 0.05); }, 100);
 }
 
+
+/* =====================================================================
+   «ASCENSIÓN» · canción épica de la animación secreta (WebAudio, sin archivos ni descargas)
+   Re menor → re mayor · 109 BPM (compás = 2,2 s) · escrita para encajar con la cinemática:
+     0,0 s  zumbido grave y redoble lejano          2,2 s  ENCENDIDO: timbal + trueno + entra el pulso de cuerdas
+     4,4 s  ALAS: coro, trompas y destellos         8,8 s  la melodía sube · 13,2 s  cuerdas a toda velocidad
+    15,4 s  subida de tensión (redoble + riser)    17,6 s  DESTELLO: impacto, fanfarria y coro a pleno pulmón
+    22,0 s  re mayor final: se sostiene con coro y campanillas hasta que pulses CONTINUAR (luego se desvanece)
+   Todo se programa por adelantado en el reloj de audio, así que va clavado a la animación. Respeta «SONIDO» (música) y el interruptor de música.
+   ===================================================================== */
+const EP_BAR = 2.2, EP_BEAT = 0.55;
+const EP_PROG = ['Dm', 'Dm', 'Bb', 'F', 'C', 'Dm', 'Bb', 'A', 'D', 'G', 'D'];
+const EP_CH = { Dm: [38, 3, 7], Bb: [34, 4, 7], F: [41, 4, 7], C: [36, 4, 7], A: [33, 4, 7], D: [38, 4, 7], G: [43, 4, 7] };   // [bajo MIDI, 3.ª, 5.ª]
+const EP_INT = [0.3, 0.42, 0.55, 0.65, 0.75, 0.85, 0.95, 1, 1.3, 1.15, 1, 0.7];
+/* melodía de trompa: por compás, [pulso, nota MIDI, duración en pulsos] */
+const EP_MEL = [null, [[1, 62, 1], [2, 69, 2]], [[0, 74, 2], [2, 77, 1], [3, 74, 1]], [[0, 72, 2], [2, 69, 1], [3, 72, 1]], [[0, 76, 2], [2, 79, 1], [3, 76, 1]], [[0, 74, 3], [3, 69, 1]],
+  [[0, 74, 2], [2, 77, 1], [3, 79, 1]], [[0, 81, 2], [2, 79, 0.5], [2.5, 77, 0.5], [3, 76, 1]], [[0, 86, 3], [3, 81, 1]], [[0, 83, 2], [2, 81, 1], [3, 79, 1]], [[0, 86, 4.4]]];
+const epHz = m => 440 * Math.pow(2, (m - 69) / 12);
+function epNoiseBuf(x) { const n = Math.floor(x.sampleRate * 3), b = x.createBuffer(1, n, x.sampleRate), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; return b; }
+function epReverb(x) { const n = Math.floor(x.sampleRate * 2.8), b = x.createBuffer(2, n, x.sampleRate); for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3.4); } const cv = x.createConvolver(); cv.buffer = b; return cv; }
+function epEnv(g, t, vol, atk, dur, rel) { g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + atk); g.gain.setValueAtTime(vol, t + Math.max(atk, dur)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur + rel); }
+function epPad(x, out, f, t, dur, vol, lp0, lp1, atk, rel, type) {   // cuerdas / colchón: 3 osciladores desafinados con filtro que se abre
+  const g = x.createGain(), fl = x.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(lp0, t); fl.frequency.linearRampToValueAtTime(lp1, t + dur);
+  for (const d of [-9, 0, 9]) { const o = x.createOscillator(); o.type = type || 'sawtooth'; o.frequency.value = f; o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + rel + 0.05); }
+  epEnv(g, t, vol / 3, atk, dur, rel); fl.connect(g); g.connect(out);
+}
+function epBrass(x, out, f, t, dur, vol) {
+  const g = x.createGain(), fl = x.createBiquadFilter(); fl.type = 'lowpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(500, t); fl.frequency.linearRampToValueAtTime(3400, t + 0.09); fl.frequency.exponentialRampToValueAtTime(1700, t + Math.max(0.3, dur));
+  for (const [ty, d, v] of [['sawtooth', -7, 1], ['sawtooth', 7, 1], ['square', 0, 0.45]]) {
+    const o = x.createOscillator(), og = x.createGain(); o.type = ty; o.frequency.value = f; o.detune.value = d; og.gain.value = v; o.connect(og); og.connect(fl); o.start(t); o.stop(t + dur + 0.3);
+    if (dur > 0.9) { const l = x.createOscillator(), lg = x.createGain(); l.frequency.value = 5.3; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(9, t + 0.7); l.connect(lg); lg.connect(o.detune); l.start(t); l.stop(t + dur + 0.3); }
+  }
+  epEnv(g, t, vol / 2.4, 0.05, dur, 0.18); fl.connect(g); g.connect(out);
+}
+function epChoir(x, out, f, t, dur, vol) {   // «aaah»: diente de sierra pasado por formantes de vocal
+  const g = x.createGain(); for (const [fq, q, v] of [[800, 4, 1], [1150, 5, 0.7], [2800, 6, 0.25]]) { const b = x.createBiquadFilter(), bg = x.createGain(); b.type = 'bandpass'; b.frequency.value = fq; b.Q.value = q; bg.gain.value = v; b.connect(bg); bg.connect(g);
+    for (const d of [-6, 6]) { const o = x.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = d; o.connect(b); o.start(t); o.stop(t + dur + 1); } }
+  epEnv(g, t, vol, 0.55, dur, 0.7); g.connect(out);
+}
+function epBell(x, out, f, t, vol) {
+  const g = x.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+  for (const [m, v, ty] of [[1, 1, 'triangle'], [2.01, 0.35, 'sine'], [3.98, 0.12, 'sine']]) { const o = x.createOscillator(), og = x.createGain(); o.type = ty; o.frequency.value = f * m; og.gain.value = v; o.connect(og); og.connect(g); o.start(t); o.stop(t + 1.9); }
+  g.connect(out);
+}
+function epTimp(x, out, t, vol, f) {
+  const o = x.createOscillator(), g = x.createGain(); f = f || 58; o.type = 'sine'; o.frequency.setValueAtTime(f * 2.4, t); o.frequency.exponentialRampToValueAtTime(f, t + 0.16); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.75); o.connect(g); g.connect(out); o.start(t); o.stop(t + 0.8);
+}
+function epBoom(x, out, t, vol) { const o = x.createOscillator(), g = x.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(85, t); o.frequency.exponentialRampToValueAtTime(30, t + 1.6); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 2.3); o.connect(g); g.connect(out); o.start(t); o.stop(t + 2.4); }
+function epNoise(x, out, buf, t, dur, vol, type, f, q) {
+  const s = x.createBufferSource(), fl = x.createBiquadFilter(), g = x.createGain(); s.buffer = buf; s.loop = true; fl.type = type; fl.frequency.value = f; fl.Q.value = q || 0.7;
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(fl); fl.connect(g); g.connect(out); s.start(t, Math.random()); s.stop(t + dur + 0.05);
+}
+function epRiser(x, out, buf, t, dur, vol) {   // ruido que sube + diente de sierra que sube
+  const s = x.createBufferSource(), fl = x.createBiquadFilter(), g = x.createGain(); s.buffer = buf; s.loop = true; fl.type = 'bandpass'; fl.Q.value = 1.2; fl.frequency.setValueAtTime(300, t); fl.frequency.exponentialRampToValueAtTime(9000, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur); g.gain.linearRampToValueAtTime(0, t + dur + 0.08); s.connect(fl); fl.connect(g); g.connect(out); s.start(t, Math.random()); s.stop(t + dur + 0.1);
+  const o = x.createOscillator(), og = x.createGain(), lp = x.createBiquadFilter(); o.type = 'sawtooth'; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(880, t + dur); lp.type = 'lowpass'; lp.frequency.value = 1800;
+  og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(vol * 0.35, t + dur); og.gain.linearRampToValueAtTime(0, t + dur + 0.08); o.connect(lp); lp.connect(og); og.connect(out); o.start(t); o.stop(t + dur + 0.1);
+}
+/* programa el compás b (que empieza en el instante T del reloj de audio) */
+function epBar(x, out, nz, T, b) {
+  const nm = EP_PROG[Math.min(b, EP_PROG.length - 1)], [r, th, fi] = EP_CH[nm], I = EP_INT[Math.min(b, EP_INT.length - 1)] * (b > 11 ? Math.max(0.55, 1 - (b - 11) * 0.06) : 1);
+  const tn = k => [r + 12 * k, r + 12 * k + th, r + 12 * k + fi], q = EP_BEAT, e8 = q / 2, e16 = q / 4, S = EP_BAR;
+  // colchón de cuerdas
+  if (b === 0) { epPad(x, out, epHz(r), T, S + 0.4, 0.16, 250, 700, 1.4, 0.6, 'sawtooth'); epPad(x, out, epHz(r + 7), T + 0.5, S - 0.1, 0.09, 250, 600, 1.2, 0.6, 'sawtooth'); }
+  else { for (const n of tn(1)) epPad(x, out, epHz(n), T, S + 0.5, 0.075 * I, 500, 900 + 1800 * I, b < 2 ? 1 : 0.5, 0.7); if (I > 0.6) for (const n of tn(2)) epPad(x, out, epHz(n), T, S + 0.5, 0.06 * I, 700, 1400 + 2600 * I, 0.5, 0.7); }
+  // bajo: nota larga + pulso de corcheas
+  epPad(x, out, epHz(r), T, S + 0.2, 0.24 * Math.min(1, I + 0.2), 220, 260, 0.04, 0.5, 'sine');
+  if (b >= 1 && b <= 9) for (let s = 0; s < 8; s++) epPad(x, out, epHz(r + (s % 2 ? 12 : 0)), T + s * e8, e8 * 0.9, 0.17 * I * (s % 2 ? 0.55 : 1), 420, 560, 0.004, 0.04);
+  // ostinato de cuerdas (corcheas → semicorcheas)
+  if (b >= 1 && b <= 9) { const fast = b >= 4, sq = [0, 1, 2, 1], n2 = tn(2), n3 = tn(3), st = fast ? e16 : e8, cnt = fast ? 16 : 8;
+    for (let s = 0; s < cnt; s++) { const m = (s % 8 < 4 ? n2 : n3)[sq[s % 4]]; epPad(x, out, epHz(m), T + s * st, st * 1.3, 0.1 * I, 2600, 2800, 0.004, 0.06); } }
+  // percusión
+  const grv = [1, 0, 0.5, 0, 0.85, 0.35, 0.5, 0.6];
+  if (b === 0) { epRiser(x, out, nz, T + 0.4, 1.8, 0.16); [[5, 0.22], [6, 0.32], [7, 0.5]].forEach(([s, v]) => epTimp(x, out, T + s * e8 * 0.78 + 0.1, v)); }
+  else if (b === 1) { epBoom(x, out, T, 0.6); epTimp(x, out, T, 1); epNoise(x, out, nz, T, 1.6, 0.2, 'highpass', 5500, 0.5); for (let s = 1; s < 8; s++) if (grv[s]) epTimp(x, out, T + s * e8, 0.55 * grv[s]); }
+  else if (b >= 2 && b <= 6) for (let s = 0; s < 8; s++) { if (grv[s]) epTimp(x, out, T + s * e8, (0.5 + 0.06 * (b - 2)) * grv[s]); if (s === 4) epNoise(x, out, nz, T + s * e8, 0.2, 0.15 * I, 'bandpass', 1800, 0.8); if (s === 7) epTimp(x, out, T + s * e8 + e16, 0.35, 85); }
+  else if (b === 7) { epRiser(x, out, nz, T, S, 0.34); for (let s = 0; s < 16; s++) { const v = 0.14 + 0.86 * s / 15; epTimp(x, out, T + s * e16, v * 0.8, 66 + s); if (s >= 8) epNoise(x, out, nz, T + s * e16, 0.12, 0.2 * v, 'bandpass', 2000, 0.8); } }
+  else if (b === 8) { epBoom(x, out, T, 1); epNoise(x, out, nz, T, 2.8, 0.5, 'highpass', 5200, 0.5); epNoise(x, out, nz, T, 1.8, 0.3, 'bandpass', 9000, 0.8); for (let s = 0; s < 8; s++) { epTimp(x, out, T + s * e8, 1.05 * (grv[s] || 0.3)); if (s === 2 || s === 6) epNoise(x, out, nz, T + s * e8, 0.2, 0.28, 'bandpass', 1800, 0.8); } }
+  else if (b === 9) { epNoise(x, out, nz, T, 1.8, 0.22, 'highpass', 5500, 0.5); for (let s = 0; s < 8; s++) if (grv[s]) epTimp(x, out, T + s * e8, 0.85 * grv[s]); }
+  else if (b === 10) { epBoom(x, out, T, 0.8); epTimp(x, out, T, 1); epNoise(x, out, nz, T, 2.6, 0.35, 'highpass', 5500, 0.5); }
+  else if (b === 11) epTimp(x, out, T, 0.28);
+  // trompas: melodía (y octava grave en el clímax)
+  const mel = b <= 10 ? EP_MEL[b] : null;
+  if (mel) for (const [bt, m, ln] of mel) { const d = ln * q * 0.97; epBrass(x, out, epHz(m), T + bt * q, d, b >= 8 ? 0.16 : 0.13); if (b >= 8) { epBrass(x, out, epHz(m - 12), T + bt * q, d, 0.1); epBrass(x, out, epHz(m + 12), T + bt * q, d, 0.045); } }
+  if (b === 8) for (const n of tn(2)) epBrass(x, out, epHz(n), T, S * 0.95, 0.1);   // acorde de fanfarria
+  // coro
+  if (b >= 2) { const cv = b >= 8 ? 0.13 : 0.06 * I; for (const n of tn(2)) epChoir(x, out, epHz(n), T, S + 0.3, cv); if (b >= 8) for (const n of tn(3)) epChoir(x, out, epHz(n), T, S + 0.3, cv * 0.7); }
+  // campanillas / destellos
+  if (b === 2) tn(4).concat([tn(4)[0] + 12]).forEach((m, i) => epBell(x, out, epHz(m), T + 0.3 + i * 0.13, 0.05));
+  if (b >= 8) { const n4 = tn(4).concat(tn(4).map(m => m + 12)), step = b >= 11 ? q : e8, cnt = b >= 11 ? 4 : 8, v = b >= 11 ? 0.03 : 0.045 * (b === 8 ? 1.2 : 1); for (let s = 0; s < cnt; s++) epBell(x, out, epHz(n4[(s * 2 + (b % 2)) % n4.length]), T + s * step, v); }
+}
+/* cadena de salida: voces → (seco + reverb de sala) → compresor → destino */
+function epChain(x, dest, vol) {
+  const inp = x.createGain(), bus = x.createGain(), dry = x.createGain(), wet = x.createGain(), rev = epReverb(x), c = x.createDynamicsCompressor();
+  dry.gain.value = 0.82; wet.gain.value = 0.5; inp.connect(dry); dry.connect(bus); inp.connect(rev); rev.connect(wet); wet.connect(bus); bus.gain.value = vol; bus.connect(c); c.connect(dest);
+  return { inp, bus };
+}
+const EP = { on: false, ch: null, nz: null, t0: 0, next: 0, timer: 0 };
+function epicStart() {
+  epicStop(0.05); const x = Snd.ctx;
+  if (!x || save.sound === false || save.lobbyMusic === false || !volOf('volMusic')) return;
+  EP.nz = EP.nz && EP.nzCtx === x ? EP.nz : (EP.nzCtx = x, epNoiseBuf(x));
+  EP.ch = epChain(x, Snd.realDest || x.destination, 0.5 * volOf('volMusic')); EP.t0 = x.currentTime + 0.15; EP.next = 0; EP.on = true;
+  const pump = () => { if (!EP.on) return; if (mode !== 'skycine') { epicStop(0.6); return; } while (EP.t0 + EP.next * EP_BAR < x.currentTime + 1.4) { try { epBar(x, EP.ch.inp, EP.nz, EP.t0 + EP.next * EP_BAR, EP.next); } catch (e) { EP.err = e; } EP.next++; } };
+  pump(); EP.timer = setInterval(pump, 200);
+}
+function epicStop(fade) {
+  if (!EP.on) return; EP.on = false; clearInterval(EP.timer); const x = Snd.ctx, ch = EP.ch; EP.ch = null; if (!x || !ch) return;
+  ch.bus.gain.cancelScheduledValues(x.currentTime); ch.bus.gain.setValueAtTime(ch.bus.gain.value, x.currentTime); ch.bus.gain.linearRampToValueAtTime(0, x.currentTime + (fade || 1.4));
+  setTimeout(() => { try { ch.bus.disconnect(); } catch (e) { } }, ((fade || 1.4) + 0.3) * 1000);
+}
+
 go(save.name ? 'menu' : 'welcome');
 requestAnimationFrame(frame);
 </script>
@@ -10264,7 +10476,7 @@ if (mode === 'menu') tutAfterGo('menu');   // la partida ya arrancó en el menú
 </script>
 <!-- ===== DEVTOOLS-BEGIN (JS) · TEMPORAL: eliminar este bloque de script completo antes de publicar ===== -->
 <script id="devtools">
-/* Panel de administrador: Ctrl+Shift+1+Q o botón ⚙ del menú principal. Sólo cambia datos al pulsar expresamente sus botones. */
+/* Panel de administrador: Ctrl+Shift+1+Q, 5 toques seguidos en las monedas de la barra superior o botón ⚙ del menú principal. Sólo cambia datos al pulsar expresamente sus botones. */
 (() => {
   'use strict';
   const root = document.getElementById('devpanel'), stEl = document.getElementById('dvState'), skEl = document.getElementById('dvSky'), msgEl = document.getElementById('dvMsg');
@@ -10384,6 +10596,15 @@ if (mode === 'menu') tutAfterGo('menu');   // la partida ya arrancó en el menú
   inC.addEventListener('keydown', e => { if (e.key === 'Enter') coins('add'); });
   inX.addEventListener('keydown', e => { if (e.key === 'Enter') ACT.xp(); });
   const opener = document.getElementById('dvOpen'); if (opener) opener.addEventListener('click', () => { Snd.init(); setOpen(true); opener.blur(); });
+  /* 5 toques seguidos en el contador de monedas de la barra superior (cada uno a menos de 1,5 s del anterior) abren el panel: equivale a Ctrl+Shift+1+Q en ordenador */
+  const pill = document.getElementById('tbCoins') && document.getElementById('tbCoins').parentNode;
+  if (pill) {
+    let taps = 0, lastTap = 0; pill.style.pointerEvents = 'auto';
+    pill.addEventListener('click', () => {
+      const t = performance.now(); taps = t - lastTap < 1500 ? taps + 1 : 1; lastTap = t;
+      if (taps >= 5) { taps = 0; Snd.init(); setOpen(true); }
+    });
+  }
 
   /* captura: se adelanta al manejador principal para no interferir con menús ni conducción */
   addEventListener('keydown', e => {
